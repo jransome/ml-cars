@@ -8,20 +8,17 @@ public class NeuralNetwork
     public NeuralNetwork(int nInputs, int nOutputs, int nHiddenLayers)
     {
         // initialise layers list
-        int totalLayers = nHiddenLayers + 2;
-        layers = new List<Layer>(totalLayers);
+        layers = new List<Layer>();
 
-        // input layer
-        layers.Add(new Layer(true, nInputs, 1));
-
-        for (int i = 1; i < nHiddenLayers + 1; i++)
+        // hidden layers
+        for (int i = 0; i < nHiddenLayers; i++)
         {
-            int neuronsInPreviousLayer = layers[i - 1].Neurons.Count;
-            layers.Add(new Layer(false, 5, neuronsInPreviousLayer));
+            int inputsPerNeuron = i == 0 ? nInputs : layers[i - 1].Neurons.Count;
+            layers.Add(new Layer(5, inputsPerNeuron));
         }
 
         // output layer
-        layers[totalLayers] = new Layer(false, nOutputs, layers[totalLayers - 1].Neurons.Count); 
+        layers.Add(new Layer(nOutputs, layers.Last().Neurons.Count)); 
     }
 
     public List<double> Calculate(List<double> inputs) => layers.Aggregate(inputs, (result, layer) => layer.FireNeurons(result));

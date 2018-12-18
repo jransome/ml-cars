@@ -3,13 +3,12 @@ using System.Linq;
 
 public class Neuron
 {
-    private bool isPassive;
     private double[] weights;
-    private double bias;
+    private double bias = 1;
 
-    public Neuron(bool isPassiveNeuron = false)
+    public Neuron(int nInputs)
     {
-        isPassive = isPassiveNeuron;
+        weights = Enumerable.Repeat((double)1, nInputs).ToArray();
     }
 
     public void SetWeights(double[] inputWeights, double biasValue)
@@ -20,7 +19,6 @@ public class Neuron
 
     public double CalculateOutput(List<double> inputValues)
     {
-        if (isPassive) return inputValues[0];
         if (inputValues.Count != weights.Length)
             throw new System.ArgumentException("Neuron received the wrong number of inputs!");
 
