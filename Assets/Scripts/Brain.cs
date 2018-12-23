@@ -7,10 +7,8 @@ public class Brain : MonoBehaviour
 
     public DNA Dna { get; set; }
 
-    private void OnEnable()
+    public void Think()
     {
-        nn = new NeuralNetwork(2, 1, 2);
-
         double input1 = 1, input2 = 1;
         List<double> inputs = new List<double>() { input1, input2 };
 
@@ -20,5 +18,13 @@ public class Brain : MonoBehaviour
         {
             Debug.Log(o);
         }
+    }
+
+    private void Start()
+    {
+        Dna = new DNA(2, 1, 2, 5);
+        nn = new NeuralNetwork(Dna);
+
+        Think();
     }
 }

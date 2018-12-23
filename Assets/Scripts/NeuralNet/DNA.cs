@@ -4,11 +4,19 @@ using UnityEngine;
 
 public class DNA
 {
+    public readonly int NumInputs;
+    public readonly int NumOutputs;
     public readonly int NumHiddenLayers;
-    public List<LayerGene> LayerGenes { get; set; }
+    public readonly int MaxNeuronsPerLayer;
+
+    public List<LayerGene> LayerGenes { get; private set; } = new List<LayerGene>();
 
     public DNA(int nInputs, int nOutputs, int nHiddenLayers, int maxNeuronsPerLayer)
     {
+        NumInputs = nInputs;
+        NumOutputs = nOutputs;
+        MaxNeuronsPerLayer = maxNeuronsPerLayer;
+
         // hidden layers
         NumHiddenLayers = nHiddenLayers;
         for (int i = 0; i < NumHiddenLayers; i++)
@@ -30,13 +38,19 @@ public class DNA
         return this;
     }
 
-    // add mutate
+    public void Mutate(float proportion)
+    {
+        proportion = Mathf.Clamp01(proportion); // proportion of neurons to be mutated
+        foreach (LayerGene layerGene in LayerGenes)
+            layerGene.Mutate(proportion);
+    }
 }
 
 public class LayerGene
 {
-    public List<NeuronGene> NeuronGenes = new List<NeuronGene>();
-    public int MaxNeurons { get; set; }
+    public readonly int MaxNeurons;
+
+    public List<NeuronGene> NeuronGenes { get; private set; } = new List<NeuronGene>();
 
     public LayerGene(int nNeurons, int inputsPerNeuron, bool isOutputLayer = false)
     {
@@ -56,7 +70,11 @@ public class LayerGene
         return this;
     }
 
-    // add mutate
+    public void Mutate(float proportion)
+    {
+        foreach (NeuronGene neuronGene in NeuronGenes)
+            if (Random.Range(0f, 1f) < proportion) neuronGene.Mutate();
+    }
 }
 
 public class NeuronGene
@@ -82,9 +100,28 @@ public class NeuronGene
 
     public void Mutate()
     {
-        List<double> allWeights = new List<double>(weights);
-        allWeights.Add(bias);
-        allWeights[Random.Range(0, weights.Length + 1)] = Random.Range(-1f, 1f);
+        int mutationType = Random.Range(0, 3);
+
+        if (mutationType == 0)
+        {
+            // Mutate by selecting a random weight and scaling it by +/-25%
+            List<double> allWeights = new List<double>(weights);
+            allWeights.Add(bias);
+            int randomWeightIndex = Random.Range(0, weights.Length + 1);
+            allWeights[randomWeightIndex] = allWeights[randomWeightIndex] * 1.25f * Random.Range(0, 2) * 2 - 1;
+        }
+        else if (mutationType == 1)
+        {
+            // Mutate by selecting a random weight and replacing it with a new random number
+            List<double> allWeights = new List<double>(weights);
+            allWeights.Add(bias);
+            allWeights[Random.Range(0, weights.Length + 1)] = Random.Range(-1f, 1f);
+        }
+        else
+        {
+            // Mutate by randomising all weights
+            RandomiseWeights();
+        }
     }
 
     public void RandomiseWeights()

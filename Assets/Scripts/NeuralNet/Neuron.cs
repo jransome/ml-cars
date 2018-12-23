@@ -3,27 +3,20 @@ using System.Linq;
 
 public class Neuron
 {
-    private double[] weights;
-    private double bias = 1;
+    private NeuronGene gene;
 
-    public Neuron(int nInputs)
+    public Neuron(NeuronGene neuronGene)
     {
-        weights = Enumerable.Repeat((double)1, nInputs).ToArray();
-    }
-
-    public void SetWeights(double[] inputWeights, double biasValue)
-    {
-        weights = inputWeights;
-        bias = biasValue;
+        gene = neuronGene;
     }
 
     public double CalculateOutput(List<double> inputValues)
     {
-        if (inputValues.Count != weights.Length)
+        if (inputValues.Count != gene.weights.Length)
             throw new System.ArgumentException("Neuron received the wrong number of inputs!");
 
-        double dotProduct = inputValues.Zip(weights, (input, weight) => input * weight).Sum();
-        return ActivationFunction(dotProduct + bias);
+        double dotProduct = inputValues.Zip(gene.weights, (input, weight) => input * weight).Sum();
+        return ActivationFunction(dotProduct + gene.bias);
     }
 
     private double ActivationFunction(double dotProductBias) => dotProductBias > 0 ? 1 : 0;
