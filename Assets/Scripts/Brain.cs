@@ -5,6 +5,8 @@ public class Brain : MonoBehaviour
 {
     private NeuralNetwork nn;
 
+    public DNA Dna { get; set; }
+
     private void OnEnable()
     {
         nn = new NeuralNetwork(2, 1, 2);
