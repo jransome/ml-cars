@@ -5,7 +5,7 @@ public class Car : MonoBehaviour
     public bool IsHumanControlled = false;
     [SerializeField] private float torque = 800f;
     [SerializeField] private float maxLockDegrees = 35f;
-    [SerializeField] private WheelCollider[] frontWheels;
+    [SerializeField] private WheelCollider[] frontWheels = null;
 
     public void Throttle(float input)
     {
