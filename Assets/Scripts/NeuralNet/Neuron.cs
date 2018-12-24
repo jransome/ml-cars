@@ -19,5 +19,5 @@ public class Neuron
         return ActivationFunction(dotProduct + gene.bias);
     }
 
-    private double ActivationFunction(double dotProductBias) => dotProductBias > 0 ? 1 : 0;
+    private double ActivationFunction(double dotProductBias) => Activation.TanH(dotProductBias);
 }

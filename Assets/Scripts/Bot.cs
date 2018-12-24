@@ -23,9 +23,9 @@ public class Bot : MonoBehaviour
         rb = GetComponent<Rigidbody>();
     }
 
-    private void Update()
-    {
-        Throttle(Input.GetAxis("Vertical"));
-        Steer(Input.GetAxis("Horizontal"));
-    }
+    //private void Update()
+    //{
+    //    Throttle(Input.GetAxis("Vertical"));
+    //    Steer(Input.GetAxis("Horizontal"));
+    //}
 }
