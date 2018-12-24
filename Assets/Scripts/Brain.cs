@@ -4,6 +4,8 @@ using UnityEngine;
 public class Brain : MonoBehaviour
 {
     private NeuralNetwork nn;
+    private Sensors sensors;
+    private Car carController;
 
     public DNA Dna { get; set; }
 
