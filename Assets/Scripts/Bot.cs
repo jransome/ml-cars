@@ -18,7 +18,7 @@ public class Bot : MonoBehaviour
         rb.MoveRotation(transform.rotation * rotationDelta);
     }
 
-    private void Start()
+    private void Awake()
     {
         rb = GetComponent<Rigidbody>();
     }
