@@ -4,12 +4,13 @@ using UnityEngine;
 
 public class DNA
 {
+    public double WeightSum = 0;
     public readonly int NumInputs;
     public readonly int NumOutputs;
     public readonly int NumHiddenLayers;
     public readonly int MaxNeuronsPerLayer;
 
-    public List<LayerGene> LayerGenes { get; private set; } = new List<LayerGene>();
+    public List<LayerGene> LayerGenes { get; set; } = new List<LayerGene>();
 
     public DNA(int nInputs, int nOutputs, int nHiddenLayers, int maxNeuronsPerLayer)
     {
@@ -27,15 +28,23 @@ public class DNA
 
         // output layer
         LayerGenes.Add(new LayerGene(nOutputs, LayerGenes.Last().MaxNeurons, true));
+        CalculateWeightSum();
     }
 
-    public DNA Splice(DNA other)
+    public DNA Clone() 
+    {
+        DNA clone = (DNA)this.MemberwiseClone();
+        clone.LayerGenes = LayerGenes.Select(layerGene => layerGene.Clone()).ToList();
+        return clone;
+    }
+
+    public void Splice(DNA other)
     {
         if (NumHiddenLayers != other.NumHiddenLayers)
             throw new System.ArgumentException("Tried to splice two NNs with different numbers of hidden layers!");
 
         LayerGenes = LayerGenes.Zip(other.LayerGenes, (otherL, ownL) => ownL.Splice(otherL)).ToList();
-        return this;
+        CalculateWeightSum();
     }
 
     public void Mutate(float proportion)
@@ -43,6 +52,24 @@ public class DNA
         proportion = Mathf.Clamp01(proportion); // proportion of neurons to be mutated
         foreach (LayerGene layerGene in LayerGenes)
             layerGene.Mutate(proportion);
+        
+        CalculateWeightSum();
+    }
+
+    private void CalculateWeightSum()
+    {
+        WeightSum = 0;
+        foreach (var l in LayerGenes)
+        {
+            foreach (var n in l.NeuronGenes)
+            {
+                WeightSum += n.bias;
+                foreach (var w in n.weights)
+                {
+                    WeightSum += w;
+                }
+            }
+        }
     }
 }
 
@@ -50,7 +77,7 @@ public class LayerGene
 {
     public readonly int MaxNeurons;
 
-    public List<NeuronGene> NeuronGenes { get; private set; } = new List<NeuronGene>();
+    public List<NeuronGene> NeuronGenes { get; set; } = new List<NeuronGene>();
 
     public LayerGene(int nNeurons, int inputsPerNeuron, bool isOutputLayer = false)
     {
@@ -59,6 +86,13 @@ public class LayerGene
             NeuronGenes.Add(new NeuronGene(inputsPerNeuron, isOutputLayer));
 
         if (isOutputLayer == false) NeuronGenes[Random.Range(0, nNeurons)].RandomiseWeights(); // set 1 neuron as alive
+    }
+
+    public LayerGene Clone() 
+    {
+        LayerGene clone = (LayerGene)this.MemberwiseClone();
+        clone.NeuronGenes = NeuronGenes.Select(neuronGene => neuronGene.Clone()).ToList();
+        return clone;
     }
 
     public LayerGene Splice(LayerGene other)
@@ -91,6 +125,8 @@ public class NeuronGene
             SetWeights(0);
     }
 
+    public NeuronGene Clone() => (NeuronGene)this.MemberwiseClone();
+
     public NeuronGene Splice(NeuronGene other)
     {
         bias = RandomBool() ? other.bias : bias;
@@ -100,17 +136,16 @@ public class NeuronGene
 
     public void Mutate()
     {
-        int mutationType = Random.Range(0, 3);
-
-        if (mutationType == 0)
+        int mutationType = Random.Range(0, 5);
+        if (mutationType <= 2)
         {
-            // Mutate by selecting a random weight and scaling it by +/-25%
+            // Mutate by selecting a random weight and scaling it by +/-50%
             List<double> allWeights = new List<double>(weights);
             allWeights.Add(bias);
             int randomWeightIndex = Random.Range(0, weights.Length + 1);
-            allWeights[randomWeightIndex] = allWeights[randomWeightIndex] * 1.25f * Random.Range(0, 2) * 2 - 1;
+            allWeights[randomWeightIndex] = allWeights[randomWeightIndex] * 1.5f * Random.Range(0, 2) * 2 - 1;
         }
-        else if (mutationType == 1)
+        else if (mutationType <= 4)
         {
             // Mutate by selecting a random weight and replacing it with a new random number
             List<double> allWeights = new List<double>(weights);
@@ -138,5 +173,5 @@ public class NeuronGene
             weights[i] = value;
     }
 
-    private bool RandomBool() => Random.Range(0, 2) == 1 ? true : false; // Random.Range is max exclusive with ints
+    private static bool RandomBool() => Random.Range(0, 2) == 1 ? true : false; // Random.Range is max exclusive with ints
 }
