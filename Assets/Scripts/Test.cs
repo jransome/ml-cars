@@ -9,6 +9,8 @@ public class Test : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        print("Materials " + Resources.FindObjectsOfTypeAll(typeof(Material)).Length);
+
         Debug.Log(g.DirectionToNext);
         Debug.DrawRay(g.transform.position, g.DirectionToNext * 10, Color.blue, 5000);
         transform.forward = g.DirectionToNext;

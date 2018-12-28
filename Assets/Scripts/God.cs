@@ -4,9 +4,16 @@ using UnityEngine;
 
 public class God : MonoBehaviour
 {
+    [Header("Lineage Colours")]
+    public static Dictionary<DnaOrigin, Color> LineageColours;
+    public Color NewGenome;
+    public Color UnchangedFromLastGen;
+    public Color Bred;
+    public Color Mutated;
+
     [SerializeField] private GameObject populationPrefab = null;
     [SerializeField] private int generationSize = 10;
-    private List<Brain> generationPool;
+    [SerializeField] private List<Brain> generationPool;
 
     public int GenerationCount { get; set; }
     public int CurrentlyAlive { get; set; }
@@ -37,26 +44,26 @@ public class God : MonoBehaviour
             // do breeding/mutation for all but top 3
             for (int i = 0; i < generationSize; i++)
             {
-                Brain agent = generationPool[i];
+                Brain brain = generationPool[i];
                 if (i < 3)
-                    agent.Dna.Origin = DnaOrigin.UnchangedFromLastGen;
+                    brain.Dna.Origin = DnaOrigin.UnchangedFromLastGen;
                 else
                 {
                     float chance = Random.Range(0f, 1f);
                     if (chance < 0.1f)
                     {
                         // 10% chance to replace completely
-                        agent.ReplaceDna(new Dna(5, 2, 1, 5));
+                        brain.ReplaceDna(new Dna(5, 2, 1, 5));
                     }
                     else if (chance > 0.70f)
                     {
                         // 30% chance to mutate
-                        agent.Dna.Mutate(Random.Range(0f,1f));
+                        brain.Dna.Mutate(Random.Range(0f,1f));
                     }
                     else
                     {
                         // 60% chance to breed with a random top others
-                        agent.Dna.Splice(generationPool[Random.Range(0, generationSize / 2)].Dna);
+                        brain.Dna.Splice(generationPool[Random.Range(0, generationSize / 2)].Dna);
                     }
                 }
 
@@ -82,6 +89,14 @@ public class God : MonoBehaviour
 
     private void Start()
     {
+        LineageColours = new Dictionary<DnaOrigin, Color> ()
+        {
+            { DnaOrigin.IsNew, NewGenome },
+            { DnaOrigin.UnchangedFromLastGen, UnchangedFromLastGen },
+            { DnaOrigin.Mutated, Mutated },
+            { DnaOrigin.Bred, Bred },
+        };
+
         generationPool = new List<Brain>();
         for (int i = 0; i < generationSize; i++)
         {

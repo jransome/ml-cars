@@ -126,8 +126,9 @@ MonoBehaviour:
   botController: {fileID: 8070622361090416648}
   sensors: {fileID: 8070622361090416646}
   renderer: {fileID: 8070622361090416645}
-  thoughtInterval: 0.1
+  thoughtInterval: 0.08
   suicideThreshold: 15
+  Origin: 
 --- !u!114 &8070622361090416648
 MonoBehaviour:
   m_ObjectHideFlags: 0
