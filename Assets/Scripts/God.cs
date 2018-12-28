@@ -6,7 +6,7 @@ using UnityEngine;
 public class God : MonoBehaviour
 {
     [Header("Lineage colours")]
-    public static Dictionary<DnaOrigin, Color> LineageColours;
+    public static Dictionary<DnaHeritage, Color> LineageColours;
     public Color NewGenome;
     public Color UnchangedFromLastGen;
     public Color Bred;
@@ -49,7 +49,7 @@ public class God : MonoBehaviour
             {
                 Brain brain = generationPool[i];
                 if (i < TopSurvivorsToKeepUnchanged)
-                    brain.Dna.Origin = DnaOrigin.UnchangedFromLastGen;
+                    brain.Dna.Heritage = DnaHeritage.UnchangedFromLastGen;
                 else
                 {
                     float chance = Random.Range(0f, 1f);
@@ -65,7 +65,7 @@ public class God : MonoBehaviour
                     }
                     else
                     {
-                        // breed with a random top others
+                        // breed with a random other that's not the same
                         brain.Dna.Splice(generationPool[Random.Range(0, nSurvivors)].Dna);
                     }
                 }
@@ -92,12 +92,12 @@ public class God : MonoBehaviour
 
     private void Start()
     {
-        LineageColours = new Dictionary<DnaOrigin, Color> ()
+        LineageColours = new Dictionary<DnaHeritage, Color> ()
         {
-            { DnaOrigin.IsNew, NewGenome },
-            { DnaOrigin.UnchangedFromLastGen, UnchangedFromLastGen },
-            { DnaOrigin.Mutated, Mutated },
-            { DnaOrigin.Bred, Bred },
+            { DnaHeritage.IsNew, NewGenome },
+            { DnaHeritage.UnchangedFromLastGen, UnchangedFromLastGen },
+            { DnaHeritage.Mutated, Mutated },
+            { DnaHeritage.Bred, Bred },
         };
 
         generationPool = new List<Brain>();

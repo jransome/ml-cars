@@ -10,7 +10,7 @@ public class Brain : MonoBehaviour
     [SerializeField] private Renderer renderer = null;
     [SerializeField] private float thoughtInterval = 0.1f;
     [SerializeField] private float suicideThreshold = 20f;
-    [SerializeField] private DnaOrigin origin; // For debugging in inspector
+    [SerializeField] private DnaHeritage heritage; // For debugging in inspector
     private NeuralNetwork nn;
     private float timeOfBirth;
     private float timeLastGateCrossed;
@@ -33,8 +33,8 @@ public class Brain : MonoBehaviour
         if (IsAlive) Debug.LogError("Brain was not dead when reset");
         transform.position = startPosition;
         transform.rotation = startRotation;
-        origin = Dna.Origin;
-        renderer.material.color = God.LineageColours[Dna.Origin];
+        heritage = Dna.Heritage;
+        renderer.material.color = God.LineageColours[Dna.Heritage];
 
         Fitness = 0f;
         LifeSpan = 0f;

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public enum DnaOrigin
+public enum DnaHeritage
 {
     IsNew,
     UnchangedFromLastGen,
@@ -12,18 +12,18 @@ public enum DnaOrigin
 
 public class Dna
 {
-    public double WeightSum = 0;
     public readonly int NumInputs;
     public readonly int NumOutputs;
     public readonly int NumHiddenLayers;
     public readonly int MaxNeuronsPerLayer;
 
     public List<LayerGene> LayerGenes { get; private set; } = new List<LayerGene>();
-    public DnaOrigin Origin { get; set; }
+    public DnaHeritage Heritage { get; set; }
+    public double WeightSum { get { return LayerGenes.Aggregate(0.0, (acc, x) => acc += x.WeightSum); } }
 
     public Dna(int nInputs, int nOutputs, int nHiddenLayers, int maxNeuronsPerLayer)
     {
-        Origin = DnaOrigin.IsNew;
+        Heritage = DnaHeritage.IsNew;
         NumInputs = nInputs;
         NumOutputs = nOutputs;
         MaxNeuronsPerLayer = maxNeuronsPerLayer;
@@ -53,7 +53,7 @@ public class Dna
             throw new System.ArgumentException("Tried to splice two NNs with different numbers of hidden layers!");
 
         LayerGenes = LayerGenes.Zip(other.LayerGenes, (otherL, ownL) => ownL.Splice(otherL)).ToList();
-        Origin = DnaOrigin.Bred;
+        Heritage = DnaHeritage.Bred;
     }
 
     public void Mutate(float proportion)
@@ -62,7 +62,7 @@ public class Dna
         foreach (LayerGene layerGene in LayerGenes)
             layerGene.Mutate(proportion);
         
-        Origin = DnaOrigin.Mutated;
+        Heritage = DnaHeritage.Mutated;
     }
 }
 
@@ -71,6 +71,7 @@ public class LayerGene
     public readonly int MaxNeurons;
 
     public List<NeuronGene> NeuronGenes { get; set; } = new List<NeuronGene>();
+    public double WeightSum { get { return NeuronGenes.Aggregate(0.0, (acc, x) => acc += x.WeightSum); } }
 
     public LayerGene(int nNeurons, int inputsPerNeuron, bool isOutputLayer = false)
     {
@@ -108,6 +109,7 @@ public class NeuronGene
 {
     public double[] weights { get; set; }
     public double bias { get; set; }
+    public double WeightSum { get; private set; }
 
     public NeuronGene(int nWeights, bool initialiseAsAlive)
     {
@@ -130,7 +132,6 @@ public class NeuronGene
     public void Mutate()
     {
         int mutationType = Random.Range(0, 6);
-        double sum = weights.Aggregate((acc, x) => acc += x) + bias;
         if (mutationType <= 2)
         {
             // Mutate by selecting a random (non zero) weight and scaling it by +/-50%
@@ -148,7 +149,9 @@ public class NeuronGene
             // Mutate by randomising all weights
             RandomiseWeights();
         }
-        if (sum == weights.Aggregate((acc, x) => acc += x) + bias) Debug.LogError("Mutation failed");
+        double newWeightSum = CalculateWeightSum();
+        if (WeightSum == newWeightSum) Debug.LogError("Mutation failed");
+        WeightSum = newWeightSum;
     }
 
     public void RandomiseWeights()
@@ -192,6 +195,8 @@ public class NeuronGene
         for (int i = 0; i < weights.Length; i++)
             weights[i] = value;
     }
+
+    private double CalculateWeightSum() => weights.Aggregate((acc, x) => acc += x) + bias;
 
     private static bool RandomBool() => Random.Range(0, 2) == 1 ? true : false; // Random.Range is max exclusive with ints
 }
