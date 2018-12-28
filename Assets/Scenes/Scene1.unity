@@ -3310,11 +3310,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10b804197aea0ba4dac0c43690d550ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  NewGenome: {r: 1, g: 0.9618751, b: 0, a: 0}
+  NewGenome: {r: 1, g: 0.9618751, b: 0, a: 1}
   UnchangedFromLastGen: {r: 0.5188679, g: 0.5188679, b: 0.5188679, a: 1}
-  Bred: {r: 0, g: 0.36163354, b: 1, a: 0.99215686}
+  Bred: {r: 0, g: 0.36163354, b: 1, a: 1}
   Mutated: {r: 0.023899764, g: 0.8207547, b: 0, a: 1}
   Eliminated: {r: 1, g: 0, b: 0, a: 1}
+  SurvivorProportion: 0.25
+  TopSurvivorsToKeepUnchanged: 2
+  NewDnaRate: 0.05
+  MutationRate: 0.05
   populationPrefab: {fileID: 8070622361090416649, guid: 487f0c203d4e587499141d56e06a867f,
     type: 3}
   generationSize: 30
