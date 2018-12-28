@@ -129,27 +129,26 @@ public class NeuronGene
 
     public void Mutate()
     {
-        int mutationType = Random.Range(0, 5);
+        int mutationType = Random.Range(0, 6);
+        double sum = weights.Aggregate((acc, x) => acc += x) + bias;
         if (mutationType <= 2)
         {
-            // Mutate by selecting a random weight and scaling it by +/-50%
-            List<double> allWeights = new List<double>(weights);
-            allWeights.Add(bias);
-            int randomWeightIndex = Random.Range(0, weights.Length + 1);
-            allWeights[randomWeightIndex] = allWeights[randomWeightIndex] * 1.5f * Random.Range(0, 2) * 2 - 1;
+            // Mutate by selecting a random (non zero) weight and scaling it by +/-50%
+            // If all weights were zero, then randomise one of them instead
+            bool success = ScaleRandomWeight(1.5f);
+            if (!success) RandomiseSingleWeight();
         }
         else if (mutationType <= 4)
         {
             // Mutate by selecting a random weight and replacing it with a new random number
-            List<double> allWeights = new List<double>(weights);
-            allWeights.Add(bias);
-            allWeights[Random.Range(0, weights.Length + 1)] = Random.Range(-1f, 1f);
+            RandomiseSingleWeight();
         }
         else
         {
             // Mutate by randomising all weights
             RandomiseWeights();
         }
+        if (sum == weights.Aggregate((acc, x) => acc += x) + bias) Debug.LogError("Mutation failed");
     }
 
     public void RandomiseWeights()
@@ -157,6 +156,34 @@ public class NeuronGene
         bias = Random.Range(-1f, 1f);
         for (int i = 0; i < weights.Length; i++)
             weights[i] = Random.Range(-1f, 1f);
+    }
+
+    private void RandomiseSingleWeight()
+    {
+        int weightIndex = Random.Range(-1, weights.Length); // -1 for the bias
+        if (weightIndex == -1) 
+            bias = Random.Range(-1f, 1f);
+        else
+            weights[weightIndex] = Random.Range(-1f, 1f);
+    }
+
+    private bool ScaleRandomWeight(float scalar)
+    {
+        List<int> nonZeroWeightIndicies = new List<int>();
+        if (bias != 0) nonZeroWeightIndicies.Add(-1);
+        for (int i = 0; i < weights.Length; i++)
+            if (weights[i] != 0) nonZeroWeightIndicies.Add(i);
+
+        if (nonZeroWeightIndicies.Count == 0) return false;
+        else
+        {
+            float scale = scalar * Random.Range(0, 2) * 2 - 1;
+            int randomNonZeroWeightIndex = nonZeroWeightIndicies[Random.Range(0, nonZeroWeightIndicies.Count)];
+            if (randomNonZeroWeightIndex == -1) bias *= scale;
+            else weights[randomNonZeroWeightIndex] *= scale;
+            
+            return true;
+        }
     }
 
     private void SetWeights(double value)
