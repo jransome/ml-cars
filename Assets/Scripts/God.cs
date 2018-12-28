@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -10,6 +11,7 @@ public class God : MonoBehaviour
     public Color UnchangedFromLastGen;
     public Color Bred;
     public Color Mutated;
+    public Color Eliminated;
 
     [SerializeField] private GameObject populationPrefab = null;
     [SerializeField] private int generationSize = 10;
@@ -18,7 +20,7 @@ public class God : MonoBehaviour
     public int GenerationCount { get; set; }
     public int CurrentlyAlive { get; set; }
 
-    private void CreateGeneration()
+    private IEnumerator CreateGeneration()
     {
         GenerationCount++;
         Debug.Log("Generation " + GenerationCount + ": Avg: " + generationPool.Average(b => b.Fitness) + " range: " + generationPool.Min(b => b.Fitness) + " - " + generationPool.Max(b => b.Fitness));
@@ -39,6 +41,7 @@ public class God : MonoBehaviour
             {
                 // if (!randomUnfitSurvivors.Contains(i))
                     generationPool[i].ReplaceDna(generationPool[Random.Range(0, generationSize / 3)].Dna.Clone());
+                    generationPool[i].GetComponent<Renderer>().material.color = Eliminated;
             }
 
             // do breeding/mutation for all but top 3
@@ -68,6 +71,7 @@ public class God : MonoBehaviour
                 }
 
             }
+            yield return new WaitForSeconds(3f); // pause so we can see the eliminated agents change colour
         }
 
         CurrentlyAlive = generationSize;
@@ -79,7 +83,7 @@ public class God : MonoBehaviour
     {
         CalculateFitness(deceased);
         CurrentlyAlive--;
-        if (CurrentlyAlive == 0) CreateGeneration();
+        if (CurrentlyAlive == 0) StartCoroutine(CreateGeneration());
     }
 
     private void CalculateFitness(Brain brain)
@@ -106,6 +110,6 @@ public class God : MonoBehaviour
             b.Died += IndividualDiedCallBack;
         }
 
-        CreateGeneration();
+        StartCoroutine(CreateGeneration());
     }
 }
