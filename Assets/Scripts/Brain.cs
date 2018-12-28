@@ -13,7 +13,7 @@ public class Brain : MonoBehaviour
     private float timeOfBirth;
     private float timeLastGateCrossed;
 
-    public DNA Dna { get; private set; }
+    public Dna Dna { get; private set; }
     public bool IsAlive { get; set; } = false;
     public float ThrottleDecision { get; private set; } = 0f;
     public float SteeringDecision { get; private set; } = 0f;
@@ -45,7 +45,7 @@ public class Brain : MonoBehaviour
         StartCoroutine(ThoughtProcess());
     }
 
-    public void ReplaceDna(DNA dna)
+    public void ReplaceDna(Dna dna)
     {
         Dna = dna;
         if (nn == null) 

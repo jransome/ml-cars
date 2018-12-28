@@ -19,9 +19,9 @@ public class Gate : MonoBehaviour
         Number = Convert.ToInt32(gameObject.name.Split(new char[] { '(', ')' })[1]);
     }
 
-    private void OnDrawGizmos() 
-    {
-        // used for setting up gates
-        // Gizmos.DrawRay(transform.position, transform.forward * 50); 
-    }
+    // used for setting up gates
+    // private void OnDrawGizmos() 
+    // {
+    //     Gizmos.DrawRay(transform.position, transform.forward * 50); 
+    // }
 }

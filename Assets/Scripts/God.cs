@@ -46,7 +46,7 @@ public class God : MonoBehaviour
                 if (chance < 0.1f)
                 {
                     // 10% chance to replace completely
-                    agent.ReplaceDna(new DNA(5, 2, 1, 5));
+                    agent.ReplaceDna(new Dna(5, 2, 1, 5));
                     nReplaced++;
                 }
                 else if (chance > 0.70f)
@@ -57,7 +57,7 @@ public class God : MonoBehaviour
                 }
                 else
                 {
-                    // 60% chance to breed with a random top other without being 
+                    // 60% chance to breed with a random top other without being changed
                     agent.Dna.Splice(generationPool[Random.Range(0, generationSize / 2)].Dna);
                     nBred++;
                 }
@@ -89,7 +89,7 @@ public class God : MonoBehaviour
         for (int i = 0; i < generationSize; i++)
         {
             Brain b = Instantiate(populationPrefab).GetComponent<Brain>();
-            b.ReplaceDna(new DNA(5, 2, 1, 5));
+            b.ReplaceDna(new Dna(5, 2, 1, 5));
             generationPool.Add(b);
             b.Died += IndividualDiedCallBack;
         }

@@ -6,12 +6,12 @@ public class NeuralNetwork
     private List<Layer> layers;
     private int layerWidth;
 
-    public NeuralNetwork(DNA dna)
+    public NeuralNetwork(Dna dna)
     {
         ReplaceDna(dna);
     }
 
-    public void ReplaceDna(DNA dna)
+    public void ReplaceDna(Dna dna)
     {
         layerWidth = dna.MaxNeuronsPerLayer;
         layers  = new List<Layer>();

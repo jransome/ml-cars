@@ -2,7 +2,12 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class DNA
+public enum DnaOrigin
+{
+    
+}
+
+public class Dna
 {
     public double WeightSum = 0;
     public readonly int NumInputs;
@@ -11,8 +16,11 @@ public class DNA
     public readonly int MaxNeuronsPerLayer;
 
     public List<LayerGene> LayerGenes { get; set; } = new List<LayerGene>();
+    public bool IsNew { get; set; }
+    public bool WasMutated { get; set; }
+    public bool WasBred { get; set; }
 
-    public DNA(int nInputs, int nOutputs, int nHiddenLayers, int maxNeuronsPerLayer)
+    public Dna(int nInputs, int nOutputs, int nHiddenLayers, int maxNeuronsPerLayer)
     {
         NumInputs = nInputs;
         NumOutputs = nOutputs;
@@ -31,14 +39,14 @@ public class DNA
         CalculateWeightSum();
     }
 
-    public DNA Clone() 
+    public Dna Clone() 
     {
-        DNA clone = (DNA)this.MemberwiseClone();
+        Dna clone = (Dna)this.MemberwiseClone();
         clone.LayerGenes = LayerGenes.Select(layerGene => layerGene.Clone()).ToList();
         return clone;
     }
 
-    public void Splice(DNA other)
+    public void Splice(Dna other)
     {
         if (NumHiddenLayers != other.NumHiddenLayers)
             throw new System.ArgumentException("Tried to splice two NNs with different numbers of hidden layers!");
