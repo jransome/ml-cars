@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -70,7 +70,7 @@ public class Brain : MonoBehaviour
     private void Think()
     {
         if (Time.time - timeLastGateCrossed > suicideThreshold) Die();
-        List<double> inputs = sensors.CalculateDistances();
+        List<double> inputs = sensors.CalculateNormalisedDistances();
         List<double> outputs = nn.Calculate(inputs);
         ThrottleDecision = (float)outputs[0];
         SteeringDecision = (float)outputs[1];

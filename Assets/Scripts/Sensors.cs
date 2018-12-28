@@ -6,16 +6,16 @@ public class Sensors : MonoBehaviour
     public bool DrawSensors = false;
     [SerializeField] private float raycastDistance = 15f;
 
-    public List<double> Distances { get; set; }
+    public List<double> NormalisedDistances { get; set; }
 
-    public List<double> CalculateDistances() // TODO: Normalise?
+    public List<double> CalculateNormalisedDistances()
     {
-        Distances[0] = CheckDistance(-90);  // Left
-        Distances[1] = CheckDistance(-45);  // Left-Fwd
-        Distances[2] = CheckDistance(0);    // Fwd
-        Distances[3] = CheckDistance(45);   // Right-Fwd
-        Distances[4] = CheckDistance(90);   // Right
-        return Distances;
+        NormalisedDistances[0] = CheckDistance(-90) / raycastDistance;  // Left
+        NormalisedDistances[1] = CheckDistance(-45) / raycastDistance;  // Left-Fwd
+        NormalisedDistances[2] = CheckDistance(0) / raycastDistance;    // Fwd
+        NormalisedDistances[3] = CheckDistance(45) / raycastDistance;   // Right-Fwd
+        NormalisedDistances[4] = CheckDistance(90) / raycastDistance;   // Right
+        return NormalisedDistances;
     }
 
     private float CheckDistance(float angle)
@@ -29,7 +29,7 @@ public class Sensors : MonoBehaviour
 
     private void Awake()
     {
-        Distances = new List<double>()
+        NormalisedDistances = new List<double>()
         {
             raycastDistance,    // Left
             raycastDistance,    // Left-Fwd
@@ -42,11 +42,11 @@ public class Sensors : MonoBehaviour
     private void Update()
     {
         if (!DrawSensors) return;
-        Debug.DrawRay(transform.position, CalculateDirectionFromAngle(-90) * raycastDistance, GetColour(Distances[0]));
-        Debug.DrawRay(transform.position, CalculateDirectionFromAngle(-45) * raycastDistance, GetColour(Distances[1]));
-        Debug.DrawRay(transform.position, CalculateDirectionFromAngle(0) * raycastDistance, GetColour(Distances[2]));
-        Debug.DrawRay(transform.position, CalculateDirectionFromAngle(45) * raycastDistance, GetColour(Distances[3]));
-        Debug.DrawRay(transform.position, CalculateDirectionFromAngle(90) * raycastDistance, GetColour(Distances[4]));
+        Debug.DrawRay(transform.position, CalculateDirectionFromAngle(-90) * raycastDistance, GetColour(NormalisedDistances[0]));
+        Debug.DrawRay(transform.position, CalculateDirectionFromAngle(-45) * raycastDistance, GetColour(NormalisedDistances[1]));
+        Debug.DrawRay(transform.position, CalculateDirectionFromAngle(0) * raycastDistance, GetColour(NormalisedDistances[2]));
+        Debug.DrawRay(transform.position, CalculateDirectionFromAngle(45) * raycastDistance, GetColour(NormalisedDistances[3]));
+        Debug.DrawRay(transform.position, CalculateDirectionFromAngle(90) * raycastDistance, GetColour(NormalisedDistances[4]));
     }
 
     private Color GetColour(double distance) => distance < raycastDistance ? Color.red : Color.green;
