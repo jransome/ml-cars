@@ -5,8 +5,17 @@ using UnityEngine;
 
 public class Brain : MonoBehaviour
 {
+    private static Dictionary<DnaOrigin, Color> LineageColours = new Dictionary<DnaOrigin, Color> ()
+    {
+        { DnaOrigin.IsNew, Color.yellow },
+        { DnaOrigin.UnchangedFromLastGen, Color.gray },
+        { DnaOrigin.Mutated, Color.green },
+        { DnaOrigin.Bred, Color.blue },
+    };
+
     [SerializeField] private Bot botController = null;
     [SerializeField] private Sensors sensors = null;
+    [SerializeField] private Renderer renderer = null;
     [SerializeField] private float thoughtInterval = 0.1f;
     [SerializeField] private float suicideThreshold = 20f;
     private NeuralNetwork nn;
@@ -31,6 +40,7 @@ public class Brain : MonoBehaviour
         if (IsAlive) Debug.LogError("Brain was not dead when reset");
         transform.position = startPosition;
         transform.rotation = startRotation;
+        renderer.material.color = LineageColours[Dna.Origin];
 
         Fitness = 0f;
         LifeSpan = 0f;

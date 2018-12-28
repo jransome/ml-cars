@@ -4,20 +4,17 @@ using UnityEngine;
 
 public class God : MonoBehaviour
 {
-    [SerializeField] private GameObject populationPrefab;
+    [SerializeField] private GameObject populationPrefab = null;
     [SerializeField] private int generationSize = 10;
     private List<Brain> generationPool;
 
     public int GenerationCount { get; set; }
-    public int CurrentlyAlive; //{ get; set; }
+    public int CurrentlyAlive { get; set; }
 
     private void CreateGeneration()
     {
         GenerationCount++;
         Debug.Log("Generation " + GenerationCount + ": Avg: " + generationPool.Average(b => b.Fitness) + " range: " + generationPool.Min(b => b.Fitness) + " - " + generationPool.Max(b => b.Fitness));
-        int nReplaced = 0;
-        int nMutated = 0;
-        int nBred = 0;
 
         if (GenerationCount != 1)
         {
@@ -38,32 +35,32 @@ public class God : MonoBehaviour
             }
 
             // do breeding/mutation for all but top 3
-            for (int i = 3; i < generationSize; i++)
+            for (int i = 0; i < generationSize; i++)
             {
-                var agent = generationPool[i];
-                float chance = Random.Range(0f, 1f);
-
-                if (chance < 0.1f)
-                {
-                    // 10% chance to replace completely
-                    agent.ReplaceDna(new Dna(5, 2, 1, 5));
-                    nReplaced++;
-                }
-                else if (chance > 0.70f)
-                {
-                    // 30% chance to mutate
-                    agent.Dna.Mutate(Random.Range(0f,1f));
-                    nMutated++;
-                }
+                Brain agent = generationPool[i];
+                if (i < 3)
+                    agent.Dna.Origin = DnaOrigin.UnchangedFromLastGen;
                 else
                 {
-                    // 60% chance to breed with a random top other without being changed
-                    agent.Dna.Splice(generationPool[Random.Range(0, generationSize / 2)].Dna);
-                    nBred++;
+                    float chance = Random.Range(0f, 1f);
+                    if (chance < 0.1f)
+                    {
+                        // 10% chance to replace completely
+                        agent.ReplaceDna(new Dna(5, 2, 1, 5));
+                    }
+                    else if (chance > 0.70f)
+                    {
+                        // 30% chance to mutate
+                        agent.Dna.Mutate(Random.Range(0f,1f));
+                    }
+                    else
+                    {
+                        // 60% chance to breed with a random top others
+                        agent.Dna.Splice(generationPool[Random.Range(0, generationSize / 2)].Dna);
+                    }
                 }
-            }
 
-            Debug.Log("Replaced: " + nReplaced + " Mutated: " + nMutated + " Bred: " + nBred);
+            }
         }
 
         CurrentlyAlive = generationSize;

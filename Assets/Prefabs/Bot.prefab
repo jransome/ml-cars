@@ -125,6 +125,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   botController: {fileID: 8070622361090416648}
   sensors: {fileID: 8070622361090416646}
+  renderer: {fileID: 8070622361090416645}
   thoughtInterval: 0.1
   suicideThreshold: 15
 --- !u!114 &8070622361090416648
@@ -153,4 +154,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aea8bda322c433a4d81d4139a51b8d9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DrawSensors: 0
   raycastDistance: 15

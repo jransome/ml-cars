@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class Sensors : MonoBehaviour
 {
+    public bool DrawSensors = false;
     [SerializeField] private float raycastDistance = 15f;
 
     public List<double> Distances { get; set; }
@@ -40,6 +41,7 @@ public class Sensors : MonoBehaviour
 
     private void Update()
     {
+        if (!DrawSensors) return;
         Debug.DrawRay(transform.position, CalculateDirectionFromAngle(-90) * raycastDistance, GetColour(Distances[0]));
         Debug.DrawRay(transform.position, CalculateDirectionFromAngle(-45) * raycastDistance, GetColour(Distances[1]));
         Debug.DrawRay(transform.position, CalculateDirectionFromAngle(0) * raycastDistance, GetColour(Distances[2]));

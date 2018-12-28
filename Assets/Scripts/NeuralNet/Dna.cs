@@ -4,7 +4,10 @@ using UnityEngine;
 
 public enum DnaOrigin
 {
-    
+    IsNew,
+    UnchangedFromLastGen,
+    Bred,
+    Mutated,
 }
 
 public class Dna
@@ -15,13 +18,12 @@ public class Dna
     public readonly int NumHiddenLayers;
     public readonly int MaxNeuronsPerLayer;
 
-    public List<LayerGene> LayerGenes { get; set; } = new List<LayerGene>();
-    public bool IsNew { get; set; }
-    public bool WasMutated { get; set; }
-    public bool WasBred { get; set; }
+    public List<LayerGene> LayerGenes { get; private set; } = new List<LayerGene>();
+    public DnaOrigin Origin { get; set; }
 
     public Dna(int nInputs, int nOutputs, int nHiddenLayers, int maxNeuronsPerLayer)
     {
+        Origin = DnaOrigin.IsNew;
         NumInputs = nInputs;
         NumOutputs = nOutputs;
         MaxNeuronsPerLayer = maxNeuronsPerLayer;
@@ -36,7 +38,6 @@ public class Dna
 
         // output layer
         LayerGenes.Add(new LayerGene(nOutputs, LayerGenes.Last().MaxNeurons, true));
-        CalculateWeightSum();
     }
 
     public Dna Clone() 
@@ -52,7 +53,7 @@ public class Dna
             throw new System.ArgumentException("Tried to splice two NNs with different numbers of hidden layers!");
 
         LayerGenes = LayerGenes.Zip(other.LayerGenes, (otherL, ownL) => ownL.Splice(otherL)).ToList();
-        CalculateWeightSum();
+        Origin = DnaOrigin.Bred;
     }
 
     public void Mutate(float proportion)
@@ -61,23 +62,7 @@ public class Dna
         foreach (LayerGene layerGene in LayerGenes)
             layerGene.Mutate(proportion);
         
-        CalculateWeightSum();
-    }
-
-    private void CalculateWeightSum()
-    {
-        WeightSum = 0;
-        foreach (var l in LayerGenes)
-        {
-            foreach (var n in l.NeuronGenes)
-            {
-                WeightSum += n.bias;
-                foreach (var w in n.weights)
-                {
-                    WeightSum += w;
-                }
-            }
-        }
+        Origin = DnaOrigin.Mutated;
     }
 }
 
