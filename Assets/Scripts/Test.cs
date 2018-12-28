@@ -4,19 +4,19 @@ using UnityEngine;
 
 public class Test : MonoBehaviour
 {
-    public float force = 10f;
-    private Rigidbody rb;
+    public Gate g;
 
     // Start is called before the first frame update
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
-        rb.AddForce(Vector3.left * force, ForceMode.VelocityChange);
+        Debug.Log(g.DirectionToNext);
+        Debug.DrawRay(g.transform.position, g.DirectionToNext * 10, Color.blue, 5000);
+        transform.forward = g.DirectionToNext;
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        Debug.Log(g.CalculateDistanceTo(transform.position));
     }
 }

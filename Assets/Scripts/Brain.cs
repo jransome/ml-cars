@@ -12,7 +12,6 @@ public class Brain : MonoBehaviour
     private NeuralNetwork nn;
     private float timeOfBirth;
     private float timeLastGateCrossed;
-    private Vector3 lastGatePosition;
 
     public DNA Dna { get; private set; }
     public bool IsAlive { get; set; } = false;
@@ -23,6 +22,7 @@ public class Brain : MonoBehaviour
     public float LifeSpan { get; private set; }
     public float DistanceCovered { get; set; }
     public int GatesCrossed { get; private set; }
+    public Gate LastGateCrossed { get; private set; }
 
     public event Action<Brain> Died = delegate { };
 
@@ -35,8 +35,8 @@ public class Brain : MonoBehaviour
         Fitness = 0f;
         LifeSpan = 0f;
         DistanceCovered = 0f;
-        GatesCrossed = -1;
-        lastGatePosition = transform.position;
+        GatesCrossed = 0;
+        LastGateCrossed = GateManager.Instance.StartingGate;
 
         IsAlive = true;
         timeOfBirth = Time.time;
@@ -76,7 +76,7 @@ public class Brain : MonoBehaviour
     {
         IsAlive = false;
         LifeSpan = Time.time - timeOfBirth;
-        DistanceCovered += Vector3.Distance(lastGatePosition, transform.position);
+        DistanceCovered += LastGateCrossed.CalculateDistanceTo(transform.position);
         Died(this);
     }
 
@@ -85,13 +85,13 @@ public class Brain : MonoBehaviour
         if (other.CompareTag("Terrain")) Die();
         else if (other.CompareTag("Gate"))
         {
-            if (GatesCrossed + 1 == other.GetComponent<Gate>().Number)
+            Gate g = other.GetComponent<Gate>();
+            if (GatesCrossed + 1 == g.Number)
             {
-                Vector3 gatePosition = other.transform.position;
-                DistanceCovered += Vector3.Distance(lastGatePosition, gatePosition);
+                DistanceCovered += LastGateCrossed.DistanceToNext;
                 GatesCrossed++;
+                LastGateCrossed = g;
                 timeLastGateCrossed = Time.time;
-                lastGatePosition = gatePosition;
             }
             else Die();
         }
