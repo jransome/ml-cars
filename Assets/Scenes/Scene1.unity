@@ -3314,15 +3314,18 @@ MonoBehaviour:
   UnchangedFromLastGen: {r: 0.5188679, g: 0.5188679, b: 0.5188679, a: 1}
   Bred: {r: 0, g: 0.36163354, b: 1, a: 1}
   Mutated: {r: 0.023899764, g: 0.8207547, b: 0, a: 1}
-  Eliminated: {r: 1, g: 0, b: 0, a: 1}
-  SurvivorProportion: 0.25
-  TopSurvivorsToKeepUnchanged: 2
+  Inputs: 5
+  Outputs: 2
+  HiddenLayers: 1
+  MaxNeuronsPerLayer: 1
+  ProportionUnchanged: 0.05
   NewDnaRate: 0.05
-  MutationRate: 0.05
+  MutationRate: 0.5
   populationPrefab: {fileID: 8070622361090416649, guid: 487f0c203d4e587499141d56e06a867f,
     type: 3}
-  generationSize: 30
+  generationSize: 50
   generationPool: []
+  generationTotalFitness: 0
 --- !u!4 &985539030
 Transform:
   m_ObjectHideFlags: 0

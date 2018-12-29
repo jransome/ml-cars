@@ -7,7 +7,7 @@ public class Brain : MonoBehaviour
 {
     [SerializeField] private Bot botController = null;
     [SerializeField] private Sensors sensors = null;
-    [SerializeField] private Renderer renderer = null;
+    [SerializeField] private Renderer botRenderer = null;
     [SerializeField] private float thoughtInterval = 0.1f;
     [SerializeField] private float suicideThreshold = 20f;
     [SerializeField] private DnaHeritage heritage; // For debugging in inspector
@@ -31,10 +31,11 @@ public class Brain : MonoBehaviour
     public void Arise(Vector3 startPosition, Quaternion startRotation)
     {
         if (IsAlive) Debug.LogError("Brain was not dead when reset");
+        transform.localScale = Vector3.one;
         transform.position = startPosition;
         transform.rotation = startRotation;
         heritage = Dna.Heritage;
-        renderer.material.color = God.LineageColours[Dna.Heritage];
+        botRenderer.material.color = God.LineageColours[Dna.Heritage];
 
         Fitness = 0f;
         LifeSpan = 0f;
@@ -47,6 +48,12 @@ public class Brain : MonoBehaviour
         timeLastGateCrossed = Time.time;
 
         StartCoroutine(ThoughtProcess());
+    }
+
+    public Dna SelectForBreeding()
+    {
+        transform.localScale += Vector3.up;
+        return Dna;
     }
 
     public void ReplaceDna(Dna dna)
@@ -81,8 +88,11 @@ public class Brain : MonoBehaviour
         IsAlive = false;
         LifeSpan = Time.time - timeOfBirth;
         DistanceCovered += LastGateCrossed.CalculateDistanceTo(transform.position);
+        CalculateFitness();
         Died(this);
     }
+
+    private void CalculateFitness() => Fitness = DistanceCovered > 0 ? DistanceCovered : 0;
 
     private void OnTriggerEnter(Collider other)
     {

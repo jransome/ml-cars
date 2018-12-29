@@ -19,7 +19,7 @@ public class Dna
 
     public List<LayerGene> LayerGenes { get; private set; } = new List<LayerGene>();
     public DnaHeritage Heritage { get; set; }
-    public double WeightSum { get { return LayerGenes.Aggregate(0.0, (acc, x) => acc += x.WeightSum); } }
+    public double WeightSumFingerprint { get { return LayerGenes.Aggregate(0.0, (acc, x) => acc += x.WeightSumFingerprint); } }
 
     public Dna(int nInputs, int nOutputs, int nHiddenLayers, int maxNeuronsPerLayer)
     {
@@ -44,16 +44,18 @@ public class Dna
     {
         Dna clone = (Dna)this.MemberwiseClone();
         clone.LayerGenes = LayerGenes.Select(layerGene => layerGene.Clone()).ToList();
+        clone.Heritage = DnaHeritage.UnchangedFromLastGen;
         return clone;
     }
 
-    public void Splice(Dna other)
+    public Dna Splice(Dna other)
     {
         if (NumHiddenLayers != other.NumHiddenLayers)
             throw new System.ArgumentException("Tried to splice two NNs with different numbers of hidden layers!");
 
         LayerGenes = LayerGenes.Zip(other.LayerGenes, (otherL, ownL) => ownL.Splice(otherL)).ToList();
         Heritage = DnaHeritage.Bred;
+        return this;
     }
 
     public void Mutate(float proportion)
@@ -64,6 +66,8 @@ public class Dna
         
         Heritage = DnaHeritage.Mutated;
     }
+
+    public bool IsEqual(Dna other) => !LayerGenes.Zip(other.LayerGenes, (own, otherGene) => own.IsEqual(otherGene)).Contains(false);
 }
 
 public class LayerGene
@@ -71,7 +75,7 @@ public class LayerGene
     public readonly int MaxNeurons;
 
     public List<NeuronGene> NeuronGenes { get; set; } = new List<NeuronGene>();
-    public double WeightSum { get { return NeuronGenes.Aggregate(0.0, (acc, x) => acc += x.WeightSum); } }
+    public double WeightSumFingerprint { get { return NeuronGenes.Aggregate(0.0, (acc, x) => acc += x.WeightSumFingerprint); } }
 
     public LayerGene(int nNeurons, int inputsPerNeuron, bool isOutputLayer = false)
     {
@@ -103,13 +107,15 @@ public class LayerGene
         foreach (NeuronGene neuronGene in NeuronGenes)
             if (Random.Range(0f, 1f) < proportion) neuronGene.Mutate();
     }
+
+    public bool IsEqual(LayerGene other) => !NeuronGenes.Zip(other.NeuronGenes, (own, otherGene) => own.IsEqual(otherGene)).Contains(false);
 }
 
 public class NeuronGene
 {
     public double[] weights { get; set; }
     public double bias { get; set; }
-    public double WeightSum { get; private set; }
+    public double WeightSumFingerprint { get; private set; }
 
     public NeuronGene(int nWeights, bool initialiseAsAlive)
     {
@@ -132,14 +138,12 @@ public class NeuronGene
     public void Mutate()
     {
         int mutationType = Random.Range(0, 6);
-        if (mutationType <= 2)
+        if (mutationType < 2 && (bias + weights.Sum() > 0))
         {
-            // Mutate by selecting a random (non zero) weight and scaling it by +/-50%
-            // If all weights were zero, then randomise one of them instead
-            bool success = ScaleRandomWeight(1.5f);
-            if (!success) RandomiseSingleWeight();
+            // Mutate by scaling all weights by +/-50%
+            ScaleWeights(1.5f);
         }
-        else if (mutationType <= 4)
+        else if (mutationType < 4)
         {
             // Mutate by selecting a random weight and replacing it with a new random number
             RandomiseSingleWeight();
@@ -149,9 +153,9 @@ public class NeuronGene
             // Mutate by randomising all weights
             RandomiseWeights();
         }
-        double newWeightSum = CalculateWeightSum();
-        if (WeightSum == newWeightSum) Debug.LogError("Mutation failed");
-        WeightSum = newWeightSum;
+        double newWeightSum = CalculateWeightSumFingerprint();
+        if (WeightSumFingerprint == newWeightSum) Debug.LogError("Mutation failed. Type: " + mutationType);
+        WeightSumFingerprint = newWeightSum;
     }
 
     public void RandomiseWeights()
@@ -159,6 +163,12 @@ public class NeuronGene
         bias = Random.Range(-1f, 1f);
         for (int i = 0; i < weights.Length; i++)
             weights[i] = Random.Range(-1f, 1f);
+    }
+
+    public bool IsEqual(NeuronGene other)
+    {
+        if (bias != other.bias) return false;
+        return weights.SequenceEqual(other.weights);
     }
 
     private void RandomiseSingleWeight()
@@ -170,23 +180,10 @@ public class NeuronGene
             weights[weightIndex] = Random.Range(-1f, 1f);
     }
 
-    private bool ScaleRandomWeight(float scalar)
+    private void ScaleWeights(float scalar)
     {
-        List<int> nonZeroWeightIndicies = new List<int>();
-        if (bias != 0) nonZeroWeightIndicies.Add(-1);
-        for (int i = 0; i < weights.Length; i++)
-            if (weights[i] != 0) nonZeroWeightIndicies.Add(i);
-
-        if (nonZeroWeightIndicies.Count == 0) return false;
-        else
-        {
-            float scale = scalar * Random.Range(0, 2) * 2 - 1;
-            int randomNonZeroWeightIndex = nonZeroWeightIndicies[Random.Range(0, nonZeroWeightIndicies.Count)];
-            if (randomNonZeroWeightIndex == -1) bias *= scale;
-            else weights[randomNonZeroWeightIndex] *= scale;
-            
-            return true;
-        }
+        bias *= scalar;
+        weights = weights.Select(x => x *= scalar).ToArray();
     }
 
     private void SetWeights(double value)
@@ -196,7 +193,7 @@ public class NeuronGene
             weights[i] = value;
     }
 
-    private double CalculateWeightSum() => weights.Aggregate((acc, x) => acc += x) + bias;
+    private double CalculateWeightSumFingerprint() => weights.Select((w, i) => w + i).Sum() + bias;
 
     private static bool RandomBool() => Random.Range(0, 2) == 1 ? true : false; // Random.Range is max exclusive with ints
 }

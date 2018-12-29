@@ -11,83 +11,115 @@ public class God : MonoBehaviour
     public Color UnchangedFromLastGen;
     public Color Bred;
     public Color Mutated;
-    public Color Eliminated;
+
+    [Header("Neural network variables")]
+    public int Inputs = 5;
+    public int Outputs = 2;
+    public int HiddenLayers = 1;
+    public int MaxNeuronsPerLayer = 5;
 
     [Header("Algorithm variables")]
-    public float SurvivorProportion = 0.5f;
-    public int TopSurvivorsToKeepUnchanged = 1;
+    public float ProportionUnchanged = 0.05f;
     public float NewDnaRate = 0.05f;
     public float MutationRate = 0.05f;
 
     [SerializeField] private GameObject populationPrefab = null;
     [SerializeField] private int generationSize = 10;
     [SerializeField] private List<Brain> generationPool;
+    [SerializeField] private float generationTotalFitness;
 
     public int GenerationCount { get; set; }
     public int CurrentlyAlive { get; set; }
 
-    private IEnumerator CreateGeneration()
+    private Dna SelectDna(Dictionary<Brain, float> selectionProbabilities, Dna exceptThisOne = null)
     {
-        GenerationCount++;
-        int nSurvivors = (int)(generationSize * SurvivorProportion);
-        Debug.Log("Generation " + GenerationCount + ": Avg: " + generationPool.Average(b => b.Fitness) + " range: " + generationPool.Min(b => b.Fitness) + " - " + generationPool.Max(b => b.Fitness));
-
-        if (GenerationCount != 1)
+        float random = Random.Range(0f, 1f);
+        foreach(KeyValuePair<Brain, float> entry in selectionProbabilities)
         {
-            generationPool = generationPool.OrderByDescending(b => b.Fitness).ToList();
+            random -= entry.Value;
+            if(random < 0 && entry.Key.Dna != exceptThisOne) return entry.Key.SelectForBreeding();
+        }
+        Debug.Log("dfhjgd");
+        return selectionProbabilities.Keys.ToArray()[Random.Range(0, selectionProbabilities.Count)].SelectForBreeding();
+    }
 
-            // eliminate the laggards and replace them with clones of the survivors
-            // TODO: keep randomUnfitSurvivors?
-            for (int i = nSurvivors; i < generationSize; i++)
-            {
-                generationPool[i].ReplaceDna(generationPool[Random.Range(0, generationSize / 3)].Dna.Clone());
-                generationPool[i].GetComponent<Renderer>().material.color = Eliminated;
-            }
+    private IEnumerator CreateGeneration(bool seed = false)
+    {
+        // create TNG
+        List<Dna> theNextGeneration = new List<Dna>();
 
-            // do breeding/mutation for all but a number specified at the very top
+        if (seed)
+        {
+            Debug.Log("Generation 1 seeded");
             for (int i = 0; i < generationSize; i++)
+                theNextGeneration.Add(new Dna(Inputs, Outputs, HiddenLayers, MaxNeuronsPerLayer));
+        }
+        else
+        {
+            // report on last generation
+            Debug.Log("Generation " + GenerationCount + ": Avg: " + generationPool.Average(b => b.Fitness) + " range: " + generationPool.Min(b => b.Fitness) + " - " + generationPool.Max(b => b.Fitness));
+            
+            // preserve top survivors 
+            int nUnchanged = Mathf.RoundToInt(generationSize * ProportionUnchanged);
+            if (nUnchanged > 0) theNextGeneration.AddRange(generationPool.OrderByDescending(b => b.Fitness).ToList().GetRange(0, nUnchanged).Select(b => b.Dna.Clone()));
+
+            // TODO: mutate without breeding
+
+            // add completely new dna into next gen
+            int nNew = Mathf.RoundToInt(generationSize * NewDnaRate);
+            if (nNew > 0) for (int i = 0; i < nNew; i++) theNextGeneration.Add(new Dna(Inputs, Outputs, HiddenLayers, MaxNeuronsPerLayer));
+
+            // calculate probability of selection for each genome
+            Dictionary<Brain, float> SelectionProbabilities = new Dictionary<Brain, float>();
+            foreach (Brain b in generationPool)
+                SelectionProbabilities.Add(b, b.Fitness / generationTotalFitness);
+
+            // populate rest of next generation with offspring
+            for (int i = nUnchanged; i < generationSize; i++)
             {
-                Brain brain = generationPool[i];
-                if (i < TopSurvivorsToKeepUnchanged)
-                    brain.Dna.Heritage = DnaHeritage.UnchangedFromLastGen;
-                else
-                {
-                    float chance = Random.Range(0f, 1f);
-                    if (chance < NewDnaRate)
-                    {
-                        // replace completely
-                        brain.ReplaceDna(new Dna(5, 2, 1, 5));
-                    }
-                    else if (chance > (1 - MutationRate))
-                    {
-                        // mutate
-                        brain.Dna.Mutate(Random.Range(0f,1f));
-                    }
-                    else
-                    {
-                        // breed with a random other that's not the same
-                        brain.Dna.Splice(generationPool[Random.Range(0, nSurvivors)].Dna);
-                    }
-                }
+                // pick 2 random DIFFERENT parents and breed
+                Dna p1 = SelectDna(SelectionProbabilities);
+                Dna p2 = SelectDna(SelectionProbabilities, p1);
+                Dna offspring = p1.Clone().Splice(p2);
+                
+                // do mutation
+                if (Random.Range(0f, 1f) < MutationRate) offspring.Mutate(0.7f); 
+                
+                theNextGeneration.Add(offspring);
+                yield return new WaitForSeconds(0.2f); // so we can visualise selection of agents for the next generation
             }
-            yield return new WaitForSeconds(3f); // pause so we can see the eliminated agents change colour
+
+            yield return new WaitForSeconds(3f); // pause so we can see the results of selection
         }
 
+        // setup next generation
+        CheckForIdenticalGenomes(theNextGeneration);
+        GenerationCount++;
+        generationTotalFitness = 0;
         CurrentlyAlive = generationSize;
-        foreach (Brain b in generationPool)
-            b.Arise(transform.position, transform.rotation);
+        generationPool = generationPool.Zip(theNextGeneration, (brain, dna) => {
+            brain.ReplaceDna(dna);
+            brain.Arise(transform.position, transform.rotation);
+            return brain;
+        }).ToList();
     }
 
-    private void IndividualDiedCallBack(Brain deceased)
+    private void CheckForIdenticalGenomes(List<Dna> dnaList)
     {
-        CalculateFitness(deceased);
+        bool x = dnaList.Select(d => {
+            foreach (var otherD in dnaList)
+                if (d != otherD && d.Equals(otherD)) return false;
+            
+            return true;
+        }).Contains(false);
+        if (x) Debug.LogError("Identical genomes in generation");
+    }
+
+    private void HandleIndividualDied(Brain deceased)
+    {
+        generationTotalFitness += deceased.Fitness;
         CurrentlyAlive--;
         if (CurrentlyAlive == 0) StartCoroutine(CreateGeneration());
-    }
-
-    private void CalculateFitness(Brain brain)
-    {
-        brain.Fitness = brain.DistanceCovered;
     }
 
     private void Start()
@@ -104,11 +136,9 @@ public class God : MonoBehaviour
         for (int i = 0; i < generationSize; i++)
         {
             Brain b = Instantiate(populationPrefab).GetComponent<Brain>();
-            b.ReplaceDna(new Dna(5, 2, 1, 5));
             generationPool.Add(b);
-            b.Died += IndividualDiedCallBack;
+            b.Died += HandleIndividualDied;
         }
-
-        StartCoroutine(CreateGeneration());
+        StartCoroutine(CreateGeneration(true));
     }
 }
