@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class Gate : MonoBehaviour
 {
-    public int Number { get; set; }
+    public int Number { get; private set; }
     public Vector3 DirectionToNext { get; set; }
     public float DistanceToNext { get; set; }
 
@@ -14,9 +14,10 @@ public class Gate : MonoBehaviour
         return Mathf.Cos(adjacentToHypotenuseRadians) * Vector3.Distance(position, transform.position);
     }
 
-    private void Awake()
+    public int GetNumber()
     {
         Number = Convert.ToInt32(gameObject.name.Split(new char[] { '(', ')' })[1]);
+        return Number;
     }
 
     // used for setting up gates

@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -22,7 +22,9 @@ public class God : MonoBehaviour
     public float ProportionUnchanged = 0.05f;
     public float NewDnaRate = 0.05f;
     public float MutationRate = 0.05f;
+    public float MaxTimeToReachNextGate = 5f;
 
+    [Header("Population")]
     [SerializeField] private GameObject populationPrefab = null;
     [SerializeField] private int generationSize = 10;
     [SerializeField] private List<Brain> generationPool;
@@ -39,7 +41,7 @@ public class God : MonoBehaviour
             random -= entry.Value;
             if(random < 0 && entry.Key.Dna != exceptThisOne) return entry.Key.SelectForBreeding();
         }
-        Debug.Log("dfhjgd");
+
         return selectionProbabilities.Keys.ToArray()[Random.Range(0, selectionProbabilities.Count)].SelectForBreeding();
     }
 

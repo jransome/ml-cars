@@ -7,14 +7,14 @@ public class GateManager : MonoBehaviour
 {
     public static GateManager Instance; 
     
-    private Gate[] Gates;
+    [SerializeField] private Gate[] Gates;
 
     public Gate StartingGate { get; private set; }
 
     private void Awake()
     {
         Instance = this;
-        Gates = GetComponentsInChildren<Gate>().OrderBy(g => g.Number).ToArray();
+        Gates = GetComponentsInChildren<Gate>().OrderBy(g => g.GetNumber()).ToArray();
         for (int i = 0; i < Gates.Length; i++)
         {
             Gate nextGate = i == Gates.Length - 1 ? Gates[0] : Gates[i + 1];
