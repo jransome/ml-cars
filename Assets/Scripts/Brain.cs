@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class Brain : MonoBehaviour
 {
+    public double WeightSumFingerprint; // debugging
+
     [SerializeField] private Bot botController = null;
     [SerializeField] private Sensors sensors = null;
     [SerializeField] private Renderer botRenderer = null;
@@ -30,6 +32,7 @@ public class Brain : MonoBehaviour
 
     public void Arise(Vector3 startPosition, Quaternion startRotation)
     {
+        WeightSumFingerprint = Dna.WeightSumFingerprint;
         if (IsAlive) Debug.LogError("Brain was not dead when reset");
         transform.localScale = Vector3.one;
         transform.position = startPosition;
@@ -92,7 +95,7 @@ public class Brain : MonoBehaviour
         Died(this);
     }
 
-    private void CalculateFitness() => Fitness = DistanceCovered > 0 ? DistanceCovered : 0;
+    private void CalculateFitness() => Fitness = DistanceCovered > 0 ? Mathf.Pow(DistanceCovered, 2) : 0;
 
     private void OnTriggerEnter(Collider other)
     {

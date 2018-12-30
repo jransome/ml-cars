@@ -61,8 +61,10 @@ public class Dna
     public void Mutate(float proportion)
     {
         proportion = Mathf.Clamp01(proportion); // proportion of neurons to be mutated
-        foreach (LayerGene layerGene in LayerGenes)
-            layerGene.Mutate(proportion);
+        int nLayersToMutate = Mathf.CeilToInt(LayerGenes.Count * proportion);
+        if (nLayersToMutate == 0) return;
+        for (int i = 0; i < nLayersToMutate; i++)
+            LayerGenes[Random.Range(0, LayerGenes.Count)].Mutate(proportion);
         
         Heritage = DnaHeritage.Mutated;
     }
@@ -104,8 +106,10 @@ public class LayerGene
 
     public void Mutate(float proportion)
     {
-        foreach (NeuronGene neuronGene in NeuronGenes)
-            if (Random.Range(0f, 1f) < proportion) neuronGene.Mutate();
+        int nNeuronsToMutate = Mathf.CeilToInt(MaxNeurons * proportion);
+        if (nNeuronsToMutate == 0) return;
+        for (int i = 0; i < nNeuronsToMutate; i++)
+            NeuronGenes[Random.Range(0, MaxNeurons)].Mutate();
     }
 
     public bool IsEqual(LayerGene other) => !NeuronGenes.Zip(other.NeuronGenes, (own, otherGene) => own.IsEqual(otherGene)).Contains(false);
@@ -140,8 +144,9 @@ public class NeuronGene
         int mutationType = Random.Range(0, 6);
         if (mutationType < 2 && (bias + weights.Sum() > 0))
         {
-            // Mutate by scaling all weights by +/-50%
-            ScaleWeights(1.5f);
+            // Mutate by scaling all weights by up to +/-50%
+            float scale = Random.Range(-0.5f, 0.5f);
+            ScaleWeights(1 + scale);
         }
         else if (mutationType < 4)
         {
@@ -154,7 +159,7 @@ public class NeuronGene
             RandomiseWeights();
         }
         double newWeightSum = CalculateWeightSumFingerprint();
-        if (WeightSumFingerprint == newWeightSum) Debug.LogError("Mutation failed. Type: " + mutationType);
+        if (WeightSumFingerprint == newWeightSum) Debug.LogError("Neuron mutation failed. Type: " + mutationType);
         WeightSumFingerprint = newWeightSum;
     }
 
@@ -180,10 +185,10 @@ public class NeuronGene
             weights[weightIndex] = Random.Range(-1f, 1f);
     }
 
-    private void ScaleWeights(float scalar)
+    private void ScaleWeights(float factor)
     {
-        bias *= scalar;
-        weights = weights.Select(x => x *= scalar).ToArray();
+        bias *= factor;
+        weights = weights.Select(x => x *= factor).ToArray();
     }
 
     private void SetWeights(double value)

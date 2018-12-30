@@ -80,10 +80,19 @@ public class God : MonoBehaviour
                 // pick 2 random DIFFERENT parents and breed
                 Dna p1 = SelectDna(SelectionProbabilities);
                 Dna p2 = SelectDna(SelectionProbabilities, p1);
-                Dna offspring = p1.Clone().Splice(p2);
+                // Dna offspring = p1.Clone().Splice(p2);
+                Dna unmutoffspring = p1.Clone().Splice(p2);
                 
+                bool parSame = p1.IsEqual(p2);
+                bool offSameP1 = p1.IsEqual(unmutoffspring);
+                bool offSameP2 = p2.IsEqual(unmutoffspring);
+
                 // do mutation
-                if (Random.Range(0f, 1f) < MutationRate) offspring.Mutate(0.7f); 
+                Dna offspring = unmutoffspring.Clone();
+                offspring.Mutate(1f);
+                bool mutantSame = unmutoffspring.IsEqual(offspring);
+                // if (Random.Range(0f, 1f) < MutationRate) offspring.Mutate(0.7f); 
+                Debug.Log("parents same: " + parSame + " child == 1: " + (offSameP1 || offSameP2) + " child == both: " + (offSameP1 && offSameP2) + " mutation worked " + !mutantSame);
                 
                 theNextGeneration.Add(offspring);
                 yield return new WaitForSeconds(0.2f); // so we can visualise selection of agents for the next generation
@@ -106,13 +115,13 @@ public class God : MonoBehaviour
 
     private void CheckForIdenticalGenomes(List<Dna> dnaList)
     {
-        bool x = dnaList.Select(d => {
+        List<Dna> duplicates = dnaList.Where(d => {
             foreach (var otherD in dnaList)
-                if (d != otherD && d.Equals(otherD)) return false;
-            
-            return true;
-        }).Contains(false);
-        if (x) Debug.LogError("Identical genomes in generation");
+                if (d != otherD && d.IsEqual(otherD)) return true;
+
+            return false;
+        }).ToList();
+        if (duplicates.Count > 0) Debug.LogError(duplicates.Count + " identical genomes in generation");
     }
 
     private void HandleIndividualDied(Brain deceased)

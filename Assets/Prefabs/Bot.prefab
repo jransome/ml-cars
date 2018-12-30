@@ -158,7 +158,7 @@ MonoBehaviour:
   sensors: {fileID: 8070622361090416646}
   botRenderer: {fileID: 9083424398251516781}
   thoughtInterval: 0.08
-  suicideThreshold: 15
+  suicideThreshold: 5
   heritage: 0
 --- !u!114 &8070622361090416648
 MonoBehaviour:
@@ -172,8 +172,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5022502e6c076ab4e90e8aa17cde4c44, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxSpeed: 10
-  turnSpeed: 3
+  maxSpeed: 20
+  turnSpeed: 5
 --- !u!114 &8070622361090416646
 MonoBehaviour:
   m_ObjectHideFlags: 0
