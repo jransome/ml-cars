@@ -53,7 +53,7 @@ public class Dna
         if (NumHiddenLayers != other.NumHiddenLayers)
             throw new System.ArgumentException("Tried to splice two NNs with different numbers of hidden layers!");
 
-        LayerGenes = LayerGenes.Zip(other.LayerGenes, (otherL, ownL) => ownL.Splice(otherL)).ToList();
+        LayerGenes = LayerGenes.Zip(other.LayerGenes, (ownL, otherL) => ownL.Splice(otherL)).ToList();
         Heritage = DnaHeritage.Bred;
         return this;
     }
@@ -79,13 +79,12 @@ public class LayerGene
     public List<NeuronGene> NeuronGenes { get; set; } = new List<NeuronGene>();
     public double WeightSumFingerprint { get { return NeuronGenes.Aggregate(0.0, (acc, x) => acc += x.WeightSumFingerprint); } }
 
-    public LayerGene(int nNeurons, int inputsPerNeuron, bool isOutputLayer = false)
+    public LayerGene(int nNeurons, int inputsPerNeuron, bool allNeuronsAlive = false)
     {
         MaxNeurons = nNeurons;
+        int initialAliveNeuron = Random.Range(0, nNeurons);
         for (int i = 0; i < MaxNeurons; i++)
-            NeuronGenes.Add(new NeuronGene(inputsPerNeuron, isOutputLayer));
-
-        if (isOutputLayer == false) NeuronGenes[Random.Range(0, nNeurons)].RandomiseWeights(); // set 1 neuron as alive
+            NeuronGenes.Add(new NeuronGene(inputsPerNeuron, allNeuronsAlive || i == initialAliveNeuron));
     }
 
     public LayerGene Clone() 
@@ -100,7 +99,7 @@ public class LayerGene
         if (MaxNeurons != other.MaxNeurons)
             throw new System.ArgumentException("Tried to splice layer with another layer of a different size!");
 
-        NeuronGenes = NeuronGenes.Zip(other.NeuronGenes, (otherN, ownN) => ownN.Splice(otherN)).ToList();
+        NeuronGenes = NeuronGenes.Zip(other.NeuronGenes, (ownN, otherN) => ownN.Splice(otherN)).ToList();
         return this;
     }
 

@@ -3317,10 +3317,10 @@ MonoBehaviour:
   Inputs: 5
   Outputs: 2
   HiddenLayers: 1
-  MaxNeuronsPerLayer: 1
+  MaxNeuronsPerLayer: 3
   ProportionUnchanged: 0.05
   NewDnaRate: 0.05
-  MutationRate: 0.5
+  MutationRate: 0.05
   populationPrefab: {fileID: 8070622361090416649, guid: 487f0c203d4e587499141d56e06a867f,
     type: 3}
   generationSize: 50
