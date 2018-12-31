@@ -11,7 +11,6 @@ public class Brain : MonoBehaviour
     [SerializeField] private Sensors sensors = null;
     [SerializeField] private Renderer botRenderer = null;
     [SerializeField] private float thoughtInterval = 0.1f;
-    [SerializeField] private float suicideThreshold = 20f;
     [SerializeField] private DnaHeritage heritage; // For debugging in inspector
     private NeuralNetwork nn;
     private float timeOfBirth;
@@ -22,25 +21,24 @@ public class Brain : MonoBehaviour
     public float ThrottleDecision { get; private set; } = 0f;
     public float SteeringDecision { get; private set; } = 0f;
 
-    public float Fitness { get; set; }
     public float LifeSpan { get; private set; }
-    public float DistanceCovered { get; set; }
+    public float DistanceCovered; //{ get; private set; }
     public int GatesCrossed { get; private set; }
     public Gate LastGateCrossed { get; private set; }
+    public float SuicideThreshold { get; set; } = 5f;
 
-    public event Action<Brain> Died = delegate { };
+    public event Action<Brain, float> Died = delegate { };
 
     public void Arise(Vector3 startPosition, Quaternion startRotation)
     {
         WeightSumFingerprint = Dna.WeightSumFingerprint;
-        if (IsAlive) Debug.LogError("Brain was not dead when reset");
+        if (IsAlive) Debug.LogWarning("Brain was not dead when reset");
         transform.localScale = Vector3.one;
         transform.position = startPosition;
         transform.rotation = startRotation;
         heritage = Dna.Heritage;
         botRenderer.material.color = God.LineageColours[Dna.Heritage];
 
-        Fitness = 0f;
         LifeSpan = 0f;
         DistanceCovered = 0f;
         GatesCrossed = 0;
@@ -53,19 +51,23 @@ public class Brain : MonoBehaviour
         StartCoroutine(ThoughtProcess());
     }
 
-    public Dna SelectForBreeding()
+    private void OnSelectForBreeding()
     {
         transform.localScale += Vector3.up;
-        return Dna;
     }
 
     public void ReplaceDna(Dna dna)
     {
-        Dna = dna;
         if (nn == null) 
-            nn = new NeuralNetwork(Dna);
+            nn = new NeuralNetwork(dna);
         else
+        {
+            Dna.SelectedForBreeding -= OnSelectForBreeding;
             nn.ReplaceDna(dna);
+        }
+
+        Dna = dna;
+        Dna.SelectedForBreeding += OnSelectForBreeding;
     }
 
     private IEnumerator ThoughtProcess()
@@ -79,7 +81,7 @@ public class Brain : MonoBehaviour
 
     private void Think()
     {
-        if (Time.time - timeLastGateCrossed > suicideThreshold) Die();
+        if (Time.time - timeLastGateCrossed > SuicideThreshold) Die();
         List<double> inputs = sensors.CalculateNormalisedDistances();
         List<double> outputs = nn.Calculate(inputs);
         ThrottleDecision = (float)outputs[0];
@@ -91,11 +93,14 @@ public class Brain : MonoBehaviour
         IsAlive = false;
         LifeSpan = Time.time - timeOfBirth;
         DistanceCovered += LastGateCrossed.CalculateDistanceTo(transform.position);
-        CalculateFitness();
-        Died(this);
+        // transform.localScale += Vector3.up * DistanceCovered; // debugging
+        // float fitness = 1;
+        float fitness = CalculateFitness();
+        Dna.Fitness = fitness;
+        Died(this, fitness);
     }
 
-    private void CalculateFitness() => Fitness = DistanceCovered > 0 ? Mathf.Pow(DistanceCovered, 2) : 0;
+    private float CalculateFitness() => DistanceCovered > 0 ? Mathf.Pow(DistanceCovered, 2) : 0;
 
     private void OnTriggerEnter(Collider other)
     {

@@ -19,17 +19,22 @@ public class Dna
 
     public List<LayerGene> LayerGenes { get; private set; } = new List<LayerGene>();
     public DnaHeritage Heritage { get; set; }
+    public float Fitness { get; set; }
     public double WeightSumFingerprint { get { return LayerGenes.Aggregate(0.0, (acc, x) => acc += x.WeightSumFingerprint); } }
 
-    public Dna(int nInputs, int nOutputs, int nHiddenLayers, int maxNeuronsPerLayer)
+    public event System.Action SelectedForBreeding = delegate { };
+
+    public Dna(int nInputs, int nOutputs, int nHiddenLayers, int maxNeuronsPerLayer, bool splicing = false)
     {
-        Heritage = DnaHeritage.IsNew;
+        Heritage = splicing ? DnaHeritage.Bred : DnaHeritage.IsNew;
+        Fitness = 0f;
         NumInputs = nInputs;
         NumOutputs = nOutputs;
         MaxNeuronsPerLayer = maxNeuronsPerLayer;
+        NumHiddenLayers = nHiddenLayers;
+        if (splicing) return;
 
         // hidden layers
-        NumHiddenLayers = nHiddenLayers;
         for (int i = 0; i < NumHiddenLayers; i++)
         {
             int inputsPerNeuron = i == 0 ? nInputs : LayerGenes[i - 1].MaxNeurons;
@@ -48,14 +53,25 @@ public class Dna
         return clone;
     }
 
-    public Dna Splice(Dna other)
+    public Dna[] Splice(Dna other)
     {
         if (NumHiddenLayers != other.NumHiddenLayers)
             throw new System.ArgumentException("Tried to splice two NNs with different numbers of hidden layers!");
 
-        LayerGenes = LayerGenes.Zip(other.LayerGenes, (ownL, otherL) => ownL.Splice(otherL)).ToList();
-        Heritage = DnaHeritage.Bred;
-        return this;
+        Dna[] children = new Dna[2] {
+            new Dna(NumInputs, NumOutputs, NumHiddenLayers, MaxNeuronsPerLayer, true),
+            new Dna(NumInputs, NumOutputs, NumHiddenLayers, MaxNeuronsPerLayer, true),
+        };
+
+        for (int i = 0; i < LayerGenes.Count; i++)
+        {
+            LayerGene[] layerOffspring = LayerGenes[i].Splice(other.LayerGenes[i]);
+            children[0].LayerGenes.Add(layerOffspring[0]);
+            children[1].LayerGenes.Add(layerOffspring[1]);
+        }
+        
+        SelectedForBreeding();
+        return children;
     }
 
     public void Mutate(float proportion)
@@ -87,6 +103,8 @@ public class LayerGene
             NeuronGenes.Add(new NeuronGene(inputsPerNeuron, allNeuronsAlive || i == initialAliveNeuron));
     }
 
+    private LayerGene(int nNeurons) => MaxNeurons = nNeurons;
+
     public LayerGene Clone() 
     {
         LayerGene clone = (LayerGene)this.MemberwiseClone();
@@ -94,13 +112,24 @@ public class LayerGene
         return clone;
     }
 
-    public LayerGene Splice(LayerGene other)
+    public LayerGene[] Splice(LayerGene other)
     {
         if (MaxNeurons != other.MaxNeurons)
             throw new System.ArgumentException("Tried to splice layer with another layer of a different size!");
 
-        NeuronGenes = NeuronGenes.Zip(other.NeuronGenes, (ownN, otherN) => ownN.Splice(otherN)).ToList();
-        return this;
+        LayerGene[] children = new LayerGene[2] {
+            new LayerGene(MaxNeurons),
+            new LayerGene(MaxNeurons),
+        };
+
+        for (int i = 0; i < MaxNeurons; i++)
+        {
+            NeuronGene[] neuronOffspring = NeuronGenes[i].Splice(other.NeuronGenes[i]);
+            children[0].NeuronGenes.Add(neuronOffspring[0]);
+            children[1].NeuronGenes.Add(neuronOffspring[1]);
+        }
+
+        return children;
     }
 
     public void Mutate(float proportion)
@@ -116,32 +145,51 @@ public class LayerGene
 
 public class NeuronGene
 {
-    public double[] weights { get; set; }
-    public double bias { get; set; }
+    public double[] Weights { get; set; }
+    public double Bias { get; set; }
     public double WeightSumFingerprint { get; private set; }
 
     public NeuronGene(int nWeights, bool initialiseAsAlive)
     {
-        weights = new double[nWeights];
+        Weights = new double[nWeights];
         if (initialiseAsAlive)
             RandomiseWeights();
         else
             SetWeights(0);
     }
 
+    private NeuronGene(int nWeights, double bias)
+    {
+        Weights = new double[nWeights];
+        Bias = bias;
+    }
+
     public NeuronGene Clone() => (NeuronGene)this.MemberwiseClone();
 
-    public NeuronGene Splice(NeuronGene other)
+    public NeuronGene[] Splice(NeuronGene other)
     {
-        bias = RandomBool() ? other.bias : bias;
-        weights = weights.Zip(other.weights, (otherW, ownW) => RandomBool() ? otherW : ownW).ToArray();
-        return this;
+        if (Weights.Length != other.Weights.Length)
+            throw new System.ArgumentException("Tried to splice neuron with another neuron with a different number of weights!");
+
+        NeuronGene[] children = new NeuronGene[2] { 
+            new NeuronGene(Weights.Length, Bias),
+            new NeuronGene(Weights.Length, other.Bias),
+        };
+
+        for (int i = 0; i < Weights.Length; i++)
+        {
+            int random = Random.Range(0, 2);
+            children[0].Weights[i] = random == 0 ? Weights[i] : other.Weights[i];
+            children[1].Weights[i] = random == 0 ? other.Weights[i] : Weights[i];
+        }
+
+        return children;
     }
 
     public void Mutate()
     {
         int mutationType = Random.Range(0, 6);
-        if (mutationType < 2 && (bias + weights.Sum() > 0))
+        if (mutationType < 2 && (Bias + Weights.Sum() > 0))
         {
             // Mutate by scaling all weights by up to +/-50%
             float scale = Random.Range(-0.5f, 0.5f);
@@ -164,40 +212,40 @@ public class NeuronGene
 
     public void RandomiseWeights()
     {
-        bias = Random.Range(-1f, 1f);
-        for (int i = 0; i < weights.Length; i++)
-            weights[i] = Random.Range(-1f, 1f);
+        Bias = Random.Range(-1f, 1f);
+        for (int i = 0; i < Weights.Length; i++)
+            Weights[i] = Random.Range(-1f, 1f);
     }
 
     public bool IsEqual(NeuronGene other)
     {
-        if (bias != other.bias) return false;
-        return weights.SequenceEqual(other.weights);
+        if (Bias != other.Bias) return false;
+        return Weights.SequenceEqual(other.Weights);
     }
 
     private void RandomiseSingleWeight()
     {
-        int weightIndex = Random.Range(-1, weights.Length); // -1 for the bias
+        int weightIndex = Random.Range(-1, Weights.Length); // -1 for the bias
         if (weightIndex == -1) 
-            bias = Random.Range(-1f, 1f);
+            Bias = Random.Range(-1f, 1f);
         else
-            weights[weightIndex] = Random.Range(-1f, 1f);
+            Weights[weightIndex] = Random.Range(-1f, 1f);
     }
 
     private void ScaleWeights(float factor)
     {
-        bias *= factor;
-        weights = weights.Select(x => x *= factor).ToArray();
+        Bias *= factor;
+        Weights = Weights.Select(x => x *= factor).ToArray();
     }
 
     private void SetWeights(double value)
     {
-        bias = value;
-        for (int i = 0; i < weights.Length; i++)
-            weights[i] = value;
+        Bias = value;
+        for (int i = 0; i < Weights.Length; i++)
+            Weights[i] = value;
     }
 
-    private double CalculateWeightSumFingerprint() => weights.Select((w, i) => w + i).Sum() + bias;
+    private double CalculateWeightSumFingerprint() => Weights.Select((w, i) => w + i).Sum() + Bias;
 
-    private static bool RandomBool() => Random.Range(0, 2) == 1 ? true : false; // Random.Range is max exclusive with ints
+    // private static bool RandomBool() => Random.Range(0, 2) == 1 ? true : false; // Random.Range is max exclusive with ints
 }

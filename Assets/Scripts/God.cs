@@ -1,10 +1,12 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 public class God : MonoBehaviour
 {
+    List<Transform> ts;
+
     [Header("Lineage colours")]
     public static Dictionary<DnaHeritage, Color> LineageColours;
     public Color NewGenome;
@@ -22,96 +24,106 @@ public class God : MonoBehaviour
     public float ProportionUnchanged = 0.05f;
     public float NewDnaRate = 0.05f;
     public float MutationRate = 0.05f;
+    public bool MutateClones = true;
     public float MaxTimeToReachNextGate = 5f;
 
     [Header("Population")]
     [SerializeField] private GameObject populationPrefab = null;
     [SerializeField] private int generationSize = 10;
     [SerializeField] private List<Brain> generationPool;
-    [SerializeField] private float generationTotalFitness;
+    [SerializeField] private List<Dna> genePool;
+    [SerializeField] private float generationTotalFitness; // for debugging
 
     public int GenerationCount { get; set; }
     public int CurrentlyAlive { get; set; }
 
-    private Dna SelectDna(Dictionary<Brain, float> selectionProbabilities, Dna exceptThisOne = null)
+    private Dna[] CreateOffspring(List<Dna> parentPool)
     {
-        float random = Random.Range(0f, 1f);
-        foreach(KeyValuePair<Brain, float> entry in selectionProbabilities)
-        {
-            random -= entry.Value;
-            if(random < 0 && entry.Key.Dna != exceptThisOne) return entry.Key.SelectForBreeding();
-        }
-
-        return selectionProbabilities.Keys.ToArray()[Random.Range(0, selectionProbabilities.Count)].SelectForBreeding();
+        Dna parent1 = SelectRandomBasedOnFitness(parentPool);
+        Dna parent2 = SelectRandomBasedOnFitness(parentPool.Where(p => p != parent1).ToList());
+        return parent1.Splice(parent2);
     }
 
-    private IEnumerator CreateGeneration(bool seed = false)
+    private Dna SelectRandomBasedOnFitness(List<Dna> parentPool)
     {
-        // create TNG
-        List<Dna> theNextGeneration = new List<Dna>();
-
-        if (seed)
+        float random = Random.Range(0f, parentPool.Sum(p => p.Fitness));
+        foreach(Dna candidate in parentPool.OrderBy(c => Random.Range(0f, 1f)))
         {
-            Debug.Log("Generation 1 seeded");
-            for (int i = 0; i < generationSize; i++)
-                theNextGeneration.Add(new Dna(Inputs, Outputs, HiddenLayers, MaxNeuronsPerLayer));
+            random -= candidate.Fitness;
+            if (random < 0) return candidate;
         }
-        else
-        {
-            // report on last generation
-            Debug.Log("Generation " + GenerationCount + ": Avg: " + generationPool.Average(b => b.Fitness) + " range: " + generationPool.Min(b => b.Fitness) + " - " + generationPool.Max(b => b.Fitness));
-            
-            // preserve top survivors 
-            int nUnchanged = Mathf.RoundToInt(generationSize * ProportionUnchanged);
-            if (nUnchanged > 0) theNextGeneration.AddRange(generationPool.OrderByDescending(b => b.Fitness).ToList().GetRange(0, nUnchanged).Select(b => b.Dna.Clone()));
+        return parentPool.Last();
+    }
 
-            // TODO: mutate without breeding
-
-            // add completely new dna into next gen
-            int nNew = Mathf.RoundToInt(generationSize * NewDnaRate);
-            if (nNew > 0) for (int i = 0; i < nNew; i++) theNextGeneration.Add(new Dna(Inputs, Outputs, HiddenLayers, MaxNeuronsPerLayer));
-
-            // calculate probability of selection for each genome
-            Dictionary<Brain, float> SelectionProbabilities = new Dictionary<Brain, float>();
-            foreach (Brain b in generationPool)
-                SelectionProbabilities.Add(b, b.Fitness / generationTotalFitness);
-
-            // populate rest of next generation with offspring
-            for (int i = nUnchanged; i < generationSize; i++)
-            {
-                // pick 2 random DIFFERENT parents and breed
-                Dna p1 = SelectDna(SelectionProbabilities);
-                Dna p2 = SelectDna(SelectionProbabilities, p1);
-                Dna offspring = p1.Clone().Splice(p2);
-                // Dna unmutoffspring = p1.Clone().Splice(p2);
-                // bool parSame = p1.IsEqual(p2);
-                // bool offSameP1 = p1.IsEqual(unmutoffspring);
-                // bool offSameP2 = p2.IsEqual(unmutoffspring);
-
-                // do mutation
-                if (Random.Range(0f, 1f) < MutationRate) offspring.Mutate(0.7f); 
-                // Dna offspring = unmutoffspring.Clone();
-                // offspring.Mutate(1f);
-                // bool mutantSame = unmutoffspring.IsEqual(offspring);
-                // Debug.Log("parents same: " + parSame + " child == 1: " + (offSameP1 || offSameP2) + " child == both: " + (offSameP1 && offSameP2) + " mutation worked " + !mutantSame);
-                
-                theNextGeneration.Add(offspring);
-                yield return new WaitForSeconds(0.2f); // so we can visualise selection of agents for the next generation
-            }
-
-            yield return new WaitForSeconds(3f); // pause so we can see the results of selection
-        }
-
-        // setup next generation
-        CheckForIdenticalGenomes(theNextGeneration);
-        GenerationCount++;
-        generationTotalFitness = 0;
+    private void ReleaseNewGeneration(List<Dna> newGenerationDna)
+    {
+        genePool = newGenerationDna;
+        generationTotalFitness = 0; // used for debugging only
         CurrentlyAlive = generationSize;
-        generationPool = generationPool.Zip(theNextGeneration, (brain, dna) => {
+        generationPool = generationPool.Zip(newGenerationDna, (brain, dna) => {
             brain.ReplaceDna(dna);
             brain.Arise(transform.position, transform.rotation);
             return brain;
         }).ToList();
+    }
+
+    private IEnumerator CreateGeneration(List<Dna> oldGeneration = null)
+    {
+        // create TNG
+        List<Dna> theNextGeneration = new List<Dna>();
+
+        if (oldGeneration == null)
+        {
+            for (int i = 0; i < generationSize; i++)
+                theNextGeneration.Add(new Dna(Inputs, Outputs, HiddenLayers, MaxNeuronsPerLayer));
+            Debug.Log("Generation 1 seeded");
+        }
+        else
+        {
+            // report on last generation
+            Debug.Log("Generation " + GenerationCount + ": Avg: " + oldGeneration.Average(d => d.Fitness) + " Max: " + oldGeneration.Max(d => d.Fitness));
+            
+            // preserve top survivors 
+            int nUnchanged = Mathf.RoundToInt(generationSize * ProportionUnchanged);
+            if (nUnchanged > 0) theNextGeneration.AddRange(oldGeneration.OrderByDescending(d => d.Fitness).ToList().GetRange(0, nUnchanged).Select(d => d.Clone()));
+
+            // add completely new dna into next gen
+            int nNew = Mathf.RoundToInt(generationSize * NewDnaRate);
+            if ((generationSize - nNew) % 2 == 1) nNew ++; // make sure remaining spaces is an even number
+            if (nNew > 0) for (int i = 0; i < nNew; i++) theNextGeneration.Add(new Dna(Inputs, Outputs, HiddenLayers, MaxNeuronsPerLayer));
+
+            // populate rest of next generation with offspring
+            for (int i = nUnchanged + nNew; i < generationSize; i += 2)
+            {
+                // pick 2 random DIFFERENT parents and breed
+                foreach (Dna child in CreateOffspring(oldGeneration))
+                {
+                    // do mutation
+                    if (Random.Range(0f, 1f) < MutationRate) child.Mutate(0.5f);
+                    theNextGeneration.Add(child);   
+                }
+                yield return new WaitForSeconds(0.1f); // so we can visualise selection of agents for the next generation
+            }
+            yield return new WaitForSeconds(0.5f); // pause so we can see the results of selection
+        }
+
+        // check for clones
+        CheckForIdenticalGenomes(theNextGeneration);
+        if (MutateClones) MutateIdenticalGenomes(theNextGeneration);
+        
+        // setup next generation
+        GenerationCount++;
+        ReleaseNewGeneration(theNextGeneration);
+    }
+
+    private void MutateIdenticalGenomes(List<Dna> dnaList)
+    {
+        Debug.Log("Mutating clones...");
+        foreach (var d in dnaList)
+        {
+            foreach (var otherD in dnaList)
+                if (d != otherD && d.IsEqual(otherD)) d.Mutate(0.5f);
+        }
     }
 
     private void CheckForIdenticalGenomes(List<Dna> dnaList)
@@ -122,55 +134,19 @@ public class God : MonoBehaviour
 
             return false;
         }).ToList();
-        if (duplicates.Count > 0) Debug.LogError(duplicates.Count + " identical genomes in generation");
+
+        if (duplicates.Count > 0) Debug.Log(duplicates.Count + " identical genomes found");
     }
 
-    private void HandleIndividualDied(Brain deceased)
+    private void HandleIndividualDied(Brain deceased, float fitness)
     {
-        generationTotalFitness += deceased.Fitness;
-        CurrentlyAlive--;
-        if (CurrentlyAlive == 0) StartCoroutine(CreateGeneration());
-    }
-
-void debugDna(Dna dna)
-{
-    foreach (var l in dna.LayerGenes)
-    {
-        Debug.Log("=====NEW LAYER=====");
-        debugLayer(l);
-    }
-}
-
-    void debugLayer(LayerGene l)
-    {
-        foreach (var n in l.NeuronGenes)
-        {
-            Debug.Log(n.bias + " ====== " + n.weights.Sum());
-        }
+        generationTotalFitness += fitness; // used for debugging only
+        --CurrentlyAlive;
+        if (CurrentlyAlive == 0) StartCoroutine(CreateGeneration(genePool));
     }
 
     private void Start()
     {
-        LayerGene n1 = new LayerGene(5, 5);
-        LayerGene n2 = new LayerGene(5, 5);
-        LayerGene offspring = n1.Clone().Splice(n2);
-
-        Debug.Log(n1.IsEqual(n2));
-        Debug.Log(n1.IsEqual(offspring));
-        Debug.Log(n2.IsEqual(offspring));
-
-
-        // debugLayer(n2);
-        // debugLayer(offspring);
-
-
-        // var d1 = new Dna(5, 2, 1, 5);
-
-
-
-        // return;
-
-
         LineageColours = new Dictionary<DnaHeritage, Color> ()
         {
             { DnaHeritage.IsNew, NewGenome },
@@ -184,8 +160,12 @@ void debugDna(Dna dna)
         {
             Brain b = Instantiate(populationPrefab).GetComponent<Brain>();
             generationPool.Add(b);
+            b.SuicideThreshold = MaxTimeToReachNextGate;
             b.Died += HandleIndividualDied;
         }
-        StartCoroutine(CreateGeneration(true));
+
+        ts = generationPool.Select(b => b.transform).ToList();
+
+        StartCoroutine(CreateGeneration());
     }
 }

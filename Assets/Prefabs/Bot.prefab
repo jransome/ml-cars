@@ -154,12 +154,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07e8cd702c253364a86d191895f17798, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  WeightSumFingerprint: 0
   botController: {fileID: 8070622361090416648}
   sensors: {fileID: 8070622361090416646}
   botRenderer: {fileID: 9083424398251516781}
-  thoughtInterval: 0.08
-  suicideThreshold: 5
+  thoughtInterval: 0.02
   heritage: 0
+  DistanceCovered: 0
 --- !u!114 &8070622361090416648
 MonoBehaviour:
   m_ObjectHideFlags: 0
