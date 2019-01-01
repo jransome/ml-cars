@@ -118,7 +118,6 @@ public class God : MonoBehaviour
 
     private void MutateIdenticalGenomes(List<Dna> dnaList)
     {
-        Debug.Log("Mutating clones...");
         foreach (var d in dnaList)
         {
             foreach (var otherD in dnaList)

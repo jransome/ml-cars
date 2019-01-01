@@ -3317,11 +3317,12 @@ MonoBehaviour:
   Mutated: {r: 0.023899764, g: 0.8207547, b: 0, a: 1}
   Inputs: 5
   Outputs: 2
-  HiddenLayers: 1
-  MaxNeuronsPerLayer: 3
+  HiddenLayers: 2
+  MaxNeuronsPerLayer: 7
   ProportionUnchanged: 0.05
   NewDnaRate: 0.05
-  MutationRate: 0.1
+  MutationRate: 0.3
+  MutateClones: 1
   MaxTimeToReachNextGate: 5
   populationPrefab: {fileID: 8070622361090416649, guid: 487f0c203d4e587499141d56e06a867f,
     type: 3}
