@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class God : MonoBehaviour
 {
-    List<Transform> ts;
+    public ChaseCamera ChaseCamera;
 
     [Header("Lineage colours")]
     public static Dictionary<DnaHeritage, Color> LineageColours;
@@ -163,8 +163,11 @@ public class God : MonoBehaviour
             b.Died += HandleIndividualDied;
         }
 
-        ts = generationPool.Select(b => b.transform).ToList();
-
         StartCoroutine(CreateGeneration());
+    }
+
+    private void Update() 
+    {
+        ChaseCamera.FollowTransform = generationPool.OrderByDescending(b => b.DistanceCovered).First().transform;    
     }
 }

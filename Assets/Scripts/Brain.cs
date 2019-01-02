@@ -5,8 +5,6 @@ using UnityEngine;
 
 public class Brain : MonoBehaviour
 {
-    public double WeightSumFingerprint; // debugging
-
     [SerializeField] private Bot botController = null;
     [SerializeField] private Sensors sensors = null;
     [SerializeField] private Renderer botRenderer = null;
@@ -21,8 +19,8 @@ public class Brain : MonoBehaviour
     public float ThrottleDecision { get; private set; } = 0f;
     public float SteeringDecision { get; private set; } = 0f;
 
-    public float LifeSpan { get; private set; }
     public float DistanceCovered; //{ get; private set; }
+    public float LifeSpan { get; private set; }
     public int GatesCrossed { get; private set; }
     public Gate LastGateCrossed { get; private set; }
     public float SuicideThreshold { get; set; } = 5f;
@@ -31,7 +29,6 @@ public class Brain : MonoBehaviour
 
     public void Arise(Vector3 startPosition, Quaternion startRotation)
     {
-        WeightSumFingerprint = Dna.WeightSumFingerprint;
         if (IsAlive) Debug.LogWarning("Brain was not dead when reset");
         transform.localScale = Vector3.one;
         transform.position = startPosition;
@@ -86,15 +83,13 @@ public class Brain : MonoBehaviour
         List<double> outputs = nn.Calculate(inputs);
         ThrottleDecision = (float)outputs[0];
         SteeringDecision = (float)outputs[1];
+        DistanceCovered = LastGateCrossed.CalculateCumulativeDistance(transform.position);
     }
 
     private void Die()
     {
         IsAlive = false;
         LifeSpan = Time.time - timeOfBirth;
-        DistanceCovered += LastGateCrossed.CalculateDistanceTo(transform.position);
-        // transform.localScale += Vector3.up * DistanceCovered; // debugging
-        // float fitness = 1;
         float fitness = CalculateFitness();
         Dna.Fitness = fitness;
         Died(this, fitness);
@@ -110,7 +105,6 @@ public class Brain : MonoBehaviour
             Gate g = other.GetComponent<Gate>();
             if (GatesCrossed + 1 == g.Number)
             {
-                DistanceCovered += LastGateCrossed.DistanceToNext;
                 GatesCrossed++;
                 LastGateCrossed = g;
                 timeLastGateCrossed = Time.time;

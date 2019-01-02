@@ -5,9 +5,11 @@ public class Gate : MonoBehaviour
 {
     public int Number { get; private set; }
     public Vector3 DirectionToNext { get; set; }
-    public float DistanceToNext { get; set; }
+    public float CumulativeDistance;
 
-    public float CalculateDistanceTo(Vector3 position)
+    public float CalculateCumulativeDistance(Vector3 position) => CumulativeDistance + CalculateDistanceTo(position);
+
+    private float CalculateDistanceTo(Vector3 position)
     {
         // Calculates the distance a point is away from this gate along a line stretching from this gate to the next gate
         float adjacentToHypotenuseRadians = Vector3.Angle(DirectionToNext, position - transform.position) * (Mathf.PI / 180);
