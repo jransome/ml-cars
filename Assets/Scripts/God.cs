@@ -6,6 +6,7 @@ using UnityEngine;
 public class God : MonoBehaviour
 {
     public ChaseCamera ChaseCamera;
+    public int StartingGate = 0;
 
     [Header("Lineage colours")]
     public static Dictionary<DnaHeritage, Color> LineageColours;
@@ -160,6 +161,7 @@ public class God : MonoBehaviour
             Brain b = Instantiate(populationPrefab).GetComponent<Brain>();
             generationPool.Add(b);
             b.SuicideThreshold = MaxTimeToReachNextGate;
+            b.StartingGate = StartingGate;
             b.Died += HandleIndividualDied;
         }
 

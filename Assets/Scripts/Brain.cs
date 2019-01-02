@@ -21,6 +21,7 @@ public class Brain : MonoBehaviour
 
     public float DistanceCovered; //{ get; private set; }
     public float LifeSpan { get; private set; }
+    public int StartingGate { get; set; }
     public int GatesCrossed { get; private set; }
     public Gate LastGateCrossed { get; private set; }
     public float SuicideThreshold { get; set; } = 5f;
@@ -38,7 +39,7 @@ public class Brain : MonoBehaviour
 
         LifeSpan = 0f;
         DistanceCovered = 0f;
-        GatesCrossed = 0;
+        GatesCrossed = StartingGate;
         LastGateCrossed = GateManager.Instance.StartingGate;
 
         IsAlive = true;
