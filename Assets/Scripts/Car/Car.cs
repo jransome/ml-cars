@@ -26,6 +26,7 @@ public class Car : MonoBehaviour
 
     public void Brake(float input)
     {
+        input = Mathf.Clamp01(input);
         foreach (WheelCollider w in wheels)
             w.brakeTorque = input * torque;
     }

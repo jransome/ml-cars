@@ -3,27 +3,26 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Brain : MonoBehaviour
+public abstract class Brain : MonoBehaviour
 {
-    [SerializeField] private Bot botController = null;
-    [SerializeField] private Sensors sensors = null;
-    [SerializeField] private Renderer botRenderer = null;
-    [SerializeField] private float thoughtInterval = 0.1f;
-    [SerializeField] private DnaHeritage heritage; // For debugging in inspector
-    private NeuralNetwork nn;
-    private float timeOfBirth;
-    private float timeLastGateCrossed;
+    [SerializeField] protected Sensors sensors = null;
+    [SerializeField] protected Renderer rend = null;
+    [SerializeField] protected float thoughtInterval = 0.1f;
+    [SerializeField] protected DnaHeritage heritage; // For debugging in inspector
+    protected NeuralNetwork nn;
+    protected float timeOfBirth;
+    protected float timeLastGateCrossed;
 
-    public Dna Dna { get; private set; }
+    public Dna Dna { get; protected set; }
     public bool IsAlive { get; set; } = false;
-    public float ThrottleDecision { get; private set; } = 0f;
-    public float SteeringDecision { get; private set; } = 0f;
+    public float ThrottleDecision { get; protected set; } = 0f;
+    public float SteeringDecision { get; protected set; } = 0f;
 
-    public float DistanceCovered; //{ get; private set; }
-    public float LifeSpan { get; private set; }
+    public float DistanceCovered; //{ get; protected set; }
+    public float LifeSpan { get; protected set; }
     public int StartingGate { get; set; }
-    public int GatesCrossed { get; private set; }
-    public Gate LastGateCrossed { get; private set; }
+    public int GatesCrossed { get; protected set; }
+    public Gate LastGateCrossed { get; protected set; }
     public float SuicideThreshold { get; set; } = 5f;
 
     public event Action<Brain, float> Died = delegate { };
@@ -35,7 +34,7 @@ public class Brain : MonoBehaviour
         transform.position = startPosition;
         transform.rotation = startRotation;
         heritage = Dna.Heritage;
-        botRenderer.material.color = God.LineageColours[Dna.Heritage];
+        rend.material.color = God.LineageColours[Dna.Heritage];
 
         LifeSpan = 0f;
         DistanceCovered = 0f;
@@ -49,7 +48,7 @@ public class Brain : MonoBehaviour
         StartCoroutine(ThoughtProcess());
     }
 
-    private void OnSelectForBreeding()
+    protected void OnSelectForBreeding()
     {
         transform.localScale += Vector3.up;
     }
@@ -68,7 +67,7 @@ public class Brain : MonoBehaviour
         Dna.SelectedForBreeding += OnSelectForBreeding;
     }
 
-    private IEnumerator ThoughtProcess()
+    protected IEnumerator ThoughtProcess()
     {
         while(IsAlive)
         {
@@ -77,17 +76,9 @@ public class Brain : MonoBehaviour
         }
     }
 
-    private void Think()
-    {
-        if (Time.time - timeLastGateCrossed > SuicideThreshold) Die();
-        List<double> inputs = sensors.CalculateNormalisedDistances();
-        List<double> outputs = nn.Calculate(inputs);
-        ThrottleDecision = (float)outputs[0];
-        SteeringDecision = (float)outputs[1];
-        DistanceCovered = LastGateCrossed.CalculateCumulativeDistance(transform.position);
-    }
+    protected abstract void Think();
 
-    private void Die()
+    protected void Die()
     {
         IsAlive = false;
         LifeSpan = Time.time - timeOfBirth;
@@ -96,9 +87,9 @@ public class Brain : MonoBehaviour
         Died(this, fitness);
     }
 
-    private float CalculateFitness() => DistanceCovered > 0 ? Mathf.Pow(DistanceCovered, 2) : 0;
+    protected float CalculateFitness() => DistanceCovered > 0 ? Mathf.Pow(DistanceCovered, 2) : 0;
 
-    private void OnTriggerEnter(Collider other)
+    protected void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Terrain")) Die();
         else if (other.CompareTag("Gate"))
@@ -112,12 +103,5 @@ public class Brain : MonoBehaviour
             }
             else Die();
         }
-    }
-
-    private void FixedUpdate()
-    {
-        if (!IsAlive) return;
-        botController.Throttle(ThrottleDecision);
-        botController.Steer(SteeringDecision);
     }
 }

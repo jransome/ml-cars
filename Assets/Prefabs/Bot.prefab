@@ -88,8 +88,8 @@ GameObject:
   - component: {fileID: 8070622361090416647}
   - component: {fileID: 8070622361090416650}
   - component: {fileID: 8070622361090416651}
-  - component: {fileID: 8070622361090416641}
   - component: {fileID: 8070622361090416648}
+  - component: {fileID: 1036445570342279107}
   - component: {fileID: 8070622361090416646}
   m_Layer: 2
   m_Name: Bot
@@ -142,25 +142,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &8070622361090416641
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8070622361090416649}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 07e8cd702c253364a86d191895f17798, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  WeightSumFingerprint: 0
-  botController: {fileID: 8070622361090416648}
-  sensors: {fileID: 8070622361090416646}
-  botRenderer: {fileID: 9083424398251516781}
-  thoughtInterval: 0.02
-  heritage: 0
-  DistanceCovered: 0
 --- !u!114 &8070622361090416648
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -175,6 +156,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxSpeed: 20
   turnSpeed: 5
+--- !u!114 &1036445570342279107
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8070622361090416649}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb19ed6abf2ff42de8975e8aedcaa974, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sensors: {fileID: 8070622361090416646}
+  rend: {fileID: 9083424398251516781}
+  thoughtInterval: 0.1
+  heritage: 0
+  DistanceCovered: 0
+  botController: {fileID: 8070622361090416648}
 --- !u!114 &8070622361090416646
 MonoBehaviour:
   m_ObjectHideFlags: 0

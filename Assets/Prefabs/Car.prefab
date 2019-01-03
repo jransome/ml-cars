@@ -604,7 +604,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c2333cafa3f0cb4eac92a671077ebef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsHumanControlled: 1
+  IsHumanControlled: 0
   torque: 800
   maxLockDegrees: 35
   wheels:
