@@ -141,7 +141,7 @@ public class God : MonoBehaviour
     private void HandleIndividualDied(Brain deceased, float fitness)
     {
         generationTotalFitness += fitness; // used for debugging only
-        --CurrentlyAlive;
+        CurrentlyAlive--;
         if (CurrentlyAlive == 0) StartCoroutine(CreateGeneration(genePool));
     }
 

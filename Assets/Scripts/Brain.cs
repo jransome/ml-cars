@@ -14,7 +14,7 @@ public abstract class Brain : MonoBehaviour
     protected float timeLastGateCrossed;
 
     public Dna Dna { get; protected set; }
-    public bool IsAlive { get; set; } = false;
+    public bool IsAlive { get; set; }
     public float ThrottleDecision { get; protected set; } = 0f;
     public float SteeringDecision { get; protected set; } = 0f;
 
@@ -80,6 +80,7 @@ public abstract class Brain : MonoBehaviour
 
     protected virtual void Die()
     {
+        if (!IsAlive) return;
         IsAlive = false;
         LifeSpan = Time.time - timeOfBirth;
         float fitness = CalculateFitness();

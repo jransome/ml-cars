@@ -3355,7 +3355,7 @@ MonoBehaviour:
   MaxTimeToReachNextGate: 5
   populationPrefab: {fileID: 6641770778032953726, guid: 83bd4ddeaecaa8c41aa631c791dbf3cf,
     type: 3}
-  generationSize: 40
+  generationSize: 30
   generationPool: []
   generationTotalFitness: 0
 --- !u!4 &985539030
