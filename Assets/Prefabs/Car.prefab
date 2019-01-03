@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6503996041191809697}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: FR
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -42,7 +42,7 @@ GameObject:
   - component: {fileID: 6310500625810534406}
   - component: {fileID: 5981986370795775169}
   - component: {fileID: 5110027591432978142}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -119,7 +119,7 @@ GameObject:
   - component: {fileID: 6364337814949408389}
   - component: {fileID: 585090443840318730}
   - component: {fileID: 8057067681058831911}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -194,7 +194,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6992204271345511843}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: FL
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -227,7 +227,7 @@ GameObject:
   - component: {fileID: 6607800168300448934}
   - component: {fileID: 3489067327474505448}
   - component: {fileID: 6667333816885228098}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -302,7 +302,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1819479291366710105}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: BR
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -333,7 +333,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 591306545023550092}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: BL
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -365,7 +365,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6641770777310051215}
   - component: {fileID: 6641770777310051212}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: FL
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -426,7 +426,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6641770777586412786}
   - component: {fileID: 6641770777586412787}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: BR
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -486,7 +486,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6641770777988054586}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -527,7 +527,9 @@ GameObject:
   - component: {fileID: 6641770778032953715}
   - component: {fileID: 6641770778032953714}
   - component: {fileID: 947620192}
-  m_Layer: 0
+  - component: {fileID: 343856203757230419}
+  - component: {fileID: 9160784905630585803}
+  m_Layer: 9
   m_Name: Car
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -628,7 +630,40 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DrawSensors: 0
-  raycastDistance: 30
+  raycastDistance: 50
+--- !u!114 &343856203757230419
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6641770778032953726}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d23b10d1cf05747ab8d6a1a98b48073e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rb: {fileID: 6641770778032953724}
+--- !u!114 &9160784905630585803
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6641770778032953726}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a38f7fe598e394c0d9b2f2ae6cdc3ce9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  colliderTrigger: {fileID: 286557435229999330}
+  rend: {fileID: 6641770778537090222}
+  thoughtInterval: 0.1
+  heritage: 0
+  DistanceCovered: 0
+  carController: {fileID: 6641770778032953714}
+  distanceSensors: {fileID: 947620192}
+  physicsSensors: {fileID: 343856203757230419}
 --- !u!1 &6641770778317482369
 GameObject:
   m_ObjectHideFlags: 0
@@ -639,7 +674,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6641770778317482374}
   - component: {fileID: 6641770778317482375}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: BL
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -701,7 +736,7 @@ GameObject:
   - component: {fileID: 6641770778537090216}
   - component: {fileID: 6641770778537090223}
   - component: {fileID: 6641770778537090222}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Cabin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -778,7 +813,7 @@ GameObject:
   - component: {fileID: 6641770778603414080}
   - component: {fileID: 6641770778603414086}
   - component: {fileID: 6641770778603414081}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -853,7 +888,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6641770778603841034}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Wheels
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -888,7 +923,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6641770778614627537}
   - component: {fileID: 6641770778614627542}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: FR
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -950,7 +985,9 @@ GameObject:
   - component: {fileID: 6641770778758741654}
   - component: {fileID: 6641770778758741653}
   - component: {fileID: 6641770778758741652}
-  m_Layer: 0
+  - component: {fileID: 1227145980741308343}
+  - component: {fileID: 286557435229999330}
+  m_Layer: 9
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1016,3 +1053,28 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!65 &1227145980741308343
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6641770778758741649}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &286557435229999330
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6641770778758741649}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc7fcd30d41454ad9a3626189d919954, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

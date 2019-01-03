@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class BotBrain : Brain
 {
-    [SerializeField] protected Bot botController = null;
+    [SerializeField] private Bot botController = null;
+    [SerializeField] private DistanceSensors distanceSensors = null;
 
     protected override void Think()
     {
         if (Time.time - timeLastGateCrossed > SuicideThreshold) Die();
-        List<double> inputs = sensors.CalculateNormalisedDistances();
+        List<double> inputs = distanceSensors.CalculateNormalisedDistances();
         List<double> outputs = nn.Calculate(inputs);
         ThrottleDecision = (float)outputs[0];
         SteeringDecision = (float)outputs[1];

@@ -5,7 +5,7 @@ using UnityEngine;
 
 public abstract class Brain : MonoBehaviour
 {
-    [SerializeField] protected Sensors sensors = null;
+    [SerializeField] protected ColliderTrigger colliderTrigger = null;
     [SerializeField] protected Renderer rend = null;
     [SerializeField] protected float thoughtInterval = 0.1f;
     [SerializeField] protected DnaHeritage heritage; // For debugging in inspector
@@ -78,7 +78,7 @@ public abstract class Brain : MonoBehaviour
 
     protected abstract void Think();
 
-    protected void Die()
+    protected virtual void Die()
     {
         IsAlive = false;
         LifeSpan = Time.time - timeOfBirth;
@@ -89,7 +89,7 @@ public abstract class Brain : MonoBehaviour
 
     protected float CalculateFitness() => DistanceCovered > 0 ? Mathf.Pow(DistanceCovered, 2) : 0;
 
-    protected void OnTriggerEnter(Collider other)
+    protected virtual void HandleColliderTriggerEnter(Collider other)
     {
         if (other.CompareTag("Terrain")) Die();
         else if (other.CompareTag("Gate"))
@@ -103,5 +103,10 @@ public abstract class Brain : MonoBehaviour
             }
             else Die();
         }
+    }
+
+    protected void Start() 
+    {
+        colliderTrigger.TriggerEntered += HandleColliderTriggerEnter;
     }
 }

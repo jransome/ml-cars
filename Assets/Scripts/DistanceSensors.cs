@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class CarSensors : MonoBehaviour
+public class DistanceSensors : MonoBehaviour
 {
     public bool DrawSensors = false;
     [SerializeField] private float raycastDistance = 15f;
-    [SerializeField] private Rigidbody rb = null;
 
     public List<double> NormalisedDistances { get; set; }
 
@@ -19,12 +18,6 @@ public class CarSensors : MonoBehaviour
         return NormalisedDistances;
     }
 
-    public List<double> GetVelocityVectors() => Vector3ToDoubleList(rb.velocity);
-
-    public List<double> GetAngularVelocityVectors() => Vector3ToDoubleList(rb.angularVelocity);
-
-    private List<double> Vector3ToDoubleList(Vector3 input) => new List<double>(3) { input.x, input.y, input.z };
-
     private float CheckDistance(float angle)
     {
         Vector3 direction = CalculateDirectionFromAngle(angle);
@@ -36,7 +29,7 @@ public class CarSensors : MonoBehaviour
 
     private void Awake()
     {
-        NormalisedDistances = new List<double>(5)
+        NormalisedDistances = new List<double>()
         {
             raycastDistance,    // Left
             raycastDistance,    // Left-Fwd
