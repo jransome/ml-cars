@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class God : MonoBehaviour
 {
-    public ChaseCamera ChaseCamera;
     public int StartingGate = 0;
 
     [Header("Lineage colours")]
@@ -37,6 +36,7 @@ public class God : MonoBehaviour
 
     public int GenerationCount { get; set; }
     public int CurrentlyAlive { get; set; }
+    public List<Brain> GenerationPool { get { return generationPool; } }
 
     private Dna[] CreateOffspring(List<Dna> parentPool)
     {
@@ -166,10 +166,5 @@ public class God : MonoBehaviour
         }
 
         StartCoroutine(CreateGeneration());
-    }
-
-    private void Update() 
-    {
-        ChaseCamera.FollowTransform = generationPool.OrderByDescending(b => b.DistanceCovered).First().transform;    
     }
 }

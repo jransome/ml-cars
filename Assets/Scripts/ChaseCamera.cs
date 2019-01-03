@@ -1,13 +1,21 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class ChaseCamera : MonoBehaviour
 {
-    public Transform FollowTransform { get; set; }
+    public God EvolutionManager;
+    private Transform chaseTransform;
 
     private void Update() 
     {
-        if (FollowTransform != null) transform.position = FollowTransform.position;
+        IOrderedEnumerable<Brain> livingAgents = EvolutionManager.GenerationPool
+            .Where(b => b.IsAlive)
+            .OrderByDescending(b => b.DistanceCovered);
+
+        if (livingAgents.Count() > 0) chaseTransform = livingAgents.First().transform;
+
+        if (chaseTransform != null) transform.position = chaseTransform.position;
     }
 }
