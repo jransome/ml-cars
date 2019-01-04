@@ -11,4 +11,6 @@ public static class Activation
         double k = Math.Exp(value);
         return k / (1.0f + k);
     }
+
+    public static double LeakyRelu(double input) => input > 0 ? input : 0.01 * input;
 }

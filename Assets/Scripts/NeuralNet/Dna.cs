@@ -147,6 +147,7 @@ public class NeuronGene
 {
     public double[] Weights { get; set; }
     public double Bias { get; set; }
+    public int Activation { get; set; }
     public double WeightSumFingerprint { get; private set; }
 
     public NeuronGene(int nWeights, bool initialiseAsAlive)
@@ -188,21 +189,21 @@ public class NeuronGene
 
     public void Mutate()
     {
-        int mutationType = Random.Range(0, 6);
-        if (mutationType < 2 && (Bias + Weights.Sum() > 0))
+        int mutationType = Random.Range(0, 10);
+        if (mutationType < 5 && (Bias + Weights.Sum() > 0))
         {
             // Mutate by scaling all weights by up to +/-50%
             float scale = Random.Range(-0.5f, 0.5f);
             ScaleWeights(1 + scale);
         }
-        else if (mutationType < 4)
+        else if (mutationType < 8)
         {
             // Mutate by selecting a random weight and replacing it with a new random number
             RandomiseSingleWeight();
         }
         else
         {
-            // Mutate by randomising all weights
+            // Mutate by randomising all weights and the activation function
             RandomiseWeights();
         }
         double newWeightSum = CalculateWeightSumFingerprint();
@@ -246,6 +247,4 @@ public class NeuronGene
     }
 
     private double CalculateWeightSumFingerprint() => Weights.Select((w, i) => w + i).Sum() + Bias;
-
-    // private static bool RandomBool() => Random.Range(0, 2) == 1 ? true : false; // Random.Range is max exclusive with ints
 }

@@ -45,14 +45,14 @@ public class CarBrain : Brain
     {
         if (other.CompareTag("Gate"))
         {
-            Gate g = other.GetComponent<Gate>();
-            if (GatesCrossed + 1 == g.Number)
-            {
-                GatesCrossed++;
-                LastGateCrossed = g;
-                timeLastGateCrossed = Time.time;
-            }
-            else Die();
+            // Gate g = other.GetComponent<Gate>();
+            // if (GatesCrossed + 1 == g.Number)
+            // {
+            //     GatesCrossed++;
+            //     LastGateCrossed = g;
+            //     timeLastGateCrossed = Time.time;
+            // }
+            // else Die();
         }
     }
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-public class Gate : MonoBehaviour
+public class DistanceGate : MonoBehaviour
 {
     public int Number { get; private set; }
     public Vector3 DirectionToNext { get; set; }

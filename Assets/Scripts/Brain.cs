@@ -22,7 +22,7 @@ public abstract class Brain : MonoBehaviour
     public float LifeSpan { get; protected set; }
     public int StartingGate { get; set; }
     public int GatesCrossed { get; protected set; }
-    public Gate LastGateCrossed { get; protected set; }
+    public DistanceGate LastGateCrossed { get; protected set; }
     public float SuicideThreshold { get; set; } = 5f;
 
     public event Action<Brain, float> Died = delegate { };
@@ -39,7 +39,7 @@ public abstract class Brain : MonoBehaviour
         LifeSpan = 0f;
         DistanceCovered = 0f;
         GatesCrossed = StartingGate;
-        LastGateCrossed = GateManager.Instance.StartingGate;
+        LastGateCrossed = DistanceGateManager.Instance.StartingGate;
 
         IsAlive = true;
         timeOfBirth = Time.time;
@@ -95,7 +95,7 @@ public abstract class Brain : MonoBehaviour
         if (other.CompareTag("Terrain")) Die();
         else if (other.CompareTag("Gate"))
         {
-            Gate g = other.GetComponent<Gate>();
+            DistanceGate g = other.GetComponent<DistanceGate>();
             if (GatesCrossed + 1 == g.Number)
             {
                 GatesCrossed++;
