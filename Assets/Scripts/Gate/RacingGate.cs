@@ -4,15 +4,12 @@ using UnityEngine;
 
 public class RacingGate : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    [SerializeField] private Transform optimalVectorPosition;
 
-    // Update is called once per frame
-    void Update()
+    // used for setting up gates
+    private void OnDrawGizmos() 
     {
-        
+        Gizmos.color = Color.red;
+        Gizmos.DrawRay(optimalVectorPosition.position - optimalVectorPosition.forward * 5, optimalVectorPosition.forward * 10); 
     }
 }
