@@ -5,9 +5,11 @@ public class PhysicsSensors : MonoBehaviour
 {
     [SerializeField] private Rigidbody rb = null;
 
-    public List<double> GetVelocityVectors() => Vector3ToDoubleList(rb.velocity);
+    public List<double> GetVelocityVectors() 
+    {
+        Vector3 localAxisVector = transform.InverseTransformDirection(rb.velocity);
+        return new List<double>(2) { localAxisVector.x, localAxisVector.z };
+    }
 
-    public List<double> GetAngularVelocityVectors() => Vector3ToDoubleList(rb.angularVelocity);
-
-    private List<double> Vector3ToDoubleList(Vector3 input) => new List<double>(3) { input.x, input.y, input.z };
+    public List<double> GetAngularVelocityVector() => new List<double>(1) { rb.angularVelocity.y };
 }
