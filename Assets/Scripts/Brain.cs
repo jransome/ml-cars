@@ -27,7 +27,7 @@ public abstract class Brain : MonoBehaviour
 
     public event Action<Brain, float> Died = delegate { };
 
-    public void Arise(Vector3 startPosition, Quaternion startRotation)
+    public virtual void Arise(Vector3 startPosition, Quaternion startRotation)
     {
         if (IsAlive) Debug.LogWarning("Brain was not dead when reset");
         transform.localScale = Vector3.one;
@@ -88,7 +88,7 @@ public abstract class Brain : MonoBehaviour
         Died(this, fitness);
     }
 
-    protected float CalculateFitness() => DistanceCovered > 0 ? Mathf.Pow(DistanceCovered, 2) : 0;
+    protected virtual float CalculateFitness() => DistanceCovered > 0 ? Mathf.Pow(DistanceCovered, 2) : 0;
 
     protected virtual void HandleColliderTriggerEnter(Collider other)
     {

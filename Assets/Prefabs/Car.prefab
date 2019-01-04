@@ -630,7 +630,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DrawSensors: 0
-  raycastDistance: 50
+  raycastDistance: 35
 --- !u!114 &343856203757230419
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -664,6 +664,8 @@ MonoBehaviour:
   carController: {fileID: 6641770778032953714}
   distanceSensors: {fileID: 947620192}
   physicsSensors: {fileID: 343856203757230419}
+  terrainBumps: 0
+  cumulativeTerrainImpactVelocity: 0
 --- !u!1 &6641770778317482369
 GameObject:
   m_ObjectHideFlags: 0
