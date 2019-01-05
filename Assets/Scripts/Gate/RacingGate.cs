@@ -4,7 +4,10 @@ using UnityEngine;
 
 public class RacingGate : MonoBehaviour
 {
-    [SerializeField] private Transform optimalVectorPosition;
+    [SerializeField] private Transform optimalVectorPosition = null;
+
+    public Vector3 OptimalDirection { get { return optimalVectorPosition.forward; } }
+    public Vector3 OptimalPosition { get { return optimalVectorPosition.position; } }
 
     // used for setting up gates
     private void OnDrawGizmos() 

@@ -5,19 +5,19 @@ using UnityEngine;
 
 public class CarBrain : Brain
 {
-    [SerializeField] protected Car carController = null;
+    [SerializeField] private Car carController = null;
+    [SerializeField] private CarFitness fitnessCalculator = null;
     [SerializeField] private DistanceSensors distanceSensors = null;
     [SerializeField] private PhysicsSensors physicsSensors = null;
-    [SerializeField] private int terrainBumps = 0;
-    [SerializeField] private float cumulativeTerrainImpactVelocity = 0;
+    [SerializeField] private RacingGate lastGateCrossed = null;
 
     public float BrakingDecision { get; private set; } = 0f;
 
     public override void Arise(Vector3 startPosition, Quaternion startRotation)
     {
+        BrakingDecision = 0;
         base.Arise(startPosition, startRotation);
-        terrainBumps = 0;
-        cumulativeTerrainImpactVelocity = 0f;
+        fitnessCalculator.ResetFitness();
     }
 
     protected override void Think()
@@ -31,7 +31,6 @@ public class CarBrain : Brain
         ThrottleDecision = (float)outputs[0];
         SteeringDecision = (float)outputs[1];
         // BrakingDecision = (float)outputs[2];
-        DistanceCovered = LastGateCrossed.CalculateCumulativeDistance(transform.position);
     }
 
     protected override void Die()
@@ -43,29 +42,30 @@ public class CarBrain : Brain
 
     protected override void HandleColliderTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Gate"))
+        if (other.CompareTag("RacingGate"))
         {
-            // Gate g = other.GetComponent<Gate>();
-            // if (GatesCrossed + 1 == g.Number)
-            // {
-            //     GatesCrossed++;
-            //     LastGateCrossed = g;
-            //     timeLastGateCrossed = Time.time;
-            // }
-            // else Die();
+            timeLastGateCrossed = Time.time;
+            RacingGate g = other.GetComponent<RacingGate>();
+            if (g == lastGateCrossed)
+            {
+                Die();
+                return;
+            }
+            if (Vector3.Dot(transform.forward, g.OptimalDirection) < -0.5f) Die(); // if obviously going backwards
+            else fitnessCalculator.UpdateFitness(g);
         }
     }
 
-    protected override float CalculateFitness() => DistanceCovered > 0 ? Mathf.Pow(DistanceCovered, 2) : 0;
+    protected override float CalculateFitness() => fitnessCalculator.Fitness;
 
-    private void OnCollisionEnter(Collision other) 
-    {
-        if (other.collider.tag == "Terrain") 
-        {
-            // terrainBumps++;
-            // cumulativeTerrainImpactVelocity += other.relativeVelocity.sqrMagnitude;
-        }
-    }
+    // private void OnCollisionEnter(Collision other) 
+    // {
+    //     if (other.collider.tag == "Terrain") 
+    //     {
+    //         terrainBumps++;
+    //         cumulativeTerrainImpactVelocity += other.relativeVelocity.sqrMagnitude;
+    //     }
+    // }
 
     private void FixedUpdate()
     {

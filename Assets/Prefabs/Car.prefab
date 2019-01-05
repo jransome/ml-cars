@@ -529,6 +529,7 @@ GameObject:
   - component: {fileID: 947620192}
   - component: {fileID: 343856203757230419}
   - component: {fileID: 9160784905630585803}
+  - component: {fileID: 1709147880}
   m_Layer: 9
   m_Name: Car
   m_TagString: Untagged
@@ -662,10 +663,29 @@ MonoBehaviour:
   heritage: 0
   DistanceCovered: 0
   carController: {fileID: 6641770778032953714}
+  fitnessCalculator: {fileID: 1709147880}
   distanceSensors: {fileID: 947620192}
   physicsSensors: {fileID: 343856203757230419}
+--- !u!114 &1709147880
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6641770778032953726}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35dc8771ee0cc491fafd8ce5dc21475d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fitness: 0
+  gatesCrossed: 0
   terrainBumps: 0
   cumulativeTerrainImpactVelocity: 0
+  gateCrossedReward: 5
+  optimalDirectionReward: 10
+  optimalPositionReward: 10
+  maxPositionDifferenceTolerance: 15
 --- !u!1 &6641770778317482369
 GameObject:
   m_ObjectHideFlags: 0

@@ -787,7 +787,7 @@ GameObject:
   - component: {fileID: 92597209}
   m_Layer: 2
   m_Name: Gate (13)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -893,7 +893,7 @@ GameObject:
   - component: {fileID: 97031018}
   m_Layer: 2
   m_Name: Gate (33)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1164,7 +1164,7 @@ GameObject:
   - component: {fileID: 167799016}
   m_Layer: 2
   m_Name: Gate (37)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1270,7 +1270,7 @@ GameObject:
   - component: {fileID: 168845055}
   m_Layer: 2
   m_Name: Gate (17)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1475,7 +1475,7 @@ GameObject:
   - component: {fileID: 174500676}
   m_Layer: 2
   m_Name: Gate (52)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1581,7 +1581,7 @@ GameObject:
   - component: {fileID: 200369643}
   m_Layer: 2
   m_Name: Gate (26)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2197,7 +2197,7 @@ GameObject:
   - component: {fileID: 291316814}
   m_Layer: 2
   m_Name: Gate (16)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2663,7 +2663,7 @@ GameObject:
   - component: {fileID: 375314327}
   m_Layer: 2
   m_Name: Gate (55)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2799,7 +2799,7 @@ GameObject:
   - component: {fileID: 401222088}
   m_Layer: 2
   m_Name: Gate (14)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2905,7 +2905,7 @@ GameObject:
   - component: {fileID: 450680716}
   m_Layer: 2
   m_Name: Gate (35)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3116,7 +3116,7 @@ GameObject:
   - component: {fileID: 472807005}
   m_Layer: 2
   m_Name: Gate (11)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3222,7 +3222,7 @@ GameObject:
   - component: {fileID: 510587179}
   m_Layer: 2
   m_Name: Gate (57)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3755,7 +3755,7 @@ GameObject:
   - component: {fileID: 535055072}
   m_Layer: 2
   m_Name: Gate (56)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4056,7 +4056,7 @@ GameObject:
   - component: {fileID: 627531248}
   m_Layer: 2
   m_Name: Gate (8)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4297,7 +4297,7 @@ GameObject:
   - component: {fileID: 631542096}
   m_Layer: 2
   m_Name: Gate (28)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4778,7 +4778,7 @@ GameObject:
   - component: {fileID: 707150323}
   m_Layer: 2
   m_Name: Gate (5)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4884,7 +4884,7 @@ GameObject:
   - component: {fileID: 712717870}
   m_Layer: 2
   m_Name: Gate (47)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4990,7 +4990,7 @@ GameObject:
   - component: {fileID: 729623263}
   m_Layer: 2
   m_Name: Gate (32)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5096,7 +5096,7 @@ GameObject:
   - component: {fileID: 734340262}
   m_Layer: 2
   m_Name: Gate (58)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5202,7 +5202,7 @@ GameObject:
   - component: {fileID: 737120375}
   m_Layer: 2
   m_Name: Gate (15)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5653,7 +5653,7 @@ GameObject:
   - component: {fileID: 792682242}
   m_Layer: 2
   m_Name: Gate (36)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6059,7 +6059,7 @@ GameObject:
   - component: {fileID: 869920185}
   m_Layer: 2
   m_Name: Gate (59)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6195,7 +6195,7 @@ GameObject:
   - component: {fileID: 882259550}
   m_Layer: 2
   m_Name: Gate (0)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6541,7 +6541,7 @@ GameObject:
   - component: {fileID: 935714642}
   m_Layer: 2
   m_Name: Gate (31)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6677,7 +6677,7 @@ GameObject:
   - component: {fileID: 943294153}
   m_Layer: 2
   m_Name: Gate (43)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6813,7 +6813,7 @@ GameObject:
   - component: {fileID: 971769301}
   m_Layer: 2
   m_Name: Gate (22)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6982,7 +6982,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &985539029
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7021,13 +7021,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 985539028}
-  m_LocalRotation: {x: -0, y: 0.91485965, z: -0, w: 0.403772}
-  m_LocalPosition: {x: 189.05, y: 1, z: 276.74}
+  m_LocalRotation: {x: -0, y: 0.97299707, z: -0, w: -0.23081739}
+  m_LocalPosition: {x: 498.9, y: 1, z: 206.2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 132.37201, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 206.68999, z: 0}
 --- !u!33 &985539031
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -7088,7 +7088,7 @@ GameObject:
   - component: {fileID: 1000587661}
   m_Layer: 2
   m_Name: Gate (49)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7524,7 +7524,7 @@ GameObject:
   - component: {fileID: 1078896313}
   m_Layer: 2
   m_Name: Gate (30)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7630,7 +7630,7 @@ GameObject:
   - component: {fileID: 1102245773}
   m_Layer: 2
   m_Name: Gate (1)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7736,7 +7736,7 @@ GameObject:
   - component: {fileID: 1119108224}
   m_Layer: 2
   m_Name: Gate (40)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7842,7 +7842,7 @@ GameObject:
   - component: {fileID: 1126618621}
   m_Layer: 2
   m_Name: Gate (12)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7948,7 +7948,7 @@ GameObject:
   - component: {fileID: 1140492887}
   m_Layer: 2
   m_Name: Gate (46)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8159,7 +8159,7 @@ GameObject:
   - component: {fileID: 1148593083}
   m_Layer: 2
   m_Name: Gate (29)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8400,7 +8400,7 @@ GameObject:
   - component: {fileID: 1153771924}
   m_Layer: 2
   m_Name: Gate (18)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8746,7 +8746,7 @@ GameObject:
   - component: {fileID: 1263517577}
   m_Layer: 2
   m_Name: Gate (6.5)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9362,7 +9362,7 @@ GameObject:
   - component: {fileID: 1322365016}
   m_Layer: 2
   m_Name: Gate (2)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9995,7 +9995,7 @@ GameObject:
   - component: {fileID: 1401024463}
   m_Layer: 2
   m_Name: Gate (9)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -10101,7 +10101,7 @@ GameObject:
   - component: {fileID: 1412157552}
   m_Layer: 2
   m_Name: Gate (53)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -10312,7 +10312,7 @@ GameObject:
   - component: {fileID: 1419213386}
   m_Layer: 2
   m_Name: Gate (50)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -10688,7 +10688,7 @@ GameObject:
   - component: {fileID: 1482668097}
   m_Layer: 2
   m_Name: Gate (3)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -10824,7 +10824,7 @@ GameObject:
   - component: {fileID: 1506946862}
   m_Layer: 2
   m_Name: Gate (20)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -11654,7 +11654,7 @@ GameObject:
   - component: {fileID: 1588299581}
   m_Layer: 2
   m_Name: Gate (21)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -12030,7 +12030,7 @@ GameObject:
   - component: {fileID: 1627726161}
   m_Layer: 2
   m_Name: Gate (24)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -12237,7 +12237,7 @@ GameObject:
   - component: {fileID: 1632732706}
   m_Layer: 0
   m_Name: RacingGates
-  m_TagString: Untagged
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -12634,7 +12634,7 @@ GameObject:
   - component: {fileID: 1678321735}
   m_Layer: 2
   m_Name: Gate (19)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -12740,7 +12740,7 @@ GameObject:
   - component: {fileID: 1684492329}
   m_Layer: 2
   m_Name: Gate (10)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -12985,7 +12985,7 @@ GameObject:
   - component: {fileID: 1698185882}
   m_Layer: 2
   m_Name: Gate (42)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -13091,7 +13091,7 @@ GameObject:
   - component: {fileID: 1698444328}
   m_Layer: 2
   m_Name: Gate (25)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -13197,7 +13197,7 @@ GameObject:
   - component: {fileID: 1717557909}
   m_Layer: 2
   m_Name: Gate (45)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -13408,7 +13408,7 @@ GameObject:
   - component: {fileID: 1752207252}
   m_Layer: 2
   m_Name: Gate (4)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -13619,7 +13619,7 @@ GameObject:
   - component: {fileID: 1754608399}
   m_Layer: 2
   m_Name: Gate (34)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -13725,7 +13725,7 @@ GameObject:
   - component: {fileID: 1758271264}
   m_Layer: 2
   m_Name: Gate (6)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -13831,7 +13831,7 @@ GameObject:
   - component: {fileID: 1763039655}
   m_Layer: 2
   m_Name: Gate (60)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -14072,7 +14072,7 @@ GameObject:
   - component: {fileID: 1773576322}
   m_Layer: 2
   m_Name: Gate (38)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -14283,7 +14283,7 @@ GameObject:
   - component: {fileID: 1792529005}
   m_Layer: 2
   m_Name: Gate (27)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -14419,7 +14419,7 @@ GameObject:
   - component: {fileID: 1797365103}
   m_Layer: 2
   m_Name: Gate (48)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -14585,7 +14585,7 @@ GameObject:
   - component: {fileID: 1861576373}
   m_Layer: 2
   m_Name: Gate (41)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -15053,7 +15053,7 @@ GameObject:
   - component: {fileID: 1986762362}
   m_Layer: 2
   m_Name: Gate (54)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -15189,7 +15189,7 @@ GameObject:
   - component: {fileID: 2020354452}
   m_Layer: 2
   m_Name: Gate (51)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -15295,7 +15295,7 @@ GameObject:
   - component: {fileID: 2022583684}
   m_Layer: 2
   m_Name: Gate (1.5)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -15506,7 +15506,7 @@ GameObject:
   - component: {fileID: 2035603821}
   m_Layer: 2
   m_Name: Gate (44)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -15612,7 +15612,7 @@ GameObject:
   - component: {fileID: 2039577340}
   m_Layer: 2
   m_Name: Gate (7)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -15718,7 +15718,7 @@ GameObject:
   - component: {fileID: 2055864839}
   m_Layer: 2
   m_Name: Gate (23)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -15854,7 +15854,7 @@ GameObject:
   - component: {fileID: 2067117255}
   m_Layer: 2
   m_Name: Gate (39)
-  m_TagString: Gate
+  m_TagString: RacingGate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

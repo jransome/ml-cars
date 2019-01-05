@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Terrain
   - Gate
+  - RacingGate
   layers:
   - Default
   - TransparentFX
