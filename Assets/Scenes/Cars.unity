@@ -7005,11 +7005,11 @@ MonoBehaviour:
   HiddenLayers: 2
   MaxNeuronsPerLayer: 10
   ProportionUnchanged: 0.05
-  NewDnaRate: 0.05
-  MutationRate: 0.2
+  NewDnaRate: 0.1
+  MutationRate: 0.25
   MutateClones: 1
-  MaxTimeToReachNextGate: 20
-  MaxGenerationTime: 45
+  MaxTimeToReachNextGate: 15
+  MaxGenerationTime: 100
   populationPrefab: {fileID: 6641770778032953726, guid: 83bd4ddeaecaa8c41aa631c791dbf3cf,
     type: 3}
   generationSize: 40
