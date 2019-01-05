@@ -10,6 +10,7 @@ public enum DnaHeritage
     Mutated,
 }
 
+[System.Serializable]
 public class Dna
 {
     public readonly int NumInputs;
@@ -88,6 +89,7 @@ public class Dna
     public bool IsEqual(Dna other) => !LayerGenes.Zip(other.LayerGenes, (own, otherGene) => own.IsEqual(otherGene)).Contains(false);
 }
 
+[System.Serializable]
 public class LayerGene
 {
     public readonly int MaxNeurons;
@@ -143,6 +145,7 @@ public class LayerGene
     public bool IsEqual(LayerGene other) => !NeuronGenes.Zip(other.NeuronGenes, (own, otherGene) => own.IsEqual(otherGene)).Contains(false);
 }
 
+[System.Serializable]
 public class NeuronGene
 {
     public double[] Weights { get; set; }
