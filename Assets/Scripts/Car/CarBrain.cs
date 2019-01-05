@@ -16,13 +16,14 @@ public class CarBrain : Brain
     public override void Arise(Vector3 startPosition, Quaternion startRotation)
     {
         BrakingDecision = 0;
-        base.Arise(startPosition, startRotation);
+        lastGateCrossed = null;
         fitnessCalculator.ResetFitness();
+        base.Arise(startPosition, startRotation);
     }
 
     protected override void Think()
     {
-        if (Time.time - timeLastGateCrossed > SuicideThreshold) Die();
+        if (Time.time - timeLastGateCrossed > GateSuicideThreshold) Die();
         List<double> inputs = distanceSensors.CalculateNormalisedDistances()
             .Concat(physicsSensors.GetVelocityVectors())
             .Concat(physicsSensors.GetAngularVelocityVector())
@@ -31,6 +32,7 @@ public class CarBrain : Brain
         ThrottleDecision = (float)outputs[0];
         SteeringDecision = (float)outputs[1];
         // BrakingDecision = (float)outputs[2];
+        ChaseCameraOrderingVariable = fitnessCalculator.Fitness;
     }
 
     protected override void Die()
@@ -51,6 +53,7 @@ public class CarBrain : Brain
                 Die();
                 return;
             }
+            lastGateCrossed = g;
             if (Vector3.Dot(transform.forward, g.OptimalDirection) < -0.5f) Die(); // if obviously going backwards
             else fitnessCalculator.UpdateFitness(g);
         }

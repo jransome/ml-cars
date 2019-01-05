@@ -12,7 +12,7 @@ public class ChaseCamera : MonoBehaviour
     {
         IOrderedEnumerable<Brain> livingAgents = EvolutionManager.GenerationPool
             .Where(b => b.IsAlive)
-            .OrderByDescending(b => b.DistanceCovered);
+            .OrderByDescending(b => b.ChaseCameraOrderingVariable);
 
         if (livingAgents.Count() > 0) chaseTransform = livingAgents.First().transform;
 

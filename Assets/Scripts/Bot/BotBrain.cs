@@ -7,24 +7,27 @@ public class BotBrain : Brain
     [SerializeField] private Bot botController = null;
     [SerializeField] private DistanceSensors distanceSensors = null;
     [SerializeField] private DistanceGate lastGateCrossed;
+    [SerializeField] private float distanceCovered;
 
     public override void Arise(Vector3 startPosition, Quaternion startRotation)
     {
-        base.Arise(startPosition, startRotation);
-        DistanceCovered = 0f;
+        distanceCovered = 0f;
         GatesCrossed = StartingGate;
         lastGateCrossed = DistanceGateManager.Instance.StartingGate;
+        base.Arise(startPosition, startRotation);
     }
 
     protected override void Think()
     {
-        if (Time.time - timeLastGateCrossed > SuicideThreshold) Die();
         List<double> inputs = distanceSensors.CalculateNormalisedDistances();
         List<double> outputs = nn.Calculate(inputs);
         ThrottleDecision = (float)outputs[0];
         SteeringDecision = (float)outputs[1];
-        DistanceCovered = lastGateCrossed.CalculateCumulativeDistance(transform.position);
+        distanceCovered = lastGateCrossed.CalculateCumulativeDistance(transform.position);
+        ChaseCameraOrderingVariable = distanceCovered;
     }
+
+    protected override float CalculateFitness() => distanceCovered > 0 ? Mathf.Pow(distanceCovered, 2) : 0;
 
     protected override void HandleColliderTriggerEnter(Collider other)
     {

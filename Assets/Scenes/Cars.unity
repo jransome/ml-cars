@@ -7009,6 +7009,7 @@ MonoBehaviour:
   MutationRate: 0.2
   MutateClones: 1
   MaxTimeToReachNextGate: 20
+  MaxGenerationTime: 45
   populationPrefab: {fileID: 6641770778032953726, guid: 83bd4ddeaecaa8c41aa631c791dbf3cf,
     type: 3}
   generationSize: 40
@@ -7022,7 +7023,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 985539028}
   m_LocalRotation: {x: -0, y: 0.97299707, z: -0, w: -0.23081739}
-  m_LocalPosition: {x: 498.9, y: 1, z: 206.2}
+  m_LocalPosition: {x: 481.5, y: 1, z: 171.8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}

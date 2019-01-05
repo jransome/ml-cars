@@ -18,11 +18,12 @@ public abstract class Brain : MonoBehaviour
     public float ThrottleDecision { get; protected set; } = 0f;
     public float SteeringDecision { get; protected set; } = 0f;
 
-    public float DistanceCovered; //{ get; protected set; }
+    public float ChaseCameraOrderingVariable { get; protected set; } // TODO: change this
     public float LifeSpan { get; protected set; }
+    public float MaxLifeSpan { get; set; } = 0f;
     public int StartingGate { get; set; }
     public int GatesCrossed { get; protected set; }
-    public float SuicideThreshold { get; set; } = 5f;
+    public float GateSuicideThreshold { get; set; } = 5f;
 
     public event Action<Brain, float> Died = delegate { };
 
@@ -66,7 +67,10 @@ public abstract class Brain : MonoBehaviour
     {
         while(IsAlive)
         {
+            if (MaxLifeSpan > 0 && LifeSpan > MaxLifeSpan) Die();
+            if (Time.time - timeLastGateCrossed > GateSuicideThreshold) Die();
             Think();
+            LifeSpan += thoughtInterval;
             yield return new WaitForSeconds(thoughtInterval);
         }
     }
@@ -83,7 +87,7 @@ public abstract class Brain : MonoBehaviour
         Died(this, fitness);
     }
 
-    protected virtual float CalculateFitness() => DistanceCovered > 0 ? Mathf.Pow(DistanceCovered, 2) : 0;
+    protected abstract float CalculateFitness();
 
     protected abstract void HandleColliderTriggerEnter(Collider other);
 

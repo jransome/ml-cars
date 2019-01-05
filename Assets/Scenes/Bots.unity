@@ -3353,6 +3353,7 @@ MonoBehaviour:
   MutationRate: 0.3
   MutateClones: 1
   MaxTimeToReachNextGate: 5
+  MaxGenerationTime: 60
   populationPrefab: {fileID: 8070622361090416649, guid: 487f0c203d4e587499141d56e06a867f,
     type: 3}
   generationSize: 50

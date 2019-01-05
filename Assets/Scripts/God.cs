@@ -26,6 +26,7 @@ public class God : MonoBehaviour
     public float MutationRate = 0.05f;
     public bool MutateClones = true;
     public float MaxTimeToReachNextGate = 5f;
+    public float MaxGenerationTime = 0f;
 
     [Header("Population")]
     [SerializeField] private GameObject populationPrefab = null;
@@ -160,7 +161,8 @@ public class God : MonoBehaviour
         {
             Brain b = Instantiate(populationPrefab).GetComponent<Brain>();
             generationPool.Add(b);
-            b.SuicideThreshold = MaxTimeToReachNextGate;
+            b.MaxLifeSpan = MaxGenerationTime;
+            b.GateSuicideThreshold = MaxTimeToReachNextGate;
             b.StartingGate = StartingGate;
             b.Died += HandleIndividualDied;
         }
