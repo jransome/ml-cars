@@ -6,6 +6,7 @@ using UnityEngine;
 public class ChaseCamera : MonoBehaviour
 {
     public God EvolutionManager;
+    public float OrbitSpeed = 2f;
     private Transform chaseTransform;
 
     private void Update() 
@@ -16,6 +17,9 @@ public class ChaseCamera : MonoBehaviour
 
         if (livingAgents.Count() > 0) chaseTransform = livingAgents.First().transform;
 
-        if (chaseTransform != null) transform.position = chaseTransform.position;
+        if (chaseTransform != null) {
+            transform.position = chaseTransform.position;
+            transform.Rotate(Vector3.up * OrbitSpeed * Time.deltaTime);
+        }
     }
 }
