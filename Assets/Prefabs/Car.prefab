@@ -631,7 +631,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DrawSensors: 0
-  raycastDistance: 35
+  SensorSpreadAngles:
+  - 0
+  - 15
+  - 30
+  - 45
+  - 90
+  raycastDistance: 60
 --- !u!114 &343856203757230419
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -661,11 +667,11 @@ MonoBehaviour:
   rend: {fileID: 6641770778537090222}
   thoughtInterval: 0.1
   heritage: 0
-  DistanceCovered: 0
   carController: {fileID: 6641770778032953714}
   fitnessCalculator: {fileID: 1709147880}
   distanceSensors: {fileID: 947620192}
   physicsSensors: {fileID: 343856203757230419}
+  lastGateCrossed: {fileID: 0}
 --- !u!114 &1709147880
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -678,10 +684,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35dc8771ee0cc491fafd8ce5dc21475d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fitness: 0
+  rawFitness: 0
   gatesCrossed: 0
-  terrainBumps: 0
-  cumulativeTerrainImpactVelocity: 0
   gateCrossedReward: 5
   optimalDirectionReward: 10
   optimalPositionReward: 10

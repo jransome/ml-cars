@@ -173,9 +173,10 @@ MonoBehaviour:
   rend: {fileID: 9083424398251516781}
   thoughtInterval: 0.1
   heritage: 0
-  DistanceCovered: 0
   botController: {fileID: 8070622361090416648}
   distanceSensors: {fileID: 8070622361090416646}
+  lastGateCrossed: {fileID: 0}
+  distanceCovered: 0
 --- !u!114 &8070622361090416646
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -189,6 +190,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DrawSensors: 0
+  SensorSpreadAngles:
+  - 0
+  - 40
+  - 80
   raycastDistance: 15
 --- !u!114 &1436688276285334138
 MonoBehaviour:
