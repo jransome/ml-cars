@@ -19,7 +19,7 @@ public class DistanceSensors : MonoBehaviour
         return Physics.Raycast(transform.position, direction, out hit, raycastDistance, ~IgnoredLayers) ? hit.distance : raycastDistance;
     }
 
-    private Vector3 CalculateDirectionFromAngle(float angle) => Quaternion.AngleAxis(angle, Vector3.up) * transform.forward;
+    private Vector3 CalculateDirectionFromAngle(float angle) => Quaternion.AngleAxis(angle, Vector3.up) * new Vector3(transform.forward.x, 0f, transform.forward.z);
 
     private void Awake()
     {
