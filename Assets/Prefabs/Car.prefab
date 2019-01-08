@@ -686,7 +686,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rawFitness: 0
   gatesCrossed: 0
-  gateCrossedReward: 5
+  gateCrossedReward: 10
   optimalDirectionReward: 10
   optimalPositionReward: 10
   maxPositionDifferenceTolerance: 15

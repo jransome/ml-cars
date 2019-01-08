@@ -11,7 +11,7 @@ public class CarFitness : MonoBehaviour
     // [SerializeField] private float cumulativeTerrainImpactVelocity = 0;
 
     [Header("Multipliers")]
-    [SerializeField] private int gateCrossedReward = 5;
+    [SerializeField] private int gateCrossedReward = 10;
     [SerializeField] private int optimalDirectionReward = 10;
     [SerializeField] private int optimalPositionReward = 10;
     [SerializeField] private int maxPositionDifferenceTolerance = 15;
@@ -29,7 +29,7 @@ public class CarFitness : MonoBehaviour
     public void UpdateFitness(RacingGate gate)
     {
         // fitnesses squared to give greater weighting to slightly higher fitness scores
-        rawFitness += Mathf.Pow(++gatesCrossed, 2) * gateCrossedReward;
+        rawFitness += Mathf.Pow(++gatesCrossed * gateCrossedReward, 2);
         float normalisedInverseDistance = (maxPositionDifferenceTolerance - Vector3.Distance(transform.position, gate.OptimalPosition)) / maxPositionDifferenceTolerance;
         rawFitness += Mathf.Pow(normalisedInverseDistance * optimalPositionReward, 2); 
         rawFitness += Mathf.Pow(Vector3.Dot(transform.forward, gate.OptimalDirection) * optimalDirectionReward, 2);
