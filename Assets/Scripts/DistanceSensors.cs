@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -9,7 +9,7 @@ public class DistanceSensors : MonoBehaviour
     private List<float> realSensorSpreadAngles;
     [SerializeField] private float raycastDistance = 15f;
 
-    public List<double> CalculateNormalisedDistances() => realSensorSpreadAngles.Select(angle => CheckDistance(angle)).ToList();
+    public List<double> CalculateNormalisedDistances() => realSensorSpreadAngles.Select(angle => CheckDistance(angle) / raycastDistance).ToList();
 
     private double CheckDistance(float angle)
     {
