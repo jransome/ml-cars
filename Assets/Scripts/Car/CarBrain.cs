@@ -10,6 +10,7 @@ public class CarBrain : Brain
     [SerializeField] private DistanceSensors distanceSensors = null;
     [SerializeField] private PhysicsSensors physicsSensors = null;
     [SerializeField] private RacingGate lastGateCrossed = null;
+    private Rigidbody rb;
 
     public float BrakingDecision { get; private set; } = 0f;
 
@@ -18,6 +19,9 @@ public class CarBrain : Brain
         BrakingDecision = 0;
         lastGateCrossed = null;
         fitnessCalculator.ResetFitness();
+        if (rb == null) rb = GetComponent<Rigidbody>();
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
         base.Arise(startPosition, startRotation);
     }
 
@@ -31,7 +35,7 @@ public class CarBrain : Brain
         List<double> outputs = nn.Calculate(inputs);
         ThrottleDecision = (float)outputs[0];
         SteeringDecision = (float)outputs[1];
-        // BrakingDecision = (float)outputs[2];
+        BrakingDecision = (float)outputs[2];
         ChaseCameraOrderingVariable = fitnessCalculator.Fitness;
     }
 

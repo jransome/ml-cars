@@ -7001,7 +7001,7 @@ MonoBehaviour:
   Bred: {r: 0, g: 0.36163354, b: 1, a: 1}
   Mutated: {r: 0.023899764, g: 0.8207547, b: 0, a: 1}
   Inputs: 12
-  Outputs: 2
+  Outputs: 3
   HiddenLayers: 2
   MaxNeuronsPerLayer: 8
   ProportionUnchanged: 0.08
@@ -9950,7 +9950,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   EvolutionManager: {fileID: 985539029}
-  OrbitSpeed: 2
+  OrbitSpeed: 0.3
 --- !u!1 &1377057224
 GameObject:
   m_ObjectHideFlags: 0
