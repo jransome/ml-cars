@@ -1,10 +1,11 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 public class DistanceSensors : MonoBehaviour
 {
     public bool DrawSensors = false;
+    public LayerMask IgnoredLayers;
     public float[] SensorSpreadAngles;
     private List<float> realSensorSpreadAngles;
     [SerializeField] private float raycastDistance = 15f;
@@ -15,7 +16,7 @@ public class DistanceSensors : MonoBehaviour
     {
         Vector3 direction = CalculateDirectionFromAngle(angle);
         RaycastHit hit;
-        return Physics.Raycast(transform.position, direction, out hit, raycastDistance) ? hit.distance : raycastDistance;
+        return Physics.Raycast(transform.position, direction, out hit, raycastDistance, ~IgnoredLayers) ? hit.distance : raycastDistance;
     }
 
     private Vector3 CalculateDirectionFromAngle(float angle) => Quaternion.AngleAxis(angle, Vector3.up) * transform.forward;

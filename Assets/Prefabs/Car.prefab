@@ -631,6 +631,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DrawSensors: 0
+  IgnoredLayers:
+    serializedVersion: 2
+    m_Bits: 516
   SensorSpreadAngles:
   - 0
   - 15
@@ -672,6 +675,7 @@ MonoBehaviour:
   distanceSensors: {fileID: 947620192}
   physicsSensors: {fileID: 343856203757230419}
   lastGateCrossed: {fileID: 0}
+  test: []
 --- !u!114 &1709147880
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -687,8 +691,8 @@ MonoBehaviour:
   rawFitness: 0
   gatesCrossed: 0
   gateCrossedReward: 10
-  optimalDirectionReward: 10
-  optimalPositionReward: 10
+  optimalDirectionReward: 0
+  optimalPositionReward: 0
   maxPositionDifferenceTolerance: 15
 --- !u!1 &6641770778317482369
 GameObject:
