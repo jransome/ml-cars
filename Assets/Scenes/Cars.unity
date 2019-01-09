@@ -7007,7 +7007,7 @@ MonoBehaviour:
   ProportionUnchanged: 0.08
   NewDnaRate: 0.07
   MutationRate: 0.2
-  MutateClones: 0
+  MutateClones: 1
   MaxTimeToReachNextGate: 5
   MaxGenerationTime: 120
   populationPrefab: {fileID: 6641770778032953726, guid: 83bd4ddeaecaa8c41aa631c791dbf3cf,
@@ -7023,13 +7023,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 985539028}
-  m_LocalRotation: {x: -0, y: 0.9280845, z: -0, w: -0.37236968}
-  m_LocalPosition: {x: 484.8, y: 1, z: 171.5}
+  m_LocalRotation: {x: -0, y: 0.57535464, z: -0, w: 0.8179041}
+  m_LocalPosition: {x: 101.3, y: 1, z: 115.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 223.724, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 70.249, z: 0}
 --- !u!33 &985539031
 MeshFilter:
   m_ObjectHideFlags: 0
