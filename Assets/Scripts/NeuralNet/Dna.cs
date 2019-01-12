@@ -18,22 +18,22 @@ public class Dna
     public readonly int NumHiddenLayers;
     public readonly int MaxNeuronsPerLayer;
 
-    public List<LayerGene> LayerGenes { get; private set; } = new List<LayerGene>();
-    public DnaHeritage Heritage { get; set; }
-    public float Fitness { get; set; }
+    public List<LayerGene> LayerGenes = new List<LayerGene>();
+    public DnaHeritage Heritage;
+    public float Fitness;
     public double WeightSumFingerprint { get { return LayerGenes.Aggregate(0.0, (acc, x) => acc += x.WeightSumFingerprint); } }
 
     public event System.Action SelectedForBreeding = delegate { };
 
-    public Dna(int nInputs, int nOutputs, int nHiddenLayers, int maxNeuronsPerLayer, bool splicing = false)
+    public Dna(int nInputs, int nOutputs, int nHiddenLayers, int maxNeuronsPerLayer, bool isCreatedBySplicing = false)
     {
-        Heritage = splicing ? DnaHeritage.Bred : DnaHeritage.IsNew;
+        Heritage = isCreatedBySplicing ? DnaHeritage.Bred : DnaHeritage.IsNew;
         Fitness = 0f;
         NumInputs = nInputs;
         NumOutputs = nOutputs;
         MaxNeuronsPerLayer = maxNeuronsPerLayer;
         NumHiddenLayers = nHiddenLayers;
-        if (splicing) return;
+        if (isCreatedBySplicing) return;
 
         // hidden layers
         for (int i = 0; i < NumHiddenLayers; i++)
@@ -94,7 +94,7 @@ public class LayerGene
 {
     public readonly int MaxNeurons;
 
-    public List<NeuronGene> NeuronGenes { get; set; } = new List<NeuronGene>();
+    public List<NeuronGene> NeuronGenes = new List<NeuronGene>();
     public double WeightSumFingerprint { get { return NeuronGenes.Aggregate(0.0, (acc, x) => acc += x.WeightSumFingerprint); } }
 
     public LayerGene(int nNeurons, int inputsPerNeuron, bool allNeuronsAlive = false)
@@ -148,9 +148,8 @@ public class LayerGene
 [System.Serializable]
 public class NeuronGene
 {
-    public double[] Weights { get; set; }
-    public double Bias { get; set; }
-    public int Activation { get; set; }
+    public double[] Weights;
+    public double Bias;
     public double WeightSumFingerprint { get; private set; }
 
     public NeuronGene(int nWeights, bool initialiseAsAlive)
