@@ -34,7 +34,7 @@ public class DistanceSensors : MonoBehaviour
     {
         if (!DrawSensors) return;
         realSensorSpreadAngles.ForEach(a => {
-            Debug.DrawRay(transform.position, CalculateDirectionFromAngle(a) * raycastDistance);
+            Debug.DrawRay(transform.position, CalculateDirectionFromAngle(a) * raycastDistance, CheckDistance(a) < raycastDistance ? Color.red : Color.gray);
         });
     }
 }

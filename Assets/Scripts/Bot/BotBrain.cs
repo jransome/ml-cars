@@ -27,7 +27,7 @@ public class BotBrain : Brain
         ChaseCameraOrderingVariable = distanceCovered;
     }
 
-    protected override float CalculateFitness() => distanceCovered > 0 ? Mathf.Pow(distanceCovered, 2) : 0;
+    protected override float CalculateFitness() => distanceCovered > 0 ? Mathf.Pow(distanceCovered / 10, 2) : 0;
 
     protected override void HandleColliderTriggerEnter(Collider other)
     {
