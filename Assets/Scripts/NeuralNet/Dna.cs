@@ -11,12 +11,26 @@ public enum DnaHeritage
 }
 
 [System.Serializable]
+public struct DnaStructure
+{
+    public int NumInputs;
+    public int NumOutputs;
+    public int NumHiddenLayers;
+    public int MaxNeuronsPerLayer;
+
+    public DnaStructure(int nInputs, int nOutputs, int nHiddenLayers, int maxNeuronsPerLayer)
+    {
+        NumInputs = nInputs;
+        NumOutputs = nOutputs;
+        MaxNeuronsPerLayer = maxNeuronsPerLayer;
+        NumHiddenLayers = nHiddenLayers;
+    }
+}
+
+[System.Serializable]
 public class Dna
 {
-    public readonly int NumInputs;
-    public readonly int NumOutputs;
-    public readonly int NumHiddenLayers;
-    public readonly int MaxNeuronsPerLayer;
+    [SerializeField] public readonly DnaStructure structure;
 
     public List<LayerGene> LayerGenes = new List<LayerGene>();
     public DnaHeritage Heritage;
@@ -25,25 +39,22 @@ public class Dna
 
     public event System.Action SelectedForBreeding = delegate { };
 
-    public Dna(int nInputs, int nOutputs, int nHiddenLayers, int maxNeuronsPerLayer, bool isCreatedBySplicing = false)
+    public Dna(DnaStructure dnaStructure, bool isCreatedBySplicing = false)
     {
         Heritage = isCreatedBySplicing ? DnaHeritage.Bred : DnaHeritage.IsNew;
         Fitness = 0f;
-        NumInputs = nInputs;
-        NumOutputs = nOutputs;
-        MaxNeuronsPerLayer = maxNeuronsPerLayer;
-        NumHiddenLayers = nHiddenLayers;
+        structure = dnaStructure;
         if (isCreatedBySplicing) return;
 
         // hidden layers
-        for (int i = 0; i < NumHiddenLayers; i++)
+        for (int i = 0; i < structure.NumHiddenLayers; i++)
         {
-            int inputsPerNeuron = i == 0 ? nInputs : LayerGenes[i - 1].MaxNeurons;
-            LayerGenes.Add(new LayerGene(maxNeuronsPerLayer, inputsPerNeuron));
+            int inputsPerNeuron = i == 0 ? structure.NumInputs : LayerGenes[i - 1].MaxNeurons;
+            LayerGenes.Add(new LayerGene(structure.MaxNeuronsPerLayer, inputsPerNeuron));
         }
 
         // output layer
-        LayerGenes.Add(new LayerGene(nOutputs, LayerGenes.Last().MaxNeurons, true));
+        LayerGenes.Add(new LayerGene(structure.NumOutputs, LayerGenes.Last().MaxNeurons, true));
     }
 
     public Dna Clone() 
@@ -56,12 +67,12 @@ public class Dna
 
     public Dna[] Splice(Dna other)
     {
-        if (NumHiddenLayers != other.NumHiddenLayers)
+        if (structure.NumHiddenLayers != other.structure.NumHiddenLayers)
             throw new System.ArgumentException("Tried to splice two NNs with different numbers of hidden layers!");
 
         Dna[] children = new Dna[2] {
-            new Dna(NumInputs, NumOutputs, NumHiddenLayers, MaxNeuronsPerLayer, true),
-            new Dna(NumInputs, NumOutputs, NumHiddenLayers, MaxNeuronsPerLayer, true),
+            new Dna(structure, true),
+            new Dna(structure, true),
         };
 
         for (int i = 0; i < LayerGenes.Count; i++)

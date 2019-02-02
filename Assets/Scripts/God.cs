@@ -15,10 +15,7 @@ public class God : MonoBehaviour
     public Color Mutated;
 
     [Header("Neural network variables")]
-    public int Inputs = 5;
-    public int Outputs = 2;
-    public int HiddenLayers = 1;
-    public int MaxNeuronsPerLayer = 5;
+    public DnaStructure DnaStructure;
 
     [Header("Algorithm variables")]
     public float ProportionUnchanged = 0.05f;
@@ -38,6 +35,7 @@ public class God : MonoBehaviour
     public int GenerationCount { get; set; }
     public int CurrentlyAlive { get; set; }
     public List<Brain> GenerationPool { get { return generationPool; } }
+    public List<Dna> GenePool { get { return genePool; } }
 
     private Dna[] CreateOffspring(List<Dna> parentPool)
     {
@@ -77,7 +75,7 @@ public class God : MonoBehaviour
         if (oldGeneration == null)
         {
             for (int i = 0; i < generationSize; i++)
-                theNextGeneration.Add(new Dna(Inputs, Outputs, HiddenLayers, MaxNeuronsPerLayer));
+                theNextGeneration.Add(new Dna(DnaStructure));
             Debug.Log("Generation 1 seeded");
         }
         else
@@ -92,7 +90,7 @@ public class God : MonoBehaviour
             // add completely new dna into next gen
             int nNew = Mathf.RoundToInt(generationSize * NewDnaRate);
             if ((generationSize - nNew) % 2 == 1) nNew ++; // make sure remaining spaces is an even number
-            if (nNew > 0) for (int i = 0; i < nNew; i++) theNextGeneration.Add(new Dna(Inputs, Outputs, HiddenLayers, MaxNeuronsPerLayer));
+            if (nNew > 0) for (int i = 0; i < nNew; i++) theNextGeneration.Add(new Dna(DnaStructure));
 
             // populate rest of next generation with offspring
             for (int i = nUnchanged + nNew; i < generationSize; i += 2)
@@ -146,16 +144,8 @@ public class God : MonoBehaviour
         if (CurrentlyAlive == 0) StartCoroutine(CreateGeneration(genePool));
     }
 
-    private void Start()
+    private void InstantiateBrains()
     {
-        LineageColours = new Dictionary<DnaHeritage, Color> ()
-        {
-            { DnaHeritage.IsNew, NewGenome },
-            { DnaHeritage.UnchangedFromLastGen, UnchangedFromLastGen },
-            { DnaHeritage.Mutated, Mutated },
-            { DnaHeritage.Bred, Bred },
-        };
-
         generationPool = new List<Brain>();
         for (int i = 0; i < generationSize; i++)
         {
@@ -166,7 +156,19 @@ public class God : MonoBehaviour
             b.StartingGate = StartingGate;
             b.Died += HandleIndividualDied;
         }
+    }
 
+    private void Start()
+    {
+        LineageColours = new Dictionary<DnaHeritage, Color> ()
+        {
+            { DnaHeritage.IsNew, NewGenome },
+            { DnaHeritage.UnchangedFromLastGen, UnchangedFromLastGen },
+            { DnaHeritage.Mutated, Mutated },
+            { DnaHeritage.Bred, Bred },
+        };
+
+        InstantiateBrains();
         StartCoroutine(CreateGeneration());
     }
 }

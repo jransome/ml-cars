@@ -4,7 +4,6 @@ using System.Linq;
 public class NeuralNetwork
 {
     private List<Layer> layers;
-    private int layerWidth;
 
     public NeuralNetwork(Dna dna)
     {
@@ -13,7 +12,6 @@ public class NeuralNetwork
 
     public void ReplaceDna(Dna dna)
     {
-        layerWidth = dna.MaxNeuronsPerLayer;
         layers  = new List<Layer>();
 
         foreach (LayerGene layerGene in dna.LayerGenes)

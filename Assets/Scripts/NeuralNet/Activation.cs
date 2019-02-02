@@ -13,4 +13,6 @@ public static class Activation
     }
 
     public static double LeakyRelu(double input) => input > 0 ? input : 0.01 * input;
+
+    public static double Relu(double input) => input > 0 ? input : 0;
 }
