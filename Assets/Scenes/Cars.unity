@@ -7982,7 +7982,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &985539029
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8001,10 +8001,10 @@ MonoBehaviour:
   Bred: {r: 0, g: 0.36163354, b: 1, a: 1}
   Mutated: {r: 0.023899764, g: 0.8207547, b: 0, a: 1}
   DnaStructure:
-    NumInputs: 0
-    NumOutputs: 0
-    NumHiddenLayers: 0
-    MaxNeuronsPerLayer: 0
+    NumInputs: 12
+    NumOutputs: 3
+    NumHiddenLayers: 2
+    MaxNeuronsPerLayer: 8
   ProportionUnchanged: 0.08
   NewDnaRate: 0.07
   MutationRate: 0.2
@@ -8024,13 +8024,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 985539028}
-  m_LocalRotation: {x: -0, y: 0.57535464, z: -0, w: 0.8179041}
-  m_LocalPosition: {x: 101.3, y: 1, z: 115.9}
+  m_LocalRotation: {x: -0, y: 0.8761571, z: -0, w: 0.48202574}
+  m_LocalPosition: {x: 28.5, y: 1, z: 153.3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 70.249, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 122.364006, z: 0}
 --- !u!33 &985539031
 MeshFilter:
   m_ObjectHideFlags: 0

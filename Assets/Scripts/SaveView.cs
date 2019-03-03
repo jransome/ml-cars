@@ -17,15 +17,15 @@ public class SaveView : MonoBehaviour
     private void Save()
     {
         // for testing
-        DnaStructure structure = new DnaStructure(2, 2, 2, 2);
-        List<Dna> TestGenes = new List<Dna> {
-            new Dna(structure),
-            new Dna(structure),
-            new Dna(structure),
-        };
-        PopulationData data = new PopulationData(TestGenes, 1, SaveName.text);
-        Persistence.Save(data);
-        // Persistence.Save(new PopulationData(EvolutionManager.GenePool, SaveName.text));
+        // DnaStructure structure = new DnaStructure(2, 2, 2, 2);
+        // List<Dna> TestGenes = new List<Dna> {
+        //     new Dna(structure),
+        //     new Dna(structure),
+        //     new Dna(structure),
+        // };
+        // PopulationData data = new PopulationData(TestGenes, 1, SaveName.text);
+        // Persistence.Save(data);
+        Persistence.Save(new PopulationData(EvolutionManager.GenePool, EvolutionManager.GenerationCount, SaveName.text));
 
         ClearSaves();
         PopulateSaves();
