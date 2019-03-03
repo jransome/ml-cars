@@ -34,7 +34,15 @@ public class DistanceSensors : MonoBehaviour
     {
         if (!DrawSensors) return;
         realSensorSpreadAngles.ForEach(a => {
-            Debug.DrawRay(transform.position, CalculateDirectionFromAngle(a) * raycastDistance, CheckDistance(a) < raycastDistance ? Color.red : Color.gray);
+            Debug.DrawRay(transform.position, CalculateDirectionFromAngle(a) * raycastDistance, CheckDistance(a) < raycastDistance ? Color.red : Color.green);
+            Debug.DrawRay(transform.position + transform.right * 0.01f, CalculateDirectionFromAngle(a) * raycastDistance, CheckDistance(a) < raycastDistance ? Color.red : Color.green);
+            Debug.DrawRay(transform.position + transform.right * -0.01f, CalculateDirectionFromAngle(a) * raycastDistance, CheckDistance(a) < raycastDistance ? Color.red : Color.green);
+            Debug.DrawRay(transform.position + transform.right * 0.02f, CalculateDirectionFromAngle(a) * raycastDistance, CheckDistance(a) < raycastDistance ? Color.red : Color.green);
+            Debug.DrawRay(transform.position + transform.right * -0.02f, CalculateDirectionFromAngle(a) * raycastDistance, CheckDistance(a) < raycastDistance ? Color.red : Color.green);
+            Debug.DrawRay(transform.position + transform.right * 0.03f, CalculateDirectionFromAngle(a) * raycastDistance, CheckDistance(a) < raycastDistance ? Color.red : Color.green);
+            Debug.DrawRay(transform.position + transform.right * -0.03f, CalculateDirectionFromAngle(a) * raycastDistance, CheckDistance(a) < raycastDistance ? Color.red : Color.green);
+            Debug.DrawRay(transform.position + transform.right * 0.04f, CalculateDirectionFromAngle(a) * raycastDistance, CheckDistance(a) < raycastDistance ? Color.red : Color.green);
+            Debug.DrawRay(transform.position + transform.right * -0.04f, CalculateDirectionFromAngle(a) * raycastDistance, CheckDistance(a) < raycastDistance ? Color.red : Color.green);
         });
     }
 }

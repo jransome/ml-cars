@@ -13,7 +13,6 @@ public class Persistence
 
     public static void Save(PopulationData popData)
     {
-        Debug.Log(saveDirectory);
         string filePath = Path.Combine(saveDirectory, popData.SaveName + ".json");
         FileStream fs = File.OpenWrite(filePath);
         StreamWriter writer = new StreamWriter(fs);
@@ -32,13 +31,15 @@ public class Persistence
 [System.Serializable]
 public struct PopulationData
 {
-    public readonly string SaveName;
-    public readonly List<Dna> GenePool;
-    public readonly DnaStructure DnaStructure;
+    public string SaveName;
+    public int GenerationNumber;
+    public List<Dna> GenePool;
+    public DnaStructure DnaStructure;
 
-    public PopulationData(List<Dna> genePool, string saveName = "")
+    public PopulationData(List<Dna> genePool, int generationNumber = 1, string saveName = null)
     {
-        SaveName = saveName;
+        SaveName = saveName == null ? "population_" + System.DateTime.Now.ToString("HHmmss_ddMMyyyy") : saveName;
+        GenerationNumber = generationNumber;
         GenePool = genePool;
         DnaStructure = genePool[0].structure;
     }
