@@ -58,7 +58,7 @@ public class CarBrain : Brain
                 return;
             }
             lastGateCrossed = g;
-            if (Vector3.Dot(transform.forward, g.OptimalDirection) < -0.5f) Die(); // if obviously going backwards
+            if (Vector3.Dot(rb.velocity, g.OptimalDirection) < 0f) Die(); // if reversing around the track in a backwards direction
             else fitnessCalculator.UpdateFitness(g);
         }
     }

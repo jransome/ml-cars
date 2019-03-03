@@ -21,6 +21,7 @@ public class God : MonoBehaviour
     public float ProportionUnchanged = 0.05f;
     public float NewDnaRate = 0.05f;
     public float MutationRate = 0.05f;
+    public float MutationSeverity = 0.2f;
     public bool MutateClones = true;
     public float MaxTimeToReachNextGate = 5f;
     public float MaxGenerationTime = 0f;
@@ -106,7 +107,7 @@ public class God : MonoBehaviour
                 foreach (Dna child in CreateOffspring(oldGeneration))
                 {
                     // do mutation
-                    if (Random.Range(0f, 1f) < MutationRate) child.Mutate(0.5f);
+                    if (Random.Range(0f, 1f) < MutationRate) child.Mutate(MutationSeverity);
                     theNextGeneration.Add(child);   
                 }
                 yield return new WaitForSeconds(0.1f); // so we can visualise selection of agents for the next generation

@@ -689,9 +689,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rawFitness: 0
   gatesCrossed: 0
-  gateCrossedReward: 10
-  optimalDirectionReward: 5
-  optimalPositionReward: 7
+  gateCrossedReward: 4
+  optimalDirectionReward: 8
+  optimalPositionReward: 6
   maxPositionDifferenceTolerance: 15
 --- !u!1 &6641770778317482369
 GameObject:
