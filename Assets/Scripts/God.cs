@@ -38,10 +38,11 @@ public class God : MonoBehaviour
     public List<Brain> GenerationPool { get { return generationPool; } }
     public List<Dna> GenePool { get { return genePool; } }
 
-    public void ReleaseGeneration(PopulationData generation)
+    public void LoadGeneration(PopulationData generation)
     {
         // TODO: generation size (and agent count)
         GenerationCount = generation.GenerationNumber;   
+        DnaStructure = generation.DnaStructure;
         ReleaseNewGeneration(generation.GenePool);
     }
 
