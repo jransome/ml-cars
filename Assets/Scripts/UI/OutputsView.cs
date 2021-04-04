@@ -9,18 +9,18 @@ public class OutputsView : MonoBehaviour
     public Slider ThrottleIndicator;
     public Slider BrakeIndicator;
 
-    private CarBrain carBrain;
 
-    private void Update() 
+    private void Update()
     {
-        IOrderedEnumerable<Brain> livingAgents = EvolutionManager.GenerationPool
-            .Where(b => b.IsAlive)
-            .OrderByDescending(b => b.ChaseCameraOrderingVariable);
+        CarBrain carToTrack = (CarBrain)EvolutionManager.MostSuccessfulAlive;
 
-        if (livingAgents.Count() > 0) carBrain = (CarBrain)livingAgents.First();
-        else return;
+        if (carToTrack) 
+            UpdateCarOutputSliders(carToTrack);
+    }
 
-        SteeringIndicator.value = carBrain.SteeringDecision;        
+    private void UpdateCarOutputSliders(CarBrain carBrain)
+    {
+        SteeringIndicator.value = carBrain.SteeringDecision;
         ThrottleIndicator.value = carBrain.ThrottleDecision;
         BrakeIndicator.value = Mathf.Clamp01(carBrain.BrakingDecision);
     }

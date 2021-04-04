@@ -38,10 +38,22 @@ public class God : MonoBehaviour
     public List<Brain> GenerationPool { get { return generationPool; } }
     public List<Dna> GenePool { get { return genePool; } }
 
+    public Brain MostSuccessfulAlive
+    {
+        get
+        {
+            return GenerationPool
+                .Where(b => b.IsAlive)
+                .OrderByDescending(b => b.ChaseCameraOrderingVariable)
+                .DefaultIfEmpty(null)
+                .First();
+        }
+    }
+
     public void LoadGeneration(PopulationData generation)
     {
         // TODO: generation size (and agent count)
-        GenerationCount = generation.GenerationNumber;   
+        GenerationCount = generation.GenerationNumber;
         DnaStructure = generation.DnaStructure;
         ReleaseNewGeneration(generation.GenePool);
     }
@@ -56,7 +68,7 @@ public class God : MonoBehaviour
     private Dna SelectRandomBasedOnFitness(List<Dna> parentPool)
     {
         float random = Random.Range(0f, parentPool.Sum(p => p.Fitness));
-        foreach(Dna candidate in parentPool.OrderBy(c => Random.Range(0f, 1f)))
+        foreach (Dna candidate in parentPool.OrderBy(c => Random.Range(0f, 1f)))
         {
             random -= candidate.Fitness;
             if (random < 0) return candidate;
@@ -69,7 +81,8 @@ public class God : MonoBehaviour
         genePool = newGenerationDna;
         generationTotalFitness = 0; // used for debugging only
         CurrentlyAlive = generationSize;
-        generationPool = generationPool.Zip(newGenerationDna, (brain, dna) => {
+        generationPool = generationPool.Zip(newGenerationDna, (brain, dna) =>
+        {
             brain.ReplaceDna(dna);
             brain.Arise(transform.position, transform.rotation);
             return brain;
@@ -91,14 +104,14 @@ public class God : MonoBehaviour
         {
             // report on last generation
             Debug.Log("Generation " + GenerationCount + ": Avg: " + oldGeneration.Average(d => d.Fitness) + " Max: " + oldGeneration.Max(d => d.Fitness));
-            
+
             // preserve top survivors 
             int nUnchanged = Mathf.RoundToInt(generationSize * ProportionUnchanged);
             if (nUnchanged > 0) theNextGeneration.AddRange(oldGeneration.OrderByDescending(d => d.Fitness).ToList().GetRange(0, nUnchanged).Select(d => d.Clone()));
 
             // add completely new dna into next gen
             int nNew = Mathf.RoundToInt(generationSize * NewDnaRate);
-            if ((generationSize - nNew) % 2 == 1) nNew ++; // make sure remaining spaces is an even number
+            if ((generationSize - nNew) % 2 == 1) nNew++; // make sure remaining spaces is an even number
             if (nNew > 0) for (int i = 0; i < nNew; i++) theNextGeneration.Add(new Dna(DnaStructure));
 
             // populate rest of next generation with offspring
@@ -109,7 +122,7 @@ public class God : MonoBehaviour
                 {
                     // do mutation
                     if (Random.Range(0f, 1f) < MutationRate) child.Mutate(MutationSeverity);
-                    theNextGeneration.Add(child);   
+                    theNextGeneration.Add(child);
                 }
                 yield return new WaitForSeconds(0.1f); // so we can visualise selection of agents for the next generation
             }
@@ -119,7 +132,7 @@ public class God : MonoBehaviour
         // check for clones
         CheckForIdenticalGenomes(theNextGeneration);
         if (MutateClones) MutateIdenticalGenomes(theNextGeneration);
-        
+
         // setup next generation
         GenerationCount++;
         ReleaseNewGeneration(theNextGeneration);
@@ -136,7 +149,8 @@ public class God : MonoBehaviour
 
     private void CheckForIdenticalGenomes(List<Dna> dnaList)
     {
-        List<Dna> duplicates = dnaList.Where(d => {
+        List<Dna> duplicates = dnaList.Where(d =>
+        {
             foreach (var otherD in dnaList)
                 if (d != otherD && d.IsEqual(otherD)) return true;
 
@@ -169,7 +183,7 @@ public class God : MonoBehaviour
 
     private void Start()
     {
-        LineageColours = new Dictionary<DnaHeritage, Color> ()
+        LineageColours = new Dictionary<DnaHeritage, Color>()
         {
             { DnaHeritage.IsNew, NewGenome },
             { DnaHeritage.UnchangedFromLastGen, UnchangedFromLastGen },
