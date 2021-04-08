@@ -36,7 +36,6 @@ public class SaveView : MonoBehaviour
         ActiveSavedPopViews = Persistence.GetSavedPopulations().Select(popData => 
         {
             GameObject go = Instantiate(SavedPopPrefab, SavedPopsPanel);
-            Debug.Log(popData.GenePool);
             go.GetComponent<SavedPopulationView>().Initialise(popData, EvolutionManager);
             return go;
         }).ToList();
