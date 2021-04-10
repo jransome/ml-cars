@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class Brain : MonoBehaviour
@@ -14,7 +13,7 @@ public abstract class Brain : MonoBehaviour
     protected float timeLastGateCrossed;
 
     public Dna Dna { get; protected set; }
-    public bool IsAlive { get; set; }
+    public bool IsAlive { get; private set; }
     public float ThrottleDecision { get; protected set; } = 0f;
     public float SteeringDecision { get; protected set; } = 0f;
 
