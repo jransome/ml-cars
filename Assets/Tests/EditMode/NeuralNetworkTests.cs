@@ -1,5 +1,5 @@
 using FluentAssertions;
-using RansomeCorp.NeuralNet;
+using RansomeCorp.AI.NeuralNet;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -26,14 +26,14 @@ public class NeuralNetworkTests
 
         // Neuron assertions
         int hiddenNeuronCount = hiddenLayers.Aggregate((sum, neuronsPerLayer) => sum + neuronsPerLayer);
-        IEnumerable<NeuronGene> allNeuronGenes = neuralNetwork.Layers.SelectMany(n => n); // SelectMany = flatmap
-        allNeuronGenes.Should().HaveCount(hiddenNeuronCount + nOutputs);
-        allNeuronGenes.Should().OnlyHaveUniqueItems();
-        neuralNetwork.Layers[0].Should().OnlyContain(n => n.Weights.Count() == nInputs, "neuron genes in hidden layer 0 had incorrect number of weight inputs");
-        neuralNetwork.Layers[1].Should().OnlyContain(n => n.Weights.Count() == hiddenLayers[0], "neuron genes in hidden layer 1 had incorrect number of weight inputs");
-        neuralNetwork.Layers[2].Should().OnlyContain(n => n.Weights.Count() == hiddenLayers[1], "neuron genes in hidden layer 2 had incorrect number of weight inputs");
-        neuralNetwork.Layers[3].Should().OnlyContain(n => n.Weights.Count() == hiddenLayers[2], "neuron genes in output layer had incorrect number of weight inputs");
-        allNeuronGenes.Should().OnlyContain(n => n.Bias <= 1 && n.Bias >= -1, " all neuron genes have Bias values between -1 and 1");
+        IEnumerable<Neuron> allNeurons = neuralNetwork.Layers.SelectMany(n => n); // SelectMany = flatmap
+        allNeurons.Should().HaveCount(hiddenNeuronCount + nOutputs);
+        allNeurons.Should().OnlyHaveUniqueItems();
+        neuralNetwork.Layers[0].Should().OnlyContain(n => n.Weights.Count() == nInputs, "neurons in hidden layer 0 had incorrect number of weight inputs");
+        neuralNetwork.Layers[1].Should().OnlyContain(n => n.Weights.Count() == hiddenLayers[0], "neurons in hidden layer 1 had incorrect number of weight inputs");
+        neuralNetwork.Layers[2].Should().OnlyContain(n => n.Weights.Count() == hiddenLayers[1], "neurons in hidden layer 2 had incorrect number of weight inputs");
+        neuralNetwork.Layers[3].Should().OnlyContain(n => n.Weights.Count() == hiddenLayers[2], "neurons in output layer had incorrect number of weight inputs");
+        allNeurons.Should().OnlyContain(n => n.Bias <= 1 && n.Bias >= -1, " all neurons have Bias values between -1 and 1");
     }
 
     // [Test]
