@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 public class Neuron
 {
@@ -16,8 +17,8 @@ public class Neuron
             throw new System.ArgumentException("Neuron received the wrong number of inputs!");
 
         double dotProduct = inputValues.Zip(gene.Weights, (input, weight) => input * weight).Sum();
-        return ActivationFunction(dotProduct + gene.Bias);
+        return TanH(dotProduct + gene.Bias);
     }
 
-    private double ActivationFunction(double dotProductBias) => Activation.TanH(dotProductBias);
+    static double TanH(double input) => Math.Tanh(input);
 }

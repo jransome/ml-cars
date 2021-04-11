@@ -1,18 +1,40 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System;
 
-public static class Activation
+namespace RansomeCorp.NeuralNet
 {
-    public static double BinaryStep(double input) => input > 0 ? 1 : 0;
-
-    public static double TanH(double input) => Math.Tanh(input);
-
-    public static double Sigmoid(double value) //(aka logistic softstep)
+    public enum ActivationType
     {
-        double k = Math.Exp(value);
-        return k / (1.0f + k);
+        BinaryStep,
+        TanH,
+        Sigmoid,
+        LeakyRelu,
+        Relu,
     }
 
-    public static double LeakyRelu(double input) => input > 0 ? input : 0.01 * input;
+    public static class Activation
+    {
+        public static Dictionary<ActivationType, Func<double, double>> Functions = new Dictionary<ActivationType, Func<double, double>>
+        {
+            { ActivationType.BinaryStep, BinaryStep },
+            { ActivationType.TanH, TanH },
+            { ActivationType.Sigmoid, Sigmoid },
+            { ActivationType.LeakyRelu, LeakyRelu },
+            { ActivationType.Relu, Relu },
+        };
 
-    public static double Relu(double input) => input > 0 ? input : 0;
+        static double BinaryStep(double input) => input > 0 ? 1 : 0;
+
+        static double TanH(double input) => Math.Tanh(input);
+
+        static double Sigmoid(double value) //(aka logistic softstep)
+        {
+            double k = Math.Exp(value);
+            return k / (1.0f + k);
+        }
+
+        static double LeakyRelu(double input) => input > 0 ? input : 0.01 * input;
+
+        static double Relu(double input) => input > 0 ? input : 0;
+    }
 }
