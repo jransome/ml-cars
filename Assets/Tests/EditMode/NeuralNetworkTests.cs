@@ -26,7 +26,7 @@ public class NeuralNetworkTests
 
         // Neuron assertions
         int hiddenNeuronCount = hiddenLayers.Aggregate((sum, neuronsPerLayer) => sum + neuronsPerLayer);
-        IEnumerable<Neuron> allNeurons = neuralNetwork.Layers.SelectMany(n => n); // SelectMany = flatmap
+        IEnumerable<INeuron> allNeurons = neuralNetwork.Layers.SelectMany(n => n); // SelectMany = flatmap
         allNeurons.Should().HaveCount(hiddenNeuronCount + nOutputs);
         allNeurons.Should().OnlyHaveUniqueItems();
         neuralNetwork.Layers[0].Should().OnlyContain(n => n.Weights.Count() == nInputs, "neurons in hidden layer 0 had incorrect number of weight inputs");

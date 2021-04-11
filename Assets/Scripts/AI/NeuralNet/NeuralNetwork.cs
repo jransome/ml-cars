@@ -8,23 +8,25 @@ namespace RansomeCorp.AI.NeuralNet
 {
     public class NeuralNetwork
     {
-        public readonly List<List<Neuron>> Layers;
+        public readonly List<List<INeuron>> Layers;
 
-        public NeuralNetwork(int inputs, int[] hiddenLayers, int outputs)
+        public NeuralNetwork(int inputs, int[] hiddenLayers, int outputs, Func<int, INeuron> neuronFactory = null)
         {
+            neuronFactory ??= (int nInputs) => new Neuron(nInputs);
+
             Layers = hiddenLayers
                 .Concat(new int[] { outputs })
                 .Select((int nNeurons, int index) =>
                     {
                         int inputsPerNeuron = index == 0 ? inputs : hiddenLayers[index - 1];
-                        return new int[nNeurons].Select((_) => new Neuron(inputsPerNeuron)).ToList();
+                        return new int[nNeurons].Select((_) => neuronFactory(inputsPerNeuron)).ToList();
                     })
                 .ToList();
         }
 
         public List<double> Think(List<double> inputs) => FeedForward(inputs, Layers);
 
-        private List<double> FeedForward(List<double> inputs, List<List<Neuron>> remainingLayers)
+        private List<double> FeedForward(List<double> inputs, List<List<INeuron>> remainingLayers)
         {
             List<double> outputs = remainingLayers
                 .First()

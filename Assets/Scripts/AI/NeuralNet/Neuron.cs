@@ -4,11 +4,19 @@ using System;
 
 namespace RansomeCorp.AI.NeuralNet
 {
-    public class Neuron
+    public interface INeuron
     {
-        public readonly double Bias;
-        public readonly List<double> Weights;
-        public readonly Func<double, double> ActivationFunction;
+        double Bias { get; }
+        List<double> Weights { get; }
+        Func<double, double> ActivationFunction { get; }
+        double Compute(List<double> inputValues);
+    }
+
+    public class Neuron : INeuron
+    {
+        public double Bias { get; private set; }
+        public List<double> Weights { get; private set; }
+        public Func<double, double> ActivationFunction { get; private set; }
 
         public Neuron(int nInputs, ActivationType activationType = ActivationType.TanH)
         {
