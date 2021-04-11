@@ -26,6 +26,9 @@ namespace RansomeCorp.AI.NeuralNet
                 .Select((_) => (double)UnityEngine.Random.Range(-1f, 1f)).ToList();
         }
 
+        public Neuron(double bias, List<double> weights, ActivationType activationType = ActivationType.TanH) =>
+            (Bias, Weights, ActivationFunction) = (bias, weights, Activation.Functions[activationType]);
+
         public double Compute(List<double> inputValues)
         {
             if (inputValues.Count != Weights.Count)

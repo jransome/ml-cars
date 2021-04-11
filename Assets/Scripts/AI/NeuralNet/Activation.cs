@@ -23,6 +23,8 @@ namespace RansomeCorp.AI.NeuralNet
             { ActivationType.Relu, Relu },
         };
 
+        public static int FunctionsCount = Activation.Functions.Count;
+
         static double BinaryStep(double input) => input > 0 ? 1 : 0;
 
         static double TanH(double input) => Math.Tanh(input);
