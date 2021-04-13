@@ -21,6 +21,14 @@ public class DarwinTests
             hiddenLayers[0] * hiddenLayers[1] +
             hiddenLayers[1] * hiddenLayers[2] +
             hiddenLayers[2] * nOutputs;
+        int[] expectedOutputsPerLayer = new int[] 
+        {
+            nInputs,
+            hiddenLayers[0],
+            hiddenLayers[1],
+            hiddenLayers[2],
+            nOutputs,
+        };
 
         // Act
         Dna randomlyGeneratedDna = Darwin.GenerateRandomDnaEncoding(nInputs, hiddenLayers, nOutputs, (ActivationType)outputLayerActivationIndex, true);
@@ -28,7 +36,7 @@ public class DarwinTests
         // Assert
         randomlyGeneratedDna.Inputs.Should().Be(nInputs);
         randomlyGeneratedDna.Outputs.Should().Be(nOutputs);
-        randomlyGeneratedDna.HiddenLayers.Should().BeEquivalentTo(hiddenLayers);
+        randomlyGeneratedDna.OutputsPerLayer.Should().BeEquivalentTo(expectedOutputsPerLayer);
         randomlyGeneratedDna.WeightsAndBiases.Should().HaveCount(expectedNumberOfWeightsAndBiases);
         randomlyGeneratedDna.ActivationIndexes.Should().HaveCount(expectedNumberOfNeurons);
         randomlyGeneratedDna.ActivationIndexes.Should().Contain(index => index > outputLayerActivationIndex, "dna was not initialised with random hidden layer activation functions");
@@ -50,13 +58,22 @@ public class DarwinTests
         const int outputLayerActivationIndex = 3;
         int[] hiddenLayers = new int[] { 30, 50, 4, 12 };
 
-        int expectedNumberOfNeurons = hiddenLayers[0] + hiddenLayers[1] + hiddenLayers[2] +  hiddenLayers[3] + nOutputs;
+        int expectedNumberOfNeurons = hiddenLayers[0] + hiddenLayers[1] + hiddenLayers[2] + hiddenLayers[3] + nOutputs;
         int expectedNumberOfWeightsAndBiases = expectedNumberOfNeurons + // ie. number of bias weights
             nInputs * hiddenLayers[0] +
             hiddenLayers[0] * hiddenLayers[1] +
             hiddenLayers[1] * hiddenLayers[2] +
             hiddenLayers[2] * hiddenLayers[3] +
             hiddenLayers[3] * nOutputs;
+        int[] expectedOutputsPerLayer = new int[] 
+        {
+            nInputs,
+            hiddenLayers[0],
+            hiddenLayers[1],
+            hiddenLayers[2],
+            hiddenLayers[3],
+            nOutputs,
+        };
 
         // Act
         Dna randomlyGeneratedDna = Darwin.GenerateRandomDnaEncoding(nInputs, hiddenLayers, nOutputs, (ActivationType)outputLayerActivationIndex, false);
@@ -64,7 +81,7 @@ public class DarwinTests
         // Assert
         randomlyGeneratedDna.Inputs.Should().Be(nInputs);
         randomlyGeneratedDna.Outputs.Should().Be(nOutputs);
-        randomlyGeneratedDna.HiddenLayers.Should().BeEquivalentTo(hiddenLayers);
+        randomlyGeneratedDna.OutputsPerLayer.Should().BeEquivalentTo(expectedOutputsPerLayer);
         randomlyGeneratedDna.WeightsAndBiases.Should().HaveCount(expectedNumberOfWeightsAndBiases);
         randomlyGeneratedDna.ActivationIndexes.Should().HaveCount(expectedNumberOfNeurons);
         randomlyGeneratedDna.ActivationIndexes.Should().OnlyContain(index => index == outputLayerActivationIndex, "dna was not initialised with uniform hidden layer activation functions");

@@ -45,15 +45,15 @@ namespace RansomeCorp.AI.Evolution
     {
         public readonly int Inputs;
         public readonly int Outputs;
-        public readonly ReadOnlyCollection<int> HiddenLayers;
+        public readonly ReadOnlyCollection<int> OutputsPerLayer;
         public readonly ReadOnlyCollection<double> WeightsAndBiases;
         public readonly ReadOnlyCollection<int> ActivationIndexes;
 
-        public Dna(int inputs, int outputs, int[] hiddenLayers, List<double> weightsAndBiases, List<int> activationIndexes)
+        public Dna(int inputs, int outputs, int[] outputsPerLayer, List<double> weightsAndBiases, List<int> activationIndexes)
         {
             Inputs = inputs;
             Outputs = outputs;
-            HiddenLayers = new ReadOnlyCollection<int>(hiddenLayers);
+            OutputsPerLayer = new ReadOnlyCollection<int>(outputsPerLayer);
             WeightsAndBiases = new ReadOnlyCollection<double>(weightsAndBiases);
             ActivationIndexes = new ReadOnlyCollection<int>(activationIndexes);
         }
@@ -86,7 +86,7 @@ namespace RansomeCorp.AI.Evolution
                 .Concat(Enumerable.Repeat((int)activationType, outputs))
                 .ToList();
 
-            return new Dna(inputs, outputs, hiddenLayers, weightsAndBiases, activationIndexes);
+            return new Dna(inputs, outputs, outputsPerLayer, weightsAndBiases, activationIndexes);
         }
     }
 }

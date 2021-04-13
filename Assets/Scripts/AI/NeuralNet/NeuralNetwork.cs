@@ -1,27 +1,35 @@
-using System.Collections;
+using RansomeCorp.AI.Evolution;
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using UnityEngine;
 
 namespace RansomeCorp.AI.NeuralNet
 {
     public class NeuralNetwork
     {
-        public readonly List<List<INeuron>> Layers;
+        public readonly List<List<INeuron>> Layers = new List<List<INeuron>>();
 
-        public NeuralNetwork(int inputs, int[] hiddenLayers, int outputs, Func<int, INeuron> neuronFactory = null)
+        public NeuralNetwork(Dna dna, Func<List<double>, ActivationType, INeuron> neuronFactory = null)
         {
-            neuronFactory ??= (int nInputs) => new Neuron(nInputs);
+            neuronFactory ??= (List<double> a, ActivationType b) => new Neuron(a, b);
 
-            Layers = hiddenLayers
-                .Concat(new int[] { outputs })
-                .Select((int nNeurons, int index) =>
-                    {
-                        int inputsPerNeuron = index == 0 ? inputs : hiddenLayers[index - 1];
-                        return new int[nNeurons].Select((_) => neuronFactory(inputsPerNeuron)).ToList();
-                    })
-                .ToList();
+            int neuronCounter = 0;
+            int weightIndex = 0;
+            for (int outputsIndex = 1; outputsIndex < dna.OutputsPerLayer.Count; outputsIndex++)
+            {
+                List<INeuron> layer = new List<INeuron>();
+                int nNeurons = dna.OutputsPerLayer[outputsIndex];
+                int weightsPerNeuron = dna.OutputsPerLayer[outputsIndex - 1] + 1; // +1 for bias
+                for (int neuronIndex = 0; neuronIndex < nNeurons; neuronIndex++)
+                {
+                    List<double> weights = dna.WeightsAndBiases.Skip(weightIndex).Take(weightsPerNeuron).ToList();
+                    ActivationType activation = (ActivationType)dna.ActivationIndexes[neuronCounter];
+                    layer.Add(neuronFactory(weights, activation));
+                    weightIndex += weightsPerNeuron; 
+                    neuronCounter++;
+                }
+                Layers.Add(layer);
+            }
         }
 
         public List<double> Think(List<double> inputs) => FeedForward(inputs, Layers);
@@ -39,19 +47,4 @@ namespace RansomeCorp.AI.NeuralNet
             return FeedForward(outputs, remainingLayers.Skip(1).ToList());
         }
     }
-
-    // public struct NeuronGene
-    // {
-    //     public readonly double Bias;
-    //     public readonly List<double> Weights;
-    //     public readonly Func<double, double> ActivationFunction;
-
-    //     public NeuronGene(int nInputs, ActivationType activationType = ActivationType.TanH)
-    //     {
-    //         Bias = UnityEngine.Random.Range(-1f, 1f);
-    //         ActivationFunction = Activation.Functions[activationType];
-    //         Weights = new List<double>(new double[nInputs])
-    //             .Select((_) => (double)UnityEngine.Random.Range(-1f, 1f)).ToList();
-    //     }
-    // }
 }

@@ -18,16 +18,12 @@ namespace RansomeCorp.AI.NeuralNet
         public List<double> Weights { get; private set; }
         public Func<double, double> ActivationFunction { get; private set; }
 
-        public Neuron(int nInputs, ActivationType activationType = ActivationType.TanH)
+        public Neuron(List<double> weights, ActivationType activationType)
         {
-            Bias = UnityEngine.Random.Range(-1f, 1f);
+            Bias = weights[0];
+            Weights = weights.Skip(1).ToList();
             ActivationFunction = Activation.Functions[activationType];
-            Weights = new List<double>(new double[nInputs])
-                .Select((_) => (double)UnityEngine.Random.Range(-1f, 1f)).ToList();
         }
-
-        public Neuron(double bias, List<double> weights, ActivationType activationType = ActivationType.TanH) =>
-            (Bias, Weights, ActivationFunction) = (bias, weights, Activation.Functions[activationType]);
 
         public double Compute(List<double> inputValues)
         {
