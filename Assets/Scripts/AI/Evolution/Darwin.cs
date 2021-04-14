@@ -61,10 +61,10 @@ namespace RansomeCorp.AI.Evolution
 
     public class Darwin
     {
-        public static Dna GenerateRandomDnaEncoding(int inputs, int[] hiddenLayers, int outputs, ActivationType activationType, bool heterogeneousHiddenActivation)
+        public static Dna GenerateRandomDnaEncoding(int inputs, int[] hiddenLayersNeuronCount, int outputs, ActivationType activationType, bool heterogeneousHiddenActivation)
         {
             int[] outputsPerLayer = new int[] { inputs }
-                .Concat(hiddenLayers)
+                .Concat(hiddenLayersNeuronCount)
                 .Concat(new int[] { outputs })
                 .ToArray();
 
