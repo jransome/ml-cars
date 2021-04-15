@@ -2,6 +2,7 @@ using RansomeCorp.AI.NeuralNet;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using UnityEngine;
 
 /*
     Goal: go from 1 dimensional encoding => instance of nn
@@ -87,6 +88,65 @@ namespace RansomeCorp.AI.Evolution
                 .ToList();
 
             return new Dna(inputs, outputs, outputsPerLayer, weightsAndBiases, activationIndexes);
+        }
+
+        public static List<Dna> CreateOffspring(Dna parent1, Dna parent2, float weightCrossoverProportion = 0.5f, float activationCrossoverProportion = 0)
+        {
+            // Weight crossover
+            if (parent1.WeightsAndBiases.Count != parent2.WeightsAndBiases.Count)
+                Debug.LogError("Inter-species mating is happening... this hasn't been coded for!!");
+
+            var child1WeightGene = new List<double>();
+            var child2WeightGene = new List<double>();
+
+            for (int i = 0; i < Mathf.Min(parent1.WeightsAndBiases.Count, parent2.WeightsAndBiases.Count); i++)
+            {
+                if (Random.Range(0f, 1f) <= weightCrossoverProportion)
+                {
+                    child1WeightGene.Add(parent2.WeightsAndBiases[i]);
+                    child2WeightGene.Add(parent1.WeightsAndBiases[i]);
+                }
+                else
+                {
+                    child1WeightGene.Add(parent1.WeightsAndBiases[i]);
+                    child2WeightGene.Add(parent2.WeightsAndBiases[i]);
+                }
+            }
+
+            // Activation crossover
+            var child1ActivationGene = new List<int>(parent1.ActivationIndexes);
+            var child2ActivationGene = new List<int>(parent2.ActivationIndexes);
+
+            if (activationCrossoverProportion > 0)
+            {
+                child1ActivationGene = new List<int>();
+                child2ActivationGene = new List<int>();
+
+                for (int i = 0; i < Mathf.Min(parent1.ActivationIndexes.Count, parent2.ActivationIndexes.Count); i++)
+                {
+                    if (Random.Range(0f, 1f) <= activationCrossoverProportion)
+                    {
+                        child1ActivationGene.Add(parent2.ActivationIndexes[i]);
+                        child2ActivationGene.Add(parent1.ActivationIndexes[i]);
+                    }
+                    else
+                    {
+                        child1ActivationGene.Add(parent1.ActivationIndexes[i]);
+                        child2ActivationGene.Add(parent2.ActivationIndexes[i]);
+                    }
+                }
+            }
+
+            // Return children. Inputs, outputs and network structure should be the same in both parents
+            int inputs = parent1.Inputs;
+            int outputs = parent1.Outputs;
+            int[] outputsPerLayer = parent1.OutputsPerLayer.ToArray();
+
+            return new List<Dna>()
+            {
+                new Dna(inputs, outputs, outputsPerLayer, child1WeightGene, child1ActivationGene),
+                new Dna(inputs, outputs, outputsPerLayer, child2WeightGene, child2ActivationGene),
+            };
         }
     }
 }
