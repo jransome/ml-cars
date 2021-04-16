@@ -148,5 +148,30 @@ namespace RansomeCorp.AI.Evolution
                 new Dna(inputs, outputs, outputsPerLayer, child2WeightGene, child2ActivationGene),
             };
         }
+
+        public static Dna Mutate(Dna dna, float weightMutationPrevalence, float activationMutationPrevalence = 0)
+        {
+            List<double> mutatedWeightGene = dna.WeightsAndBiases.Select(value =>
+            {
+                if (Random.Range(0f, 1f) <= weightMutationPrevalence) return value;
+                return Random.Range(-1f, 1f);
+            }).ToList();
+
+            if (!(activationMutationPrevalence > 0))
+                return new Dna(dna.Inputs, dna.Outputs, dna.OutputsPerLayer.ToArray(), mutatedWeightGene, dna.ActivationIndexes.ToList());
+
+            int startIndexOfOutputLayerActivation = dna.ActivationIndexes.Count - dna.Outputs;
+            List<int> mutatedActivationGene = dna.ActivationIndexes
+                .Take(startIndexOfOutputLayerActivation) // preserve the output layer activations
+                .Select(value =>
+                {
+                    if (Random.Range(0f, 1f) <= activationMutationPrevalence) return value;
+                    return Random.Range(0, Activation.FunctionsCount);
+                })
+                .Concat(dna.ActivationIndexes.Skip(startIndexOfOutputLayerActivation))
+                .ToList();
+
+            return new Dna(dna.Inputs, dna.Outputs, dna.OutputsPerLayer.ToArray(), mutatedWeightGene, mutatedActivationGene);
+        }
     }
 }

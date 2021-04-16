@@ -98,10 +98,10 @@ public class DarwinTests
     public void PerformsDnaCrossover()
     {
         // Arrange
-        const int nInputs = 50;
-        const int nOutputs = 8;
+        const int nInputs = 7;
+        const int nOutputs = 4;
         const int outputLayerActivationIndex = 3;
-        int[] hiddenLayers = new int[] { 30, 1, 4, 12 };
+        int[] hiddenLayers = new int[] { 7, 1, 4, 7 };
         Dna parent1Dna = Darwin.GenerateRandomDnaEncoding(nInputs, hiddenLayers, nOutputs, (ActivationType)outputLayerActivationIndex, true);
         Dna parent2Dna = Darwin.GenerateRandomDnaEncoding(nInputs, hiddenLayers, nOutputs, (ActivationType)outputLayerActivationIndex, true);
 
@@ -134,10 +134,10 @@ public class DarwinTests
     public void PerformsDnaCrossoverWithoutActivation()
     {
         // Arrange
-        const int nInputs = 50;
-        const int nOutputs = 8;
+        const int nInputs = 5;
+        const int nOutputs = 2;
         const int outputLayerActivationIndex = 3;
-        int[] hiddenLayers = new int[] { 30, 1, 4, 12 };
+        int[] hiddenLayers = new int[] { 10, 4, 2, 6 };
         Dna parent1Dna = Darwin.GenerateRandomDnaEncoding(nInputs, hiddenLayers, nOutputs, (ActivationType)outputLayerActivationIndex, true);
         Dna parent2Dna = Darwin.GenerateRandomDnaEncoding(nInputs, hiddenLayers, nOutputs, (ActivationType)outputLayerActivationIndex, true);
 
@@ -154,12 +154,62 @@ public class DarwinTests
             child.WeightsAndBiases.Should().NotBeEquivalentTo(parent1Dna.WeightsAndBiases);
             child.WeightsAndBiases.Should().NotBeEquivalentTo(parent2Dna.WeightsAndBiases);
         }
-        
+
         offspring[0].ActivationIndexes.Should().Equal(parent1Dna.ActivationIndexes);
         offspring[1].ActivationIndexes.Should().Equal(parent2Dna.ActivationIndexes);
 
         double offspringTotalWeights = offspring[0].WeightsAndBiases.Sum() + offspring[1].WeightsAndBiases.Sum();
         double parentsTotalWeights = parent1Dna.WeightsAndBiases.Sum() + parent2Dna.WeightsAndBiases.Sum();
         parentsTotalWeights.Should().Be(offspringTotalWeights);
+    }
+
+    // public void PerformsDnaMutationWithoutActivation()
+    [Test]
+    public void PerformsDnaMutation()
+    {
+        // Arrange
+        const int nInputs = 20;
+        const int nOutputs = 8;
+        const int outputLayerActivationIndex = 3;
+        int[] hiddenLayers = new int[] { 30, 4, 12 };
+        Dna originalDna = Darwin.GenerateRandomDnaEncoding(nInputs, hiddenLayers, nOutputs, (ActivationType)outputLayerActivationIndex, true);
+
+        // Act
+        Dna mutatedDna = Darwin.Mutate(originalDna, 0.02f, 0.8f);
+
+        // Assert
+        mutatedDna.Inputs.Should().Be(nInputs);
+        mutatedDna.Outputs.Should().Be(nOutputs);
+        mutatedDna.OutputsPerLayer.Should().Equal(originalDna.OutputsPerLayer);
+        mutatedDna.ActivationIndexes.Should().NotEqual(originalDna.ActivationIndexes);
+        mutatedDna.ActivationIndexes.Should().HaveCount(originalDna.ActivationIndexes.Count);
+        int indexOfOutputLayerActivation = originalDna.ActivationIndexes.Count - nOutputs;
+        mutatedDna.ActivationIndexes.Skip(indexOfOutputLayerActivation)
+            .Should().Equal(originalDna.ActivationIndexes.Skip(indexOfOutputLayerActivation), "preserves output layer activation functions");
+        mutatedDna.WeightsAndBiases.Should().NotEqual(originalDna.WeightsAndBiases);
+        mutatedDna.WeightsAndBiases.Should().HaveCount(originalDna.WeightsAndBiases.Count);
+    }
+
+    [Test]
+    public void PerformsDnaMutationWithoutActivation()
+    {
+        // Arrange
+        const int nInputs = 20;
+        const int nOutputs = 8;
+        const int outputLayerActivationIndex = 3;
+        int[] hiddenLayers = new int[] { 30, 4, 12 };
+        Dna originalDna = Darwin.GenerateRandomDnaEncoding(nInputs, hiddenLayers, nOutputs, (ActivationType)outputLayerActivationIndex, true);
+
+        // Act
+        Dna mutatedDna = Darwin.Mutate(originalDna, 0.02f, 0);
+
+        // Assert
+        mutatedDna.Inputs.Should().Be(nInputs);
+        mutatedDna.Outputs.Should().Be(nOutputs);
+        mutatedDna.OutputsPerLayer.Should().Equal(originalDna.OutputsPerLayer);
+        mutatedDna.ActivationIndexes.Should().Equal(originalDna.ActivationIndexes);
+        mutatedDna.ActivationIndexes.Should().HaveCount(originalDna.ActivationIndexes.Count);
+        mutatedDna.WeightsAndBiases.Should().NotEqual(originalDna.WeightsAndBiases);
+        mutatedDna.WeightsAndBiases.Should().HaveCount(originalDna.WeightsAndBiases.Count);
     }
 }
