@@ -23,7 +23,7 @@ public class NeuralNetworkTests
         const int nOutputs = 3;
         const int outputLayerActivationIndex = 0;
         int[] hiddenLayersNeuronCount = new int[] { 4, 3, 6 };
-        Dna dna = Darwin.GenerateRandomDnaEncoding(nInputs, hiddenLayersNeuronCount, nOutputs, (ActivationType)outputLayerActivationIndex, true);
+        Dna dna = Dna.GenerateRandomDnaEncoding(nInputs, hiddenLayersNeuronCount, nOutputs, (ActivationType)outputLayerActivationIndex, true);
 
         // Act
         NeuralNetwork neuralNetwork = new NeuralNetwork(dna);
@@ -74,7 +74,7 @@ public class NeuralNetworkTests
         const int nOutputs = 3;
         const int outputLayerActivationIndex = 0;
         int[] hiddenLayersNeuronCount = new int[] { 2, 9, 4 };
-        Dna dna = Darwin.GenerateRandomDnaEncoding(nInputs, hiddenLayersNeuronCount, nOutputs, (ActivationType)outputLayerActivationIndex, true);
+        Dna dna = Dna.GenerateRandomDnaEncoding(nInputs, hiddenLayersNeuronCount, nOutputs, (ActivationType)outputLayerActivationIndex, true);
         Func<List<double>, ActivationType, INeuron> fakeNeuronFactory = (List<double> a, ActivationType b) => new FakeNeuron(a, b);
 
         // Act
