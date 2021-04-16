@@ -1,6 +1,5 @@
 using RansomeCorp.AI.NeuralNet;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using UnityEngine;
 
@@ -41,25 +40,6 @@ using UnityEngine;
 
 namespace RansomeCorp.AI.Evolution
 {
-    [System.Serializable]
-    public struct Dna
-    {
-        public readonly int Inputs;
-        public readonly int Outputs;
-        public readonly ReadOnlyCollection<int> OutputsPerLayer;
-        public readonly ReadOnlyCollection<double> WeightsAndBiases;
-        public readonly ReadOnlyCollection<int> ActivationIndexes;
-
-        public Dna(int inputs, int outputs, int[] outputsPerLayer, List<double> weightsAndBiases, List<int> activationIndexes)
-        {
-            Inputs = inputs;
-            Outputs = outputs;
-            OutputsPerLayer = new ReadOnlyCollection<int>(outputsPerLayer);
-            WeightsAndBiases = new ReadOnlyCollection<double>(weightsAndBiases);
-            ActivationIndexes = new ReadOnlyCollection<int>(activationIndexes);
-        }
-    }
-
     public class Darwin
     {
         public static Dna GenerateRandomDnaEncoding(int inputs, int[] hiddenLayersNeuronCount, int outputs, ActivationType activationType, bool heterogeneousHiddenActivation)
@@ -149,7 +129,7 @@ namespace RansomeCorp.AI.Evolution
             };
         }
 
-        public static Dna Mutate(Dna dna, float weightMutationPrevalence, float activationMutationPrevalence = 0)
+        public static Dna CloneAndMutate(Dna dna, float weightMutationPrevalence, float activationMutationPrevalence = 0)
         {
             List<double> mutatedWeightGene = dna.WeightsAndBiases.Select(value =>
             {

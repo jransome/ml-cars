@@ -38,8 +38,7 @@ namespace RansomeCorp.AI.NeuralNet
         {
             List<double> outputs = remainingLayers
                 .First()
-                .Select((neuron) => neuron.Compute(inputs))
-                .ToList();
+                .ConvertAll((neuron) => neuron.Compute(inputs));
 
             if (remainingLayers.Count == 1)
                 return outputs;

@@ -110,8 +110,12 @@ public class DarwinTests
 
         // Assert
         offspring.Should().HaveCount(2);
+        CheckDnaIsNotReferentiallyEqual(offspring[0], offspring[1]);
+
         foreach (var child in offspring)
         {
+            CheckDnaIsNotReferentiallyEqual(child, parent1Dna);
+            CheckDnaIsNotReferentiallyEqual(child, parent2Dna);
             child.Inputs.Should().Be(nInputs);
             child.Outputs.Should().Be(nOutputs);
             child.OutputsPerLayer.Should().Equal(parent1Dna.OutputsPerLayer);
@@ -146,8 +150,12 @@ public class DarwinTests
 
         // Assert
         offspring.Should().HaveCount(2);
+        CheckDnaIsNotReferentiallyEqual(offspring[0], offspring[1]);
+
         foreach (var child in offspring)
         {
+            CheckDnaIsNotReferentiallyEqual(child, parent1Dna);
+            CheckDnaIsNotReferentiallyEqual(child, parent2Dna);
             child.Inputs.Should().Be(nInputs);
             child.Outputs.Should().Be(nOutputs);
             child.OutputsPerLayer.Should().Equal(parent1Dna.OutputsPerLayer);
@@ -175,9 +183,10 @@ public class DarwinTests
         Dna originalDna = Darwin.GenerateRandomDnaEncoding(nInputs, hiddenLayers, nOutputs, (ActivationType)outputLayerActivationIndex, true);
 
         // Act
-        Dna mutatedDna = Darwin.Mutate(originalDna, 0.02f, 0.8f);
+        Dna mutatedDna = Darwin.CloneAndMutate(originalDna, 0.02f, 0.8f);
 
         // Assert
+        CheckDnaIsNotReferentiallyEqual(originalDna, mutatedDna);
         mutatedDna.Inputs.Should().Be(nInputs);
         mutatedDna.Outputs.Should().Be(nOutputs);
         mutatedDna.OutputsPerLayer.Should().Equal(originalDna.OutputsPerLayer);
@@ -201,9 +210,10 @@ public class DarwinTests
         Dna originalDna = Darwin.GenerateRandomDnaEncoding(nInputs, hiddenLayers, nOutputs, (ActivationType)outputLayerActivationIndex, true);
 
         // Act
-        Dna mutatedDna = Darwin.Mutate(originalDna, 0.02f, 0);
+        Dna mutatedDna = Darwin.CloneAndMutate(originalDna, 0.02f, 0);
 
         // Assert
+        CheckDnaIsNotReferentiallyEqual(originalDna, mutatedDna);
         mutatedDna.Inputs.Should().Be(nInputs);
         mutatedDna.Outputs.Should().Be(nOutputs);
         mutatedDna.OutputsPerLayer.Should().Equal(originalDna.OutputsPerLayer);
@@ -211,5 +221,13 @@ public class DarwinTests
         mutatedDna.ActivationIndexes.Should().HaveCount(originalDna.ActivationIndexes.Count);
         mutatedDna.WeightsAndBiases.Should().NotEqual(originalDna.WeightsAndBiases);
         mutatedDna.WeightsAndBiases.Should().HaveCount(originalDna.WeightsAndBiases.Count);
+    }
+
+    public void CheckDnaIsNotReferentiallyEqual(Dna dna1, Dna dna2)
+    {
+        dna1.Should().NotBeSameAs(dna2); // NotBeSameAs = referential inequality
+        dna1.ActivationIndexes.Should().NotBeSameAs(dna2.ActivationIndexes);
+        dna1.WeightsAndBiases.Should().NotBeSameAs(dna2.WeightsAndBiases);
+        dna1.OutputsPerLayer.Should().NotBeSameAs(dna2.OutputsPerLayer);
     }
 }
