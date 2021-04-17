@@ -20,7 +20,7 @@ public class SavedPopulationView : MonoBehaviour
 
     private void Load()
     {
-        EvolutionManager.LoadGeneration(PopData);
+        // EvolutionManager.LoadGeneration(PopData);
     }
 
     private void Start()

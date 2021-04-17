@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d7f6f78e9df2d9408a9c1b1746f9d51, type: 3}
+  m_Name: Tesla
+  m_EditorClassIdentifier: 
+  PopulationPrefab: {fileID: 6641770778032953726, guid: 83bd4ddeaecaa8c41aa631c791dbf3cf,
+    type: 3}
+  SpeciesColour: {r: 0.9056604, g: 0.5596298, b: 0.15686275, a: 0}
+  IgnoredLayers:
+    serializedVersion: 2
+    m_Bits: 512
+  DrawSensors: 0
+  SensorAngles: []
+  SensorDistance: 150
+  HiddenLayersNeuronCount: 
+  HeterogeneousHiddenActivation: 0
+  OutputLayerActivation: 1
+  generationSize: 30
+  ProportionUnchanged: 0.05
+  NewDnaRate: 0.05
+  MutationProbability: 0.05
+  MutationSeverity: 0.05
+  ActivationMutationSeverity: 0.01
+  CrossoverSeverity: 0.4
+  ActivationCrossoverSeverity: 0.05
+  MaxTimeToReachNextGateSecs: 5
+  MaxLifeSpanSecs: 0

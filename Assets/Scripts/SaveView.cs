@@ -25,7 +25,7 @@ public class SaveView : MonoBehaviour
         // };
         // PopulationData data = new PopulationData(TestGenes, 1, SaveName.text);
         // Persistence.Save(data);
-        Persistence.Save(new PopulationData(EvolutionManager.GenePool, EvolutionManager.GenerationCount, SaveName.text));
+        // Persistence.Save(new PopulationData(EvolutionManager.GenePool, EvolutionManager.GenerationCount, SaveName.text));
 
         ClearSaves();
         PopulateSaves();

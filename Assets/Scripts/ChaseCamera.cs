@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class ChaseCamera : MonoBehaviour
 {
@@ -9,7 +8,7 @@ public class ChaseCamera : MonoBehaviour
 
     private void Update()
     {
-        Brain carToTrack = EvolutionManager.MostSuccessfulAlive;
+        CarBrain carToTrack = EvolutionManager.MostSuccessfulAlive;
 
         if (carToTrack)
             chaseTransform = carToTrack.transform;

@@ -7,11 +7,13 @@ namespace RansomeCorp.AI.NeuralNet
 {
     public class NeuralNetwork
     {
+        public readonly Dna Dna;
         public readonly List<List<INeuron>> Layers = new List<List<INeuron>>();
 
         public NeuralNetwork(Dna dna, Func<List<double>, ActivationType, INeuron> neuronFactory = null)
         {
             neuronFactory ??= (List<double> a, ActivationType b) => new Neuron(a, b);
+            Dna = dna;
 
             int neuronCounter = 0;
             int weightIndex = 0;
@@ -25,14 +27,20 @@ namespace RansomeCorp.AI.NeuralNet
                     List<double> weights = dna.WeightsAndBiases.Skip(weightIndex).Take(weightsPerNeuron).ToList();
                     ActivationType activation = (ActivationType)dna.ActivationIndexes[neuronCounter];
                     layer.Add(neuronFactory(weights, activation));
-                    weightIndex += weightsPerNeuron; 
+                    weightIndex += weightsPerNeuron;
                     neuronCounter++;
                 }
                 Layers.Add(layer);
             }
         }
 
-        public List<double> Think(List<double> inputs) => FeedForward(inputs, Layers);
+        public List<double> Think(List<double> inputs)
+        {
+            if (inputs.Count != Dna.Inputs)
+                throw new System.ArgumentException("Network received " + inputs.Count + " inputs, but expected " + Dna.Inputs);
+
+            return FeedForward(inputs, Layers);
+        }
 
         private List<double> FeedForward(List<double> inputs, List<List<INeuron>> remainingLayers)
         {

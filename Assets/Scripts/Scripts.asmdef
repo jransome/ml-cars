@@ -1,7 +1,9 @@
 {
     "name": "Scripts",
     "rootNamespace": "RansomeCorp",
-    "references": [],
+    "references": [
+        "GUID:a67e022a4c759274599c39ef6766b472"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

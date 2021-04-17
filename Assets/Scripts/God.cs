@@ -1,197 +1,188 @@
-﻿using System.Collections;
+﻿using RansomeCorp.AI.Evolution;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 public class God : MonoBehaviour
 {
-    public int StartingGate = 0;
+    public CarSpecies Species;
 
-    [Header("Lineage colours")]
-    public static Dictionary<DnaHeritage, Color> LineageColours;
-    public Color NewGenome;
-    public Color UnchangedFromLastGen;
-    public Color Bred;
-    public Color Mutated;
+    public int GenerationCount { get; private set; } = 0;
+    public List<CarBrain> GenerationPool { get; private set; } = new List<CarBrain>();
+    public List<CarBrain> CurrentlyAlive { get; private set; } = new List<CarBrain>();
+    public List<CarBrain> SelectedForBreeding { get; private set; } = new List<CarBrain>(); // used purely for visual feedback
 
-    [Header("Neural network variables")]
-    public DnaStructure DnaStructure;
-
-    [Header("Algorithm variables")]
-    public float ProportionUnchanged = 0.05f;
-    public float NewDnaRate = 0.05f;
-    public float MutationRate = 0.05f;
-    public float MutationSeverity = 0.2f;
-    public bool MutateClones = true;
-    public float MaxTimeToReachNextGate = 5f;
-    public float MaxGenerationTime = 0f;
-
-    [Header("Population")]
-    [SerializeField] private GameObject populationPrefab = null;
-    [SerializeField] private int generationSize = 10;
-    [SerializeField] private List<Brain> generationPool;
-    [SerializeField] private List<Dna> genePool;
-    [SerializeField] private float generationTotalFitness; // for debugging
-
-    public int GenerationCount { get; set; }
-    public int CurrentlyAlive { get; set; }
-    public List<Brain> GenerationPool { get { return generationPool; } }
-    public List<Dna> GenePool { get { return genePool; } }
-
-    public Brain MostSuccessfulAlive
+    public CarBrain MostSuccessfulAlive
     {
-        get
+        get => GenerationPool.Where(b => b.IsAlive).OrderByDescending(b => b.Fitness).DefaultIfEmpty(null).First();
+    }
+
+    // public void LoadGeneration(PopulationData generation)
+    // {
+    //     TODO: generation size (and agent count)
+    //     GenerationCount = generation.GenerationNumber;
+    //     DnaStructure = generation.DnaStructure;
+    //     ReleaseNewGeneration(generation.GenePool);
+    // }
+
+    private static Dna SelectRandomBasedOnFitness(List<Dna> parentPool, Dna excluding = null)
+    {
+        List<Dna> candidates = excluding == null ? parentPool : parentPool.Where(p => p != excluding).ToList();
+        float totalFitness = parentPool.Aggregate(0f, (total, parent) => total + parent.RawFitnessRating); // TODO: optimise this
+        List<KeyValuePair<Dna, float>> candidateChances = candidates.ConvertAll(c => new KeyValuePair<Dna, float>(c, c.RawFitnessRating / totalFitness));
+
+        float diceRoll = Random.Range(0f, 1f);
+        float cumulative = 0f;
+        for (int i = 0; i < candidateChances.Count; i++)
         {
-            return GenerationPool
-                .Where(b => b.IsAlive)
-                .OrderByDescending(b => b.ChaseCameraOrderingVariable)
-                .DefaultIfEmpty(null)
-                .First();
+            cumulative += candidateChances[i].Value;
+            if (diceRoll < cumulative) return candidateChances[i].Key;
         }
+
+        Debug.LogWarning("Failed to choose new random parent by fitness...");
+        return candidates[Random.Range(0, candidates.Count)];
     }
 
-    public void LoadGeneration(PopulationData generation)
+    private static List<Dna> CreateGenerationDna(CarSpecies species, List<Dna> previousGeneration = null)
     {
-        // TODO: generation size (and agent count)
-        GenerationCount = generation.GenerationNumber;
-        DnaStructure = generation.DnaStructure;
-        ReleaseNewGeneration(generation.GenePool);
-    }
-
-    private Dna[] CreateOffspring(List<Dna> parentPool)
-    {
-        Dna parent1 = SelectRandomBasedOnFitness(parentPool);
-        Dna parent2 = SelectRandomBasedOnFitness(parentPool.Where(p => p != parent1).ToList());
-        return parent1.Splice(parent2);
-    }
-
-    private Dna SelectRandomBasedOnFitness(List<Dna> parentPool)
-    {
-        float random = Random.Range(0f, parentPool.Sum(p => p.Fitness));
-        foreach (Dna candidate in parentPool.OrderBy(c => Random.Range(0f, 1f)))
+        if (previousGeneration == null)
         {
-            random -= candidate.Fitness;
-            if (random < 0) return candidate;
+            return Enumerable.Range(0, species.GenerationSize).Select((_) =>
+                Dna.GenerateRandomDnaEncoding(
+                    species.Inputs,
+                    species.HiddenLayersNeuronCount,
+                    CarSpecies.Outputs,
+                    species.OutputLayerActivation,
+                    species.HeterogeneousHiddenActivation
+                )
+            ).ToList();
         }
-        return parentPool.Last();
-    }
 
-    private void ReleaseNewGeneration(List<Dna> newGenerationDna)
-    {
-        genePool = newGenerationDna;
-        generationTotalFitness = 0; // used for debugging only
-        CurrentlyAlive = generationSize;
-        generationPool = generationPool.Zip(newGenerationDna, (brain, dna) =>
+        List<Dna> TNG = new List<Dna>();
+
+        // Preserve top survivors 
+        int nUnchanged = Mathf.RoundToInt(species.GenerationSize * species.ProportionUnchanged);
+        if (nUnchanged > 0)
         {
-            brain.ReplaceDna(dna);
-            brain.Arise(transform.position, transform.rotation);
-            return brain;
-        }).ToList();
-    }
-
-    private IEnumerator CreateGeneration(List<Dna> oldGeneration = null)
-    {
-        // create TNG
-        List<Dna> theNextGeneration = new List<Dna>();
-
-        if (oldGeneration == null)
-        {
-            for (int i = 0; i < generationSize; i++)
-                theNextGeneration.Add(new Dna(DnaStructure));
-            Debug.Log("Generation 1 seeded");
+            TNG.AddRange(previousGeneration.OrderByDescending((dna => dna.RawFitnessRating)).Take(nUnchanged));
         }
-        else
+
+        // Add fresh dna into next gen
+        int nNew = Mathf.RoundToInt(species.GenerationSize * species.NewDnaRate);
+        if ((species.GenerationSize - (nUnchanged + nNew) % 2 == 1)) nNew++; // make sure remaining spaces for offspring is an even number
+        if (nNew > 0)
         {
-            // report on last generation
-            Debug.Log("Generation " + GenerationCount + ": Avg: " + oldGeneration.Average(d => d.Fitness) + " Max: " + oldGeneration.Max(d => d.Fitness));
+            TNG.AddRange(Enumerable.Range(0, nNew).Select((_) =>
+                Dna.GenerateRandomDnaEncoding(
+                    species.Inputs,
+                    species.HiddenLayersNeuronCount,
+                    CarSpecies.Outputs,
+                    species.OutputLayerActivation,
+                    species.HeterogeneousHiddenActivation
+                )
+            ));
+        }
 
-            // preserve top survivors 
-            int nUnchanged = Mathf.RoundToInt(generationSize * ProportionUnchanged);
-            if (nUnchanged > 0) theNextGeneration.AddRange(oldGeneration.OrderByDescending(d => d.Fitness).ToList().GetRange(0, nUnchanged).Select(d => d.Clone()));
-
-            // add completely new dna into next gen
-            int nNew = Mathf.RoundToInt(generationSize * NewDnaRate);
-            if ((generationSize - nNew) % 2 == 1) nNew++; // make sure remaining spaces is an even number
-            if (nNew > 0) for (int i = 0; i < nNew; i++) theNextGeneration.Add(new Dna(DnaStructure));
-
-            // populate rest of next generation with offspring
-            for (int i = nUnchanged + nNew; i < generationSize; i += 2)
+        // Populate the rest with offspring of previous
+        int offspring = 0, mutatedOffspring = 0;
+        for (int i = 0; i < Mathf.RoundToInt((species.GenerationSize - (nUnchanged + nNew)) / 2); i++)
+        {
+            Dna parent1 = God.SelectRandomBasedOnFitness(previousGeneration);
+            Dna parent2 = God.SelectRandomBasedOnFitness(previousGeneration, parent1);
+            List<Dna> children = Dna.CreateOffspring(
+                parent1,
+                parent2,
+                species.CrossoverSeverity,
+                species.ActivationCrossoverSeverity
+            ).ConvertAll(child =>
             {
-                // pick 2 random DIFFERENT parents and breed
-                foreach (Dna child in CreateOffspring(oldGeneration))
+                if (Random.Range(0f, 1f) > species.MutationProbability)
                 {
-                    // do mutation
-                    if (Random.Range(0f, 1f) < MutationRate) child.Mutate(MutationSeverity);
-                    theNextGeneration.Add(child);
+                    offspring++;
+                    return child;
                 }
-                yield return new WaitForSeconds(0.1f); // so we can visualise selection of agents for the next generation
-            }
-            yield return new WaitForSeconds(0.5f); // pause so we can see the results of selection
+
+                mutatedOffspring++;
+                return Dna.CloneAndMutate(child, DnaHeritage.BredAndMutated, species.MutationSeverity, species.ActivationMutationSeverity);
+            });
+
+            TNG.AddRange(children);
         }
 
-        // check for clones
-        CheckForIdenticalGenomes(theNextGeneration);
-        if (MutateClones) MutateIdenticalGenomes(theNextGeneration);
+        Debug.Log(
+            "Created generation made up of " +
+            nNew + " new, " +
+            offspring + " descendants, " +
+            mutatedOffspring + " mutated descendants, and " +
+            nUnchanged + " unchanged genomes"
+        );
 
-        // setup next generation
-        GenerationCount++;
-        ReleaseNewGeneration(theNextGeneration);
+        return TNG;
     }
 
-    private void MutateIdenticalGenomes(List<Dna> dnaList)
+    private void HandleIndividualDied(CarBrain deceased, float fitness)
     {
-        foreach (var d in dnaList)
+        CurrentlyAlive.Remove(deceased);
+        if (CurrentlyAlive.Count == 0)
+            StartCoroutine(DoEvolution(GenerationPool));
+    }
+
+    private IEnumerator DoEvolution(List<CarBrain> previousGenerationPhenotypes, bool isFirstGeneration = false)
+    {
+        Debug.Log("Creating generation " + ++GenerationCount + "...");
+        List<Dna> newDnaList = isFirstGeneration ?
+            God.CreateGenerationDna(Species) :
+            God.CreateGenerationDna(Species, previousGenerationPhenotypes.ConvertAll(p => p.Dna));
+
+        if (newDnaList.Count != previousGenerationPhenotypes.Count)
+            Debug.LogError("Phenotype/Genotype count mismatch!");
+
+        // Show selection process for visual feedback
+        yield return StartCoroutine(ShowSelectionProcess());
+
+        for (int i = 0; i < newDnaList.Count; i++)
         {
-            foreach (var otherD in dnaList)
-                if (d != otherD && d.IsEqual(otherD)) d.Mutate(0.5f);
+            Dna newDna = newDnaList[i];
+            CarBrain carBrain = previousGenerationPhenotypes[i];
+
+            newDna.OnSelectedForBreedingCb = () => SelectedForBreeding.Add(carBrain);
+            carBrain.Arise(newDna, transform.position, transform.rotation);
         }
+        CurrentlyAlive = new List<CarBrain>(GenerationPool);
     }
 
-    private void CheckForIdenticalGenomes(List<Dna> dnaList)
+    private IEnumerator ShowSelectionProcess()
     {
-        List<Dna> duplicates = dnaList.Where(d =>
+        foreach (var brain in SelectedForBreeding)
         {
-            foreach (var otherD in dnaList)
-                if (d != otherD && d.IsEqual(otherD)) return true;
+            brain.transform.localScale += Vector3.up;
+            yield return new WaitForSeconds(0.2f);
+        }
 
-            return false;
-        }).ToList();
+        // pause to observe
+        yield return new WaitForSeconds(1f);
 
-        if (duplicates.Count > 0) Debug.Log(duplicates.Count + " identical genomes found");
+        // reset
+        foreach (var brain in SelectedForBreeding)
+            brain.transform.localScale = Vector3.one;
+
+        SelectedForBreeding.Clear();
     }
 
-    private void HandleIndividualDied(Brain deceased, float fitness)
+    private void InstantiatePhenotypes()
     {
-        generationTotalFitness += fitness; // used for debugging only
-        CurrentlyAlive--;
-        if (CurrentlyAlive == 0) StartCoroutine(CreateGeneration(genePool));
-    }
-
-    private void InstantiateBrains()
-    {
-        generationPool = new List<Brain>();
-        for (int i = 0; i < generationSize; i++)
+        for (int i = 0; i < Species.GenerationSize; i++)
         {
-            Brain b = Instantiate(populationPrefab).GetComponent<Brain>();
-            generationPool.Add(b);
-            b.MaxLifeSpan = MaxGenerationTime;
-            b.GateSuicideThreshold = MaxTimeToReachNextGate;
-            b.StartingGate = StartingGate;
-            b.Died += HandleIndividualDied;
+            CarBrain b = Instantiate(Species.PopulationPrefab).GetComponent<CarBrain>();
+            GenerationPool.Add(b);
+            b.Initialise(Species, transform.position, transform.rotation, HandleIndividualDied);
         }
     }
 
     private void Start()
     {
-        LineageColours = new Dictionary<DnaHeritage, Color>()
-        {
-            { DnaHeritage.IsNew, NewGenome },
-            { DnaHeritage.UnchangedFromLastGen, UnchangedFromLastGen },
-            { DnaHeritage.Mutated, Mutated },
-            { DnaHeritage.Bred, Bred },
-        };
-
-        InstantiateBrains();
-        StartCoroutine(CreateGeneration());
+        InstantiatePhenotypes();
+        StartCoroutine(DoEvolution(GenerationPool, true));
     }
 }

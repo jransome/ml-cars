@@ -39,22 +39,35 @@ using UnityEngine;
 
 namespace RansomeCorp.AI.Evolution
 {
+    public enum DnaHeritage
+    {
+        New,
+        Unchanged,
+        Bred,
+        BredAndMutated,
+        Mutated,
+    }
+
     [System.Serializable]
     public class Dna
     {
+        public System.Action OnSelectedForBreedingCb { get; set; } = delegate { };
         public readonly int Inputs;
         public readonly int Outputs;
         public readonly ReadOnlyCollection<int> OutputsPerLayer;
         public readonly ReadOnlyCollection<double> WeightsAndBiases;
         public readonly ReadOnlyCollection<int> ActivationIndexes;
+        public float RawFitnessRating { get; set; }
+        public DnaHeritage Heritage { get; private set; } = DnaHeritage.New;
 
-        private Dna(int inputs, int outputs, int[] outputsPerLayer, List<double> weightsAndBiases, List<int> activationIndexes)
+        private Dna(int inputs, int outputs, int[] outputsPerLayer, List<double> weightsAndBiases, List<int> activationIndexes, DnaHeritage origin = DnaHeritage.New)
         {
             Inputs = inputs;
             Outputs = outputs;
             OutputsPerLayer = new ReadOnlyCollection<int>(outputsPerLayer);
             WeightsAndBiases = new ReadOnlyCollection<double>(weightsAndBiases);
             ActivationIndexes = new ReadOnlyCollection<int>(activationIndexes);
+            Heritage = origin;
         }
 
         public static Dna GenerateRandomDnaEncoding(int inputs, int[] hiddenLayersNeuronCount, int outputs, ActivationType activationType, bool heterogeneousHiddenActivation)
@@ -74,11 +87,11 @@ namespace RansomeCorp.AI.Evolution
             }
 
             List<double> weightsAndBiases = new double[totalWeights + totalNeurons]
-                .Select((_) => (double)UnityEngine.Random.Range(-1f, 1f))
+                .Select((_) => (double)Random.Range(-1f, 1f))
                 .ToList();
 
             List<int> activationIndexes = new int[totalNeurons - outputs]
-                .Select((_) => heterogeneousHiddenActivation ? UnityEngine.Random.Range(0, Activation.FunctionsCount) : (int)activationType)
+                .Select((_) => heterogeneousHiddenActivation ? Random.Range(0, Activation.FunctionsCount) : (int)activationType)
                 .Concat(Enumerable.Repeat((int)activationType, outputs))
                 .ToList();
 
@@ -87,6 +100,10 @@ namespace RansomeCorp.AI.Evolution
 
         public static List<Dna> CreateOffspring(Dna parent1, Dna parent2, float weightCrossoverProportion = 0.5f, float activationCrossoverProportion = 0)
         {
+            // Sexi time
+            parent1.OnSelectedForBreedingCb();
+            parent2.OnSelectedForBreedingCb();
+
             // Weight crossover
             if (parent1.WeightsAndBiases.Count != parent2.WeightsAndBiases.Count)
                 Debug.LogError("Inter-species mating is happening... this hasn't been coded for!!");
@@ -139,12 +156,12 @@ namespace RansomeCorp.AI.Evolution
 
             return new List<Dna>()
             {
-                new Dna(inputs, outputs, outputsPerLayer, child1WeightGene, child1ActivationGene),
-                new Dna(inputs, outputs, outputsPerLayer, child2WeightGene, child2ActivationGene),
+                new Dna(inputs, outputs, outputsPerLayer, child1WeightGene, child1ActivationGene, DnaHeritage.Bred),
+                new Dna(inputs, outputs, outputsPerLayer, child2WeightGene, child2ActivationGene, DnaHeritage.Bred),
             };
         }
 
-        public static Dna CloneAndMutate(Dna dna, float weightMutationPrevalence, float activationMutationPrevalence = 0)
+        public static Dna CloneAndMutate(Dna dna, DnaHeritage origin, float weightMutationPrevalence, float activationMutationPrevalence = 0)
         {
             List<double> mutatedWeightGene = dna.WeightsAndBiases.Select(value =>
             {
@@ -153,7 +170,7 @@ namespace RansomeCorp.AI.Evolution
             }).ToList();
 
             if (!(activationMutationPrevalence > 0))
-                return new Dna(dna.Inputs, dna.Outputs, dna.OutputsPerLayer.ToArray(), mutatedWeightGene, dna.ActivationIndexes.ToList());
+                return new Dna(dna.Inputs, dna.Outputs, dna.OutputsPerLayer.ToArray(), mutatedWeightGene, dna.ActivationIndexes.ToList(), origin);
 
             int startIndexOfOutputLayerActivation = dna.ActivationIndexes.Count - dna.Outputs;
             List<int> mutatedActivationGene = dna.ActivationIndexes
@@ -166,7 +183,7 @@ namespace RansomeCorp.AI.Evolution
                 .Concat(dna.ActivationIndexes.Skip(startIndexOfOutputLayerActivation))
                 .ToList();
 
-            return new Dna(dna.Inputs, dna.Outputs, dna.OutputsPerLayer.ToArray(), mutatedWeightGene, mutatedActivationGene);
+            return new Dna(dna.Inputs, dna.Outputs, dna.OutputsPerLayer.ToArray(), mutatedWeightGene, mutatedActivationGene, origin);
         }
     }
 }
