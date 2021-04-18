@@ -171,7 +171,7 @@ namespace RansomeCorp.AI.Evolution
             List<double> mutatedWeightGene = dna.WeightsAndBiases.Select(value =>
             {
                 if (Random.Range(0f, 1f) <= weightMutationPrevalence) return value;
-                return Random.Range(-1f, 1f);
+                return value *= 1 + Random.Range(-0.5f, 0.5f); 
             }).ToList();
 
             if (!(activationMutationPrevalence > 0))
@@ -194,11 +194,11 @@ namespace RansomeCorp.AI.Evolution
         public static Dna Clone(Dna dna)
         {
             return new Dna(
-                dna.Inputs, 
-                dna.Outputs, 
-                dna.OutputsPerLayer.ToArray(), 
-                new List<double>(dna.WeightsAndBiases), 
-                new List<int>(dna.ActivationIndexes), 
+                dna.Inputs,
+                dna.Outputs,
+                dna.OutputsPerLayer.ToArray(),
+                new List<double>(dna.WeightsAndBiases),
+                new List<int>(dna.ActivationIndexes),
                 DnaHeritage.Unchanged
             );
         }
