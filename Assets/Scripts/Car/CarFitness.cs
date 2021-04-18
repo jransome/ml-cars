@@ -16,9 +16,9 @@ public class CarFitness : MonoBehaviour // TODO: refactor as plain class?
     [SerializeField] private RacingGate lastGateCrossed;
 
     [Header("Multipliers TODO - move to carspecies")] // TODO - move to carspecies
-    [SerializeField] private int gateCrossedReward = 10;
-    [SerializeField] private int optimalDirectionReward = 10;
-    [SerializeField] private int optimalPositionReward = 10;
+    [SerializeField] private int gateCrossedReward = 4;
+    [SerializeField] private int optimalDirectionReward = 8;
+    [SerializeField] private int optimalPositionReward = 6;
     [SerializeField] private int maxPositionDifferenceTolerance = 15;
 
     private CarSpecies species;

@@ -26,7 +26,7 @@ public class SpeciesEvolver : MonoBehaviour
     //     ReleaseNewGeneration(generation.GenePool);
     // }
 
-    private static List<Dna> CreateGenerationDna(CarSpecies species, List<Dna> previousGeneration = null) // TODO: move to darwin class
+    public static List<Dna> CreateGenerationDna(CarSpecies species, List<Dna> previousGeneration = null) // TODO: move to darwin class
     {
         if (previousGeneration == null)
         {
@@ -104,10 +104,10 @@ public class SpeciesEvolver : MonoBehaviour
 
         Debug.Log(
             "Created next generation of " + species.name + " with " + TNG.Count + " agents\n" +
-            "New: " + nNew +
-            " Decendants: " + nOffspring +
-            " Mutated descendants: " + nMutatedOffspring +
-            " Unchanged: " + nUnchanged
+            nNew + " new, " +
+            nOffspring + " decendants, " +
+            nMutatedOffspring + " mutated descendants, and " +
+            nUnchanged + " unchanged "
         );
 
         return TNG;

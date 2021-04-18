@@ -37,7 +37,7 @@ public class DnaTests
         // Assert
         randomlyGeneratedDna.Inputs.Should().Be(nInputs);
         randomlyGeneratedDna.Outputs.Should().Be(nOutputs);
-        randomlyGeneratedDna.OutputsPerLayer.Should().BeEquivalentTo(expectedOutputsPerLayer);
+        randomlyGeneratedDna.OutputsPerLayer.Should().Equal(expectedOutputsPerLayer);
         randomlyGeneratedDna.WeightsAndBiases.Should().HaveCount(expectedNumberOfWeightsAndBiases);
         randomlyGeneratedDna.ActivationIndexes.Should().HaveCount(expectedNumberOfNeurons);
         randomlyGeneratedDna.ActivationIndexes.Should().Contain(index => index > outputLayerActivationIndex, "dna was not initialised with random hidden layer activation functions");
@@ -228,7 +228,7 @@ public class DnaTests
         mutatedDna.Heritage.Should().Be(DnaHeritage.Mutated);
     }
 
-    void CheckDnaIsNotReferentiallyEqual(Dna dna1, Dna dna2)
+    public static void CheckDnaIsNotReferentiallyEqual(Dna dna1, Dna dna2)
     {
         dna1.Should().NotBeSameAs(dna2); // NotBeSameAs = referential inequality
         dna1.ActivationIndexes.Should().NotBeSameAs(dna2.ActivationIndexes);

@@ -33,8 +33,7 @@ public class CarSpecies : ScriptableObject
     public ActivationType OutputLayerActivation = ActivationType.TanH;
 
     [Header("Evolution hyperparameters")]
-    [SerializeField] private int generationSize = 30; // workaround for immutability
-    public int GenerationSize { get; private set; }
+    public int GenerationSize = 30;
     public float ProportionUnchanged = 0.05f;
     public float NewDnaRate = 0.05f;
     public float MutationProbability = 0.05f;
@@ -61,7 +60,6 @@ public class CarSpecies : ScriptableObject
         if (SensorAngles.Length == 0)
             Debug.LogWarning("Sensor config specified for species:" + this.name);
 
-        GenerationSize = generationSize;
         Inputs = SensorAngles.Length + 3; // +3 for physics sensors
     }
 }
