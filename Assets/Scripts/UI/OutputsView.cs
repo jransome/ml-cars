@@ -1,10 +1,9 @@
-﻿using System.Linq;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class OutputsView : MonoBehaviour
 {
-    public God EvolutionManager;
+    public SpeciesEvolver EvolutionManager;
     public Slider SteeringIndicator;
     public Slider ThrottleIndicator;
     public Slider BrakeIndicator;

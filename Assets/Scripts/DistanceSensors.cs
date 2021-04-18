@@ -21,7 +21,7 @@ public class DistanceSensors : MonoBehaviour
     private double CheckDistance(float angle)
     {
         Vector3 direction = CalculateDirectionFromAngle(angle);
-        bool didHitSomething = Physics.Raycast(transform.position, direction, out RaycastHit hit, species.SensorDistance, ~species.IgnoredLayers);
+        bool didHitSomething = Physics.Raycast(transform.position, direction, out RaycastHit hit, species.SensorDistance, species.SensorLayerMask);
         return didHitSomething ? hit.distance : species.SensorDistance;
     }
 

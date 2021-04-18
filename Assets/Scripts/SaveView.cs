@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class SaveView : MonoBehaviour
 {
-    public God EvolutionManager;
+    public SpeciesEvolver EvolutionManager;
     public InputField SaveName;
     public Button SaveButton;
     public GameObject SavedPopPrefab;

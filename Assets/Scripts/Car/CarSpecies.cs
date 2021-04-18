@@ -20,7 +20,7 @@ public class CarSpecies : ScriptableObject
     public Color SpeciesColour;
 
     [Header("Distance sensors")]
-    public LayerMask IgnoredLayers = 1 << 9; // 9 should be the value of the 'Car' layer in the inspector
+    public LayerMask SensorLayerMask = ~(1 << 9 | 1 << 2); // ignore layer 9 ('Car') and 2 ('ignore raycast' - for gates)
     public bool DrawSensors = false;
     public float[] SensorAngles = new float[] { 0f, 15f, -15f};
     public float SensorDistance = 150f;
@@ -52,8 +52,14 @@ public class CarSpecies : ScriptableObject
         if (LayerMask.NameToLayer("Car") == -1) 
             Debug.LogError("The 'Car' layer wasn't set in the inspector");
         
+        if (LayerMask.NameToLayer("Ignore Raycast") == -1) 
+            Debug.LogError("The 'Ignore Raycast' layer wasn't set in the inspector");
+        
         if (HiddenLayersNeuronCount.Length == 0)
-            Debug.LogWarning("No hidden layers specified!");
+            Debug.LogWarning("No hidden layers specified for species:" + this.name);
+
+        if (SensorAngles.Length == 0)
+            Debug.LogWarning("Sensor config specified for species:" + this.name);
 
         GenerationSize = generationSize;
         Inputs = SensorAngles.Length + 3; // +3 for physics sensors

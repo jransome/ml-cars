@@ -57,8 +57,8 @@ namespace RansomeCorp.AI.Evolution
         public readonly ReadOnlyCollection<int> OutputsPerLayer;
         public readonly ReadOnlyCollection<double> WeightsAndBiases;
         public readonly ReadOnlyCollection<int> ActivationIndexes;
-        public float RawFitnessRating { get; set; }
-        public DnaHeritage Heritage { get; private set; } = DnaHeritage.New;
+        public float RawFitnessRating { get; set; } = 0f;
+        public DnaHeritage Heritage { get; private set; }
 
         private Dna(int inputs, int outputs, int[] outputsPerLayer, List<double> weightsAndBiases, List<int> activationIndexes, DnaHeritage origin = DnaHeritage.New)
         {
@@ -72,6 +72,11 @@ namespace RansomeCorp.AI.Evolution
 
         public static Dna GenerateRandomDnaEncoding(int inputs, int[] hiddenLayersNeuronCount, int outputs, ActivationType activationType, bool heterogeneousHiddenActivation)
         {
+            if (hiddenLayersNeuronCount.Length == 0) // TODO: add test to check if this is actually okay
+                throw new System.ArgumentException("No hidden layers specified when generating new dna!");
+            if (hiddenLayersNeuronCount.Any(count => count < 1))
+                throw new System.ArgumentException("Hidden layers specified with less than 1 neuron!");
+
             int[] outputsPerLayer = new int[] { inputs }
                 .Concat(hiddenLayersNeuronCount)
                 .Concat(new int[] { outputs })
@@ -184,6 +189,18 @@ namespace RansomeCorp.AI.Evolution
                 .ToList();
 
             return new Dna(dna.Inputs, dna.Outputs, dna.OutputsPerLayer.ToArray(), mutatedWeightGene, mutatedActivationGene, origin);
+        }
+
+        public static Dna Clone(Dna dna)
+        {
+            return new Dna(
+                dna.Inputs, 
+                dna.Outputs, 
+                dna.OutputsPerLayer.ToArray(), 
+                new List<double>(dna.WeightsAndBiases), 
+                new List<int>(dna.ActivationIndexes), 
+                DnaHeritage.Unchanged
+            );
         }
     }
 }

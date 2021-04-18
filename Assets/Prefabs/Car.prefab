@@ -646,9 +646,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aea8bda322c433a4d81d4139a51b8d9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ignoredLayers:
-    serializedVersion: 2
-    m_Bits: 512
 --- !u!114 &343856203757230419
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -678,6 +675,7 @@ MonoBehaviour:
   fitnessCalculator: {fileID: 1709147880}
   distanceSensors: {fileID: 947620192}
   physicsSensors: {fileID: 343856203757230419}
+  speciesIndicator: {fileID: 6641770778758741652}
   heritageIndicator: {fileID: 6641770778537090222}
 --- !u!114 &1709147880
 MonoBehaviour:

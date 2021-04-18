@@ -12,9 +12,10 @@ public class CarBrain : MonoBehaviour
     [SerializeField] private CarFitness fitnessCalculator;
     [SerializeField] private DistanceSensors distanceSensors;
     [SerializeField] private PhysicsSensors physicsSensors;
+    [SerializeField] private Renderer speciesIndicator;
     [SerializeField] private Renderer heritageIndicator;
 
-    private Action<CarBrain, float> OnDeathCb = delegate { };
+    private Action<CarBrain> OnDeathCb = delegate { };
     private NeuralNetwork neuralNetwork;
     public Dna Dna { get { return neuralNetwork.Dna; } }
     public bool IsAlive { get; private set; } = false;
@@ -23,12 +24,13 @@ public class CarBrain : MonoBehaviour
     public float BrakingDecision { get; private set; } = 0f;
     public float Fitness { get => fitnessCalculator.Fitness; }
 
-    public void Initialise(CarSpecies species, Vector3 startPosition, Quaternion startRotation, Action<CarBrain, float> onDeathCb)
+    public void Initialise(CarSpecies species, Vector3 startPosition, Quaternion startRotation, Action<CarBrain> onDeathCb)
     {
         IsAlive = false;
         OnDeathCb = onDeathCb;
         distanceSensors.Initialise(species);
         fitnessCalculator.Initialise(species, this.Die);
+        speciesIndicator.material.color = species.SpeciesColour;
     }
 
     public void Arise(Dna dna, Vector3 startPosition, Quaternion startRotation)
@@ -54,18 +56,15 @@ public class CarBrain : MonoBehaviour
 
     private IEnumerator ThoughtProcess()
     {
-        const float thoughtInterval = 0.1f;
         while (IsAlive)
         {
-            fitnessCalculator.UpdateFitness(Time.time);
-
             List<double> outputs = neuralNetwork.Think(GetSensorInputs());
             ThrottleDecision = (float)outputs[0];
             SteeringDecision = (float)outputs[1];
-            BrakingDecision = (float)outputs[2];
+            BrakingDecision = (float)outputs[2]; 
+            // BrakingDecision = (float)(outputs[2] + 1) / 2; // TODO
 
-            // ChaseCameraOrderingVariable = fitnessCalculator.Fitness;
-            yield return new WaitForSeconds(thoughtInterval);
+            yield return new WaitForSeconds(0.1f);
         }
     }
 
@@ -77,9 +76,12 @@ public class CarBrain : MonoBehaviour
     private void Die()
     {
         if (!IsAlive) Debug.LogError("Tried to kill brain but was already dead?");
+        if (!IsAlive) return;
+
         IsAlive = false;
+        Dna.RawFitnessRating = fitnessCalculator.Fitness;
         StopAllCoroutines();
-        OnDeathCb(this, fitnessCalculator.Fitness);
+        OnDeathCb(this);
         carController.Brake(1f);
         heritageIndicator.material.color = Color.red;
     }

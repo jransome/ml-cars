@@ -2,7 +2,7 @@
 
 public class ChaseCamera : MonoBehaviour
 {
-    public God EvolutionManager;
+    public SpeciesEvolver EvolutionManager;
     public float OrbitSpeed = 2f;
     private Transform chaseTransform;
 

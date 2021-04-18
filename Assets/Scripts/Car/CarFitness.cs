@@ -4,6 +4,7 @@ using UnityEngine;
 public class CarFitness : MonoBehaviour // TODO: refactor as plain class?
 {
     public float Fitness { get { return Mathf.Max(0, rawFitness); } }
+    public bool IsAlive { get; private set; } = false;
 
     [SerializeField] private ColliderTrigger colliderTrigger = null;
 
@@ -14,7 +15,7 @@ public class CarFitness : MonoBehaviour // TODO: refactor as plain class?
     [SerializeField] private int gatesCrossed;
     [SerializeField] private RacingGate lastGateCrossed;
 
-    [Header("Multipliers TODO - move to carspecies?")] // TODO - move to carspecies?
+    [Header("Multipliers TODO - move to carspecies")] // TODO - move to carspecies
     [SerializeField] private int gateCrossedReward = 10;
     [SerializeField] private int optimalDirectionReward = 10;
     [SerializeField] private int optimalPositionReward = 10;
@@ -22,16 +23,23 @@ public class CarFitness : MonoBehaviour // TODO: refactor as plain class?
 
     private CarSpecies species;
     private Action callDeath;
+    private bool deathCalled = false;
 
     public void Initialise(CarSpecies carSpecies, Action DieCallback)
     {
+        deathCalled = false;
         species = carSpecies;
-        callDeath = DieCallback;
         colliderTrigger.TriggerEntered += HandleColliderTriggerEnter;
+        callDeath = () =>
+        {
+            deathCalled = true;
+            DieCallback();
+        };
     }
 
     public void Reset()
     {
+        deathCalled = false;
         rawFitness = 0f;
         timeOfBirth = Time.time;
         lastGateCrossedTime = timeOfBirth;
@@ -39,8 +47,16 @@ public class CarFitness : MonoBehaviour // TODO: refactor as plain class?
         lastGateCrossed = null;
     }
 
-    public void UpdateFitness(RacingGate gate)
+    private void UpdateFitness(float currentTime)
     {
+        if (deathCalled) return;
+        if (species.MaxLifeSpanSecs > 0 && currentTime - timeOfBirth > species.MaxLifeSpanSecs) callDeath();
+        if (currentTime - lastGateCrossedTime > species.MaxTimeToReachNextGateSecs) callDeath();
+    }
+
+    private void UpdateFitness(RacingGate gate)
+    {
+        if (deathCalled) return;
         if (gate == lastGateCrossed)
         {
             callDeath();
@@ -57,15 +73,14 @@ public class CarFitness : MonoBehaviour // TODO: refactor as plain class?
         rawFitness += Mathf.Pow(Vector3.Dot(transform.forward, gate.OptimalDirection) * optimalDirectionReward, 2);
     }
 
-    public void UpdateFitness(float currentTime)
-    {
-        if (species.MaxLifeSpanSecs > 0 && currentTime - timeOfBirth > species.MaxLifeSpanSecs) callDeath();
-        if (currentTime - lastGateCrossedTime > species.MaxTimeToReachNextGateSecs) callDeath();
-    }
-
     private void HandleColliderTriggerEnter(Collider other)
     {
         if (other.CompareTag("RacingGate"))
             UpdateFitness(other.GetComponent<RacingGate>());
+    }
+
+    private void Update()
+    {
+        UpdateFitness(Time.time);
     }
 }

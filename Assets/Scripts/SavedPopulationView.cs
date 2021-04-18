@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class SavedPopulationView : MonoBehaviour
@@ -9,9 +7,9 @@ public class SavedPopulationView : MonoBehaviour
     public Text BtnText;
     
     private PopulationData PopData;
-    private God EvolutionManager;
+    private SpeciesEvolver EvolutionManager;
 
-    public void Initialise(PopulationData popData, God em)
+    public void Initialise(PopulationData popData, SpeciesEvolver em)
     {
         EvolutionManager = em;
         PopData = popData;
