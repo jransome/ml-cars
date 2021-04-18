@@ -44,20 +44,8 @@ public class SpeciesEvolver : MonoBehaviour
 
         List<Dna> TNG = new List<Dna>();
 
-        // Preserve top survivors 
-        int nUnchanged = Mathf.RoundToInt(species.GenerationSize * species.ProportionUnchanged);
-        if (nUnchanged > 0)
-        {
-            TNG.AddRange(
-                previousGeneration.OrderByDescending((dna => dna.RawFitnessRating))
-                    .Take(nUnchanged)
-                    .Select(dna => Dna.Clone(dna))
-            );
-        }
-
         // Add fresh dna into next gen
         int nNew = Mathf.RoundToInt(species.GenerationSize * species.NewDnaRate);
-        if ((species.GenerationSize - (nUnchanged + nNew) % 2 == 1)) nNew++; // make sure remaining spaces for offspring is an even number
         if (nNew > 0)
         {
             TNG.AddRange(Enumerable.Range(0, nNew).Select((_) =>
@@ -69,6 +57,18 @@ public class SpeciesEvolver : MonoBehaviour
                     species.HeterogeneousHiddenActivation
                 )
             ));
+        }
+
+        // Preserve top survivors 
+        int nUnchanged = Mathf.RoundToInt(species.GenerationSize * species.ProportionUnchanged);
+        if (((species.GenerationSize - (nUnchanged + nNew)) % 2 == 1)) nUnchanged++; // make sure remaining spaces for offspring is an even number
+        if (nUnchanged > 0)
+        {
+            TNG.AddRange(
+                previousGeneration.OrderByDescending((dna => dna.RawFitnessRating))
+                    .Take(nUnchanged)
+                    .Select(dna => Dna.Clone(dna))
+            );
         }
 
         // Populate the rest with offspring of previous
@@ -103,7 +103,7 @@ public class SpeciesEvolver : MonoBehaviour
         if (TNG.Where(d => d.Heritage == DnaHeritage.Unchanged).ToArray().Length != nUnchanged) Debug.LogError("shit unchanged");
 
         Debug.Log(
-            "Created new " + species.name + " generation of " + TNG.Count + " agents.\n" +
+            "Created next generation of " + species.name + " with " + TNG.Count + " agents\n" +
             "New: " + nNew +
             " Decendants: " + nOffspring +
             " Mutated descendants: " + nMutatedOffspring +
@@ -120,8 +120,8 @@ public class SpeciesEvolver : MonoBehaviour
             SpeciesEvolver.CreateGenerationDna(Species) :
             SpeciesEvolver.CreateGenerationDna(Species, previousGenerationPhenotypes.ConvertAll(p => p.Dna));
 
-        if (newDnaList.Count != previousGenerationPhenotypes.Count)
-            Debug.LogError("Phenotype/Genotype count mismatch!");
+        if (previousGenerationPhenotypes.Count != newDnaList.Count)
+            Debug.LogError("Phenotype/Genotype count mismatch! " + newDnaList.Count + "/" + previousGenerationPhenotypes.Count);
 
         // Show selection process for visual feedback if crossover was performed
         yield return SelectedForBreeding.Count > 0 ? StartCoroutine(ShowSelectionProcess()) : null;

@@ -8302,6 +8302,7 @@ GameObject:
   - component: {fileID: 985539032}
   - component: {fileID: 985539031}
   - component: {fileID: 985539029}
+  - component: {fileID: 985539033}
   m_Layer: 0
   m_Name: EvolutionManager
   m_TagString: Untagged
@@ -8321,7 +8322,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10b804197aea0ba4dac0c43690d550ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Species: {fileID: 11400000, guid: 9ce418fe5cca58a4695f6fb5a9d78856, type: 2}
+  Species: {fileID: 11400000, guid: 530d74bc6d5a0fd4a8aa233fbd82a423, type: 2}
 --- !u!4 &985539030
 Transform:
   m_ObjectHideFlags: 0
@@ -8386,6 +8387,19 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &985539033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 985539028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10b804197aea0ba4dac0c43690d550ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Species: {fileID: 11400000, guid: bce068392e271794e94f79376872113d, type: 2}
 --- !u!1 &1000587659
 GameObject:
   m_ObjectHideFlags: 0

@@ -59,10 +59,12 @@ public class CarBrain : MonoBehaviour
         while (IsAlive)
         {
             List<double> outputs = neuralNetwork.Think(GetSensorInputs());
-            ThrottleDecision = (float)outputs[0];
+            // ThrottleDecision = (float)outputs[0];
+            ThrottleDecision = (float)(outputs[0] + 1) / 2; // TODO
             SteeringDecision = (float)outputs[1];
             BrakingDecision = (float)outputs[2]; 
             // BrakingDecision = (float)(outputs[2] + 1) / 2; // TODO
+            BrakingDecision = 0f;
 
             yield return new WaitForSeconds(0.1f);
         }
