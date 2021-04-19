@@ -23,6 +23,7 @@ public class Persistence
 
     private static PopulationData ReadFile(string path)
     {
+        Debug.Log("loaded saved population from path: " + path);
         StreamReader reader = new StreamReader(File.OpenRead(path));
         return JsonUtility.FromJson<PopulationData>(reader.ReadToEnd());
     }
