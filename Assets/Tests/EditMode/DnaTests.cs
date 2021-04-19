@@ -228,7 +228,53 @@ public class DnaTests
         mutatedDna.Heritage.Should().Be(DnaHeritage.Mutated);
     }
 
-    public static void CheckDnaIsNotReferentiallyEqual(Dna dna1, Dna dna2)
+    [Test]
+    public void CompareWeightsOfIdentical()
+    {
+        // Arrange
+        const int nInputs = 20;
+        const int nOutputs = 8;
+        int[] hiddenLayers = new int[] { 30, 4, 12 };
+        Dna dna1 = Dna.GenerateRandomDnaEncoding(nInputs, hiddenLayers, nOutputs, ActivationType.LeakyRelu, true);
+        Dna dna2 = Dna.Clone(dna1);
+
+        // Act
+        var comparisonResult = Dna.CompareWeights(dna1, dna2);
+
+        // Assert
+        float percentWeightDiff = comparisonResult.Item1;
+        double percentWeightValueDiff = comparisonResult.Item2;
+        percentWeightDiff.Should().Be(0);
+        percentWeightValueDiff.Should().Be(0);
+    }
+
+    [Test]
+    public void CompareWeightsOfDifferent()
+    {
+        // Arrange
+        const int nInputs = 9;
+        const int nOutputs = 1;
+        int[] hiddenLayers = new int[] { 9 };
+        Dna dna1 = Dna.GenerateRandomDnaEncoding(nInputs, hiddenLayers, nOutputs, ActivationType.LeakyRelu, true);
+        dna1.WeightsAndBiases.Should().HaveCount(100);
+        dna1.WeightsAndBiases.Clear();
+        dna1.WeightsAndBiases.AddRange(Enumerable.Repeat(1.00, 100));
+        Dna dna2 = Dna.Clone(dna1);
+        dna1.WeightsAndBiases.Should().Equal(dna2.WeightsAndBiases);
+        dna2.WeightsAndBiases[2] = -49.00; // aggregate absolute weight difference of dna2 vs dna1 should now be 50
+        dna1.WeightsAndBiases.Should().NotEqual(dna2.WeightsAndBiases);
+
+        // Act
+        var comparisonResult = Dna.CompareWeights(dna1, dna2);
+
+        // Assert
+        float percentWeightDiff = comparisonResult.Item1;
+        double percentWeightValueDiff = comparisonResult.Item2;
+        percentWeightDiff.Should().Be(0.01f); // ie. 1% of weights differ in value
+        percentWeightValueDiff.Should().Be(0.5f); // ie. total weight values of dna2 differ by 50% (NOT 50% bigger)
+    }
+
+    private static void CheckDnaIsNotReferentiallyEqual(Dna dna1, Dna dna2)
     {
         dna1.Should().NotBeSameAs(dna2); // NotBeSameAs = referential inequality
         dna1.ActivationIndexes.Should().NotBeSameAs(dna2.ActivationIndexes);

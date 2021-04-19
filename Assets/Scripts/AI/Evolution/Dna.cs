@@ -1,6 +1,5 @@
 using RansomeCorp.AI.NeuralNet;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using UnityEngine;
 
@@ -54,9 +53,9 @@ namespace RansomeCorp.AI.Evolution
         public System.Action OnSelectedForBreedingCb { get; set; } = delegate { };
         public readonly int Inputs;
         public readonly int Outputs;
-        public readonly ReadOnlyCollection<int> OutputsPerLayer;
-        public readonly ReadOnlyCollection<double> WeightsAndBiases;
-        public readonly ReadOnlyCollection<int> ActivationIndexes;
+        public readonly List<int> OutputsPerLayer;
+        public readonly List<double> WeightsAndBiases;
+        public readonly List<int> ActivationIndexes;
         public float RawFitnessRating { get; set; } = 0f;
         public DnaHeritage Heritage { get; private set; }
 
@@ -64,9 +63,9 @@ namespace RansomeCorp.AI.Evolution
         {
             Inputs = inputs;
             Outputs = outputs;
-            OutputsPerLayer = new ReadOnlyCollection<int>(outputsPerLayer);
-            WeightsAndBiases = new ReadOnlyCollection<double>(weightsAndBiases);
-            ActivationIndexes = new ReadOnlyCollection<int>(activationIndexes);
+            OutputsPerLayer = new List<int>(outputsPerLayer);
+            WeightsAndBiases = new List<double>(weightsAndBiases);
+            ActivationIndexes = new List<int>(activationIndexes);
             Heritage = origin;
         }
 
@@ -171,7 +170,7 @@ namespace RansomeCorp.AI.Evolution
             List<double> mutatedWeightGene = dna.WeightsAndBiases.Select(value =>
             {
                 double random01 = Random.Range(0f, 1f);
-                if (random01 <= weightMutationPrevalence) return value;
+                if (random01 > weightMutationPrevalence) return value;
                 bool isTails = random01 < 0.5f;
                 return isTails ? value * (0.5 + random01) : (random01 * 2) - 1; // scale by +/-50% OR random new value between -1 and 1
             }).ToList();
@@ -203,6 +202,34 @@ namespace RansomeCorp.AI.Evolution
                 new List<int>(dna.ActivationIndexes),
                 DnaHeritage.Unchanged
             );
+        }
+
+        public static bool CompareTopologies(Dna dna1, Dna dna2)
+        {
+            return dna1.Inputs != dna2.Inputs || dna1.Outputs != dna2.Outputs || Enumerable.SequenceEqual(dna1.OutputsPerLayer, dna2.OutputsPerLayer);
+        }
+
+        // Returns tuple containing 1) percentage of weight values that differ, and 2) the absolute difference in weight values of dna2 as a percentage of the aggregated absolute weight values of dna1
+        public static System.Tuple<float, double> CompareWeights(Dna dna1, Dna dna2)
+        {
+            if (!CompareTopologies(dna1, dna2))
+                throw new System.ArgumentException("Can't compare dna weights of different topologies!");
+
+            if (dna1.WeightsAndBiases.Count != dna2.WeightsAndBiases.Count) // should always be false if topologies are the same. but just in case...
+                throw new System.ArgumentException("Weights arrays not equal???");
+
+            double accumulatedAbsoluteDifference = 0;
+            int nWeightsDiffering = 0;
+            for (int i = 0; i < dna1.WeightsAndBiases.Count; i++)
+            {
+                double absoluteDifference = System.Math.Abs(dna1.WeightsAndBiases[i] - dna2.WeightsAndBiases[i]);
+                accumulatedAbsoluteDifference += absoluteDifference;
+                if (absoluteDifference > 0) nWeightsDiffering++;
+            }
+
+            double dna1TotalWeight = dna1.WeightsAndBiases.Aggregate(0.0, (total, weight) => total + System.Math.Abs(weight));
+            double weightDifferenceAsProportion = accumulatedAbsoluteDifference / dna1TotalWeight;
+            return new System.Tuple<float, double>((float)nWeightsDiffering / (float)dna1.WeightsAndBiases.Count, weightDifferenceAsProportion);
         }
     }
 }

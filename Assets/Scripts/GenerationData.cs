@@ -1,7 +1,6 @@
 using RansomeCorp.AI.Evolution;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 
 public class GenerationData
 {
@@ -19,7 +18,7 @@ public class GenerationData
             TotalFitness += brain.Fitness;
             if (brain.Fitness > BestFitness) BestFitness = brain.Fitness;
         }
-        
+
         AverageFitness = TotalFitness / GenePool.Count;
     }
 }

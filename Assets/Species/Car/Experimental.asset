@@ -33,16 +33,16 @@ MonoBehaviour:
   OutputLayerActivation: 1
   GenerationSize: 50
   ProportionUnchanged: 0.2
-  ProportionMutatantsOfUnchanged: 0.4
-  NewDnaRate: 0.05
-  OffspringMutationProbability: 0.5
-  MutationSeverity: 0.1
+  ProportionMutatantsOfUnchanged: 0.3
+  NewDnaRate: 0.02
+  OffspringMutationProbability: 0.3
+  MutationSeverity: 0.02
   ActivationMutationSeverity: 0
   CrossoverSeverity: 0.5
   ActivationCrossoverSeverity: 0
-  MaxTimeToReachNextGateSecs: 5
+  MaxTimeToReachNextGateSecs: 4
   MaxLifeSpanSecs: 0
   GateCrossedReward: 6
-  OptimalDirectionReward: 4
-  OptimalPositionReward: 0
-  MaxPositionDifferenceTolerance: 0
+  OptimalDirectionReward: 3
+  OptimalPositionReward: 6
+  MaxPositionDifferenceTolerance: 15
