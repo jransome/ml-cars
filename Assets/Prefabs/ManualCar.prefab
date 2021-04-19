@@ -538,15 +538,14 @@ GameObject:
   m_Component:
   - component: {fileID: 6641770778032953727}
   - component: {fileID: 6641770778032953724}
+  - component: {fileID: 7033098399778400751}
   - component: {fileID: 6641770778032953725}
   - component: {fileID: 6641770778032953715}
   - component: {fileID: 6641770778032953714}
   - component: {fileID: 947620192}
   - component: {fileID: 343856203757230419}
-  - component: {fileID: 9160784905630585803}
-  - component: {fileID: 1709147880}
   m_Layer: 9
-  m_Name: Car
+  m_Name: ManualCar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -584,7 +583,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!65 &6641770778032953725
+--- !u!65 &7033098399778400751
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -594,6 +593,19 @@ BoxCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1.5, y: 0.8, z: 4}
+  m_Center: {x: 0, y: 0.15, z: 0}
+--- !u!65 &6641770778032953725
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6641770778032953726}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 0
   serializedVersion: 2
   m_Size: {x: 1.5, y: 1, z: 3}
   m_Center: {x: 0, y: 0.25, z: 0.5}
@@ -606,7 +618,7 @@ BoxCollider:
   m_GameObject: {fileID: 6641770778032953726}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Size: {x: 1.5, y: 0.5, z: 1}
   m_Center: {x: 0, y: 0, z: -1.5}
@@ -622,7 +634,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c2333cafa3f0cb4eac92a671077ebef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsHumanControlled: 0
+  IsHumanControlled: 1
   rb: {fileID: 6641770778032953724}
   torque: 800
   maxLockDegrees: 35
@@ -641,7 +653,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6641770778032953726}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aea8bda322c433a4d81d4139a51b8d9d, type: 3}
   m_Name: 
@@ -659,46 +671,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rb: {fileID: 6641770778032953724}
---- !u!114 &9160784905630585803
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6641770778032953726}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a38f7fe598e394c0d9b2f2ae6cdc3ce9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  carController: {fileID: 6641770778032953714}
-  fitnessCalculator: {fileID: 1709147880}
-  distanceSensors: {fileID: 947620192}
-  physicsSensors: {fileID: 343856203757230419}
-  speciesIndicator: {fileID: 6641770778758741652}
-  heritageIndicator: {fileID: 6641770778537090222}
---- !u!114 &1709147880
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6641770778032953726}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 35dc8771ee0cc491fafd8ce5dc21475d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  colliderTrigger: {fileID: 286557435229999330}
-  rawFitness: 0
-  timeOfBirth: 0
-  lastGateCrossedTime: 0
-  gatesCrossed: 0
-  lastGateCrossed: {fileID: 0}
-  gateCrossedReward: 4
-  optimalDirectionReward: 8
-  optimalPositionReward: 6
-  maxPositionDifferenceTolerance: 15
 --- !u!1 &6641770778317482369
 GameObject:
   m_ObjectHideFlags: 0

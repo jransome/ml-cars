@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class CarFitness : MonoBehaviour // TODO: refactor as plain class?
 {
-    public float Fitness { get { return Mathf.Max(0, rawFitness); } }
+    public float Fitness { get { return Mathf.Max(1, rawFitness); } }
     public bool IsAlive { get; private set; } = false;
 
     [SerializeField] private ColliderTrigger colliderTrigger = null;
@@ -14,12 +14,6 @@ public class CarFitness : MonoBehaviour // TODO: refactor as plain class?
     [SerializeField] private float lastGateCrossedTime;
     [SerializeField] private int gatesCrossed;
     [SerializeField] private RacingGate lastGateCrossed;
-
-    [Header("Multipliers TODO - move to carspecies")] // TODO - move to carspecies
-    [SerializeField] private int gateCrossedReward = 4;
-    [SerializeField] private int optimalDirectionReward = 8;
-    [SerializeField] private int optimalPositionReward = 6;
-    [SerializeField] private int maxPositionDifferenceTolerance = 15;
 
     private CarSpecies species;
     private Action callDeath;
@@ -67,10 +61,10 @@ public class CarFitness : MonoBehaviour // TODO: refactor as plain class?
         lastGateCrossedTime = Time.time;
 
         // fitnesses squared to give greater weighting to slightly higher fitness scores
-        rawFitness += Mathf.Pow(++gatesCrossed * gateCrossedReward, 2);
-        float normalisedInverseDistance = (maxPositionDifferenceTolerance - Vector3.Distance(transform.position, gate.OptimalPosition)) / maxPositionDifferenceTolerance;
-        rawFitness += Mathf.Pow(normalisedInverseDistance * optimalPositionReward, 2);
-        rawFitness += Mathf.Pow(Vector3.Dot(transform.forward, gate.OptimalDirection) * optimalDirectionReward, 2);
+        rawFitness += Mathf.Pow(++gatesCrossed * species.GateCrossedReward, 2);
+        // float normalisedInverseDistance = (species.MaxPositionDifferenceTolerance - Vector3.Distance(transform.position, gate.OptimalPosition)) / species.MaxPositionDifferenceTolerance;
+        // rawFitness += Mathf.Pow(normalisedInverseDistance * species.OptimalPositionReward, 2);
+        rawFitness += Mathf.Pow(Vector3.Dot(transform.forward, gate.OptimalDirection) * species.OptimalDirectionReward, 2);
     }
 
     private void HandleColliderTriggerEnter(Collider other)

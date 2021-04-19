@@ -41,7 +41,7 @@ public class CarBrain : MonoBehaviour
         if (GetSensorInputs().Count != dna.Inputs)
             Debug.LogError("Network not configured with expected number of inputs. Received " + GetSensorInputs().Count + ", expected " + dna.Inputs);
 
-        if (dna.Outputs != 3)
+        if (dna.Outputs != CarSpecies.Outputs)
             Debug.LogError("Network not configured with expected number of outputs");
 
         ThrottleDecision = SteeringDecision = BrakingDecision = 0;
@@ -59,12 +59,10 @@ public class CarBrain : MonoBehaviour
         while (IsAlive)
         {
             List<double> outputs = neuralNetwork.Think(GetSensorInputs());
-            // ThrottleDecision = (float)outputs[0];
-            ThrottleDecision = (float)(outputs[0] + 1) / 2; // TODO
-            SteeringDecision = (float)outputs[1];
-            BrakingDecision = (float)outputs[2]; 
-            // BrakingDecision = (float)(outputs[2] + 1) / 2; // TODO
-            BrakingDecision = 0f;
+            bool isThrottling = outputs[1] > 0;
+            SteeringDecision = (float)outputs[0];
+            ThrottleDecision = isThrottling ? (float)outputs[1] : 0f;
+            BrakingDecision = isThrottling ? 0f : -(float)outputs[1];
 
             yield return new WaitForSeconds(0.1f);
         }
@@ -88,7 +86,7 @@ public class CarBrain : MonoBehaviour
         heritageIndicator.material.color = Color.red;
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
         if (!IsAlive) return;
         carController.Throttle(ThrottleDecision);

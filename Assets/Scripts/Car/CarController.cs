@@ -13,6 +13,9 @@ public class CarController : MonoBehaviour
     {
         for (int i = 0; i < 2; i++) // front wheels
             wheels[i].motorTorque = input * torque;
+        
+        foreach (WheelCollider w in wheels)
+            w.brakeTorque = 0; // release brakes on rear wheels
     }
 
     public void Steer(float input)

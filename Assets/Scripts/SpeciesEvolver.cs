@@ -59,21 +59,33 @@ public class SpeciesEvolver : MonoBehaviour
             ));
         }
 
-        // Preserve top survivors 
+        //  Preserve top survivors 
+        var previousGenerationOrderedByFitness = previousGeneration.OrderByDescending((dna => dna.RawFitnessRating));
         int nUnchanged = Mathf.RoundToInt(species.GenerationSize * species.ProportionUnchanged);
-        if (((species.GenerationSize - (nUnchanged + nNew)) % 2 == 1)) nUnchanged++; // make sure remaining spaces for offspring is an even number
         if (nUnchanged > 0)
         {
             TNG.AddRange(
-                previousGeneration.OrderByDescending((dna => dna.RawFitnessRating))
+                previousGenerationOrderedByFitness
                     .Take(nUnchanged)
                     .Select(dna => Dna.Clone(dna))
             );
         }
 
+        // Add mutated verstions of elites
+        int nMutatedUnchanged = Mathf.RoundToInt(species.GenerationSize * species.ProportionMutatantsOfUnchanged);
+        if (((species.GenerationSize - (nUnchanged + nMutatedUnchanged + nNew)) % 2 == 1)) nMutatedUnchanged++; // make sure remaining spaces for offspring is an even number
+        for (int i = 0; i < nMutatedUnchanged; i++)
+        {
+            Dna randomElite = Darwin.SelectRandomBasedOnFitness(
+                previousGenerationOrderedByFitness.Take(Mathf.RoundToInt(species.GenerationSize * 0.2f)).ToList()
+            );
+            TNG.Add(Dna.CloneAndMutate(randomElite, DnaHeritage.Mutated, species.MutationSeverity, species.ActivationMutationSeverity));
+        }
+
         // Populate the rest with offspring of previous
         int nOffspring = 0, nMutatedOffspring = 0;
-        for (int i = 0; i < Mathf.RoundToInt((species.GenerationSize - (nUnchanged + nNew)) / 2); i++)
+        int freeSpacesForOffspring = nUnchanged + nMutatedUnchanged + nNew;
+        for (int i = 0; i < Mathf.RoundToInt((species.GenerationSize - freeSpacesForOffspring) / 2); i++)
         {
             Dna parent1 = Darwin.SelectRandomBasedOnFitness(previousGeneration);
             Dna parent2 = Darwin.SelectRandomBasedOnFitness(previousGeneration, parent1);
@@ -84,7 +96,7 @@ public class SpeciesEvolver : MonoBehaviour
                 species.ActivationCrossoverSeverity
             ).ConvertAll(child =>
             {
-                if (Random.Range(0f, 1f) > species.MutationProbability)
+                if (Random.Range(0f, 1f) > species.OffspringMutationProbability)
                 {
                     nOffspring++;
                     return child;
@@ -97,17 +109,13 @@ public class SpeciesEvolver : MonoBehaviour
             TNG.AddRange(children);
         }
 
-        if (TNG.Where(d => d.Heritage == DnaHeritage.New).ToArray().Length != nNew) Debug.LogError("shit new");
-        if (TNG.Where(d => d.Heritage == DnaHeritage.Bred).ToArray().Length != nOffspring) Debug.LogError("shit bred");
-        if (TNG.Where(d => d.Heritage == DnaHeritage.BredAndMutated).ToArray().Length != nMutatedOffspring) Debug.LogError("shit bred mutated");
-        if (TNG.Where(d => d.Heritage == DnaHeritage.Unchanged).ToArray().Length != nUnchanged) Debug.LogError("shit unchanged");
-
         Debug.Log(
             "Created next generation of " + species.name + " with " + TNG.Count + " agents\n" +
             nNew + " new, " +
             nOffspring + " decendants, " +
-            nMutatedOffspring + " mutated descendants, and " +
-            nUnchanged + " unchanged "
+            nMutatedOffspring + " mutated descendants " +
+            nUnchanged + " elites from previous " +
+            nMutatedUnchanged + " mutated elites from previous "
         );
 
         return TNG;

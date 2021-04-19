@@ -48,7 +48,8 @@ public class SpeciesEvolverTests
         species.HiddenLayersNeuronCount = hiddenLayers;
         species.ActivationMutationSeverity = 0f;
 
-        List<Dna> previousGen = Enumerable.Range(0, species.GenerationSize).Select((_, index) => {
+        List<Dna> previousGen = Enumerable.Range(0, species.GenerationSize).Select((_, index) =>
+        {
             Dna dna = Dna.GenerateRandomDnaEncoding(
                 species.Inputs,
                 species.HiddenLayersNeuronCount,
@@ -59,15 +60,6 @@ public class SpeciesEvolverTests
             dna.RawFitnessRating = index * 5;
             return dna;
         }).ToList();
-
-
-        // Pre assertion
-        // foreach (Dna dna in previousGen)
-        // {
-        //     dna.Inputs.Should().Be(species.Inputs);
-        //     dna.OutputsPerLayer.Should().Equal(expectedOutputsPerLayer);
-        //     dna.ActivationIndexes.Should().OnlyContain(i => i == (int)species.OutputLayerActivation);
-        // }
 
         // Act
         List<Dna> TNG = SpeciesEvolver.CreateGenerationDna(species, previousGen);
@@ -83,6 +75,10 @@ public class SpeciesEvolverTests
         };
         int expectedNumberNew = Mathf.RoundToInt(species.NewDnaRate * 100);
         int expectedNumberUnchanged = Mathf.RoundToInt(species.ProportionUnchanged * 100);
+        int expectedNumberMutantsOfUnchanged = Mathf.RoundToInt(species.ProportionMutatantsOfUnchanged * 100);
+        int sumNewUnchangedMutated = expectedNumberNew + expectedNumberUnchanged + expectedNumberMutantsOfUnchanged;
+        if (sumNewUnchangedMutated % 2 == 1) expectedNumberMutantsOfUnchanged++;
+        int expectedNumberOffspring = species.GenerationSize - (expectedNumberNew + expectedNumberUnchanged + expectedNumberMutantsOfUnchanged);
 
         foreach (Dna dna in TNG)
         {
@@ -91,12 +87,17 @@ public class SpeciesEvolverTests
             dna.ActivationIndexes.Should().OnlyContain(i => i == (int)species.OutputLayerActivation);
         }
 
-        TNG.Should().HaveCount(species.GenerationSize);
         TNG.Where(d => d.Heritage == DnaHeritage.New).Should().HaveCount(expectedNumberNew);
         TNG.Where(d => d.Heritage == DnaHeritage.Unchanged).Should().HaveCount(expectedNumberUnchanged);
-        TNG.Where(d => d.Heritage != DnaHeritage.New && d.Heritage != DnaHeritage.Unchanged)
-            .Should().HaveCount(species.GenerationSize - (expectedNumberNew + expectedNumberUnchanged));
-        
+        TNG.Where(d => d.Heritage == DnaHeritage.Mutated).Should().HaveCount(expectedNumberMutantsOfUnchanged);
+        TNG.Where(d =>
+                d.Heritage != DnaHeritage.New
+                && d.Heritage != DnaHeritage.Unchanged
+                && d.Heritage != DnaHeritage.Mutated
+            )
+            .Should().HaveCount(expectedNumberOffspring);
+        TNG.Should().HaveCount(species.GenerationSize);
+
         previousGen.Concat(TNG).Should().OnlyHaveUniqueItems();
     }
 }

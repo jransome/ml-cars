@@ -6,6 +6,7 @@ public class DistanceSensors : MonoBehaviour
 {
     private CarSpecies species;
     private List<float> SensorAngles;
+    // private Dictionary<
 
     public void Initialise(CarSpecies carSpecies)
     {

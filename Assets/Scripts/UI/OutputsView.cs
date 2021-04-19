@@ -21,6 +21,6 @@ public class OutputsView : MonoBehaviour
     {
         SteeringIndicator.value = carBrain.SteeringDecision;
         ThrottleIndicator.value = carBrain.ThrottleDecision;
-        BrakeIndicator.value = Mathf.Clamp01(carBrain.BrakingDecision);
+        BrakeIndicator.value = carBrain.BrakingDecision;
     }
 }

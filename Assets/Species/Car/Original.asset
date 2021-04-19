@@ -33,7 +33,7 @@ MonoBehaviour:
   HiddenLayersNeuronCount: 0800000008000000
   HeterogeneousHiddenActivation: 0
   OutputLayerActivation: 1
-  generationSize: 30
+  GenerationSize: 40
   ProportionUnchanged: 0.08
   NewDnaRate: 0.03
   MutationProbability: 0.3

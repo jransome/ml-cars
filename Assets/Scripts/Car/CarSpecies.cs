@@ -12,7 +12,7 @@ public class CarSpecies : ScriptableObject
         { DnaHeritage.Unchanged, Color.grey },
         { DnaHeritage.Bred, Color.blue },
         { DnaHeritage.BredAndMutated, Color.green },
-        { DnaHeritage.Mutated, Color.green },
+        { DnaHeritage.Mutated, Color.magenta },
     };
 
     [Header("General")]
@@ -22,11 +22,11 @@ public class CarSpecies : ScriptableObject
     [Header("Distance sensors")]
     public LayerMask SensorLayerMask = ~(1 << 9 | 1 << 2); // ignore layer 9 ('Car') and 2 ('ignore raycast' - for gates)
     public bool DrawSensors = false;
-    public float[] SensorAngles = new float[] { 0f, 15f, -15f};
+    public float[] SensorAngles = new float[] { 0f, 15f, -15f };
     public float SensorDistance = 150f;
 
     [Header("Neural network")]
-    public const int Outputs = 3;
+    public const int Outputs = 2;
     public int Inputs { get; private set; } // computed dynamically
     public int[] HiddenLayersNeuronCount = new int[] { 1 };
     public bool HeterogeneousHiddenActivation;
@@ -35,25 +35,30 @@ public class CarSpecies : ScriptableObject
     [Header("Evolution hyperparameters")]
     public int GenerationSize = 30;
     public float ProportionUnchanged = 0.05f;
+    public float ProportionMutatantsOfUnchanged = 0.15f;
     public float NewDnaRate = 0.05f;
-    public float MutationProbability = 0.05f;
-    public float MutationSeverity = 0.05f;
+    public float OffspringMutationProbability = 0.5f;
+    public float MutationSeverity = 0.2f;
     public float ActivationMutationSeverity = 0.01f;
-    public float CrossoverSeverity = 0.4f;
+    public float CrossoverSeverity = 0.5f; // TODO: this doesn't make sense as 0.5 is actually the max value - ie child = half/half of parents
     public float ActivationCrossoverSeverity = 0.05f;
 
     [Header("Fitness hyperparameters")]
     public float MaxTimeToReachNextGateSecs = 5f;
     public float MaxLifeSpanSecs = 0f;
+    public int GateCrossedReward = 4;
+    public int OptimalDirectionReward = 8;
+    public int OptimalPositionReward = 6;
+    public int MaxPositionDifferenceTolerance = 15;
 
     private void OnEnable()
     {
-        if (LayerMask.NameToLayer("Car") == -1) 
+        if (LayerMask.NameToLayer("Car") == -1)
             Debug.LogError("The 'Car' layer wasn't set in the inspector");
-        
-        if (LayerMask.NameToLayer("Ignore Raycast") == -1) 
+
+        if (LayerMask.NameToLayer("Ignore Raycast") == -1)
             Debug.LogError("The 'Ignore Raycast' layer wasn't set in the inspector");
-        
+
         if (HiddenLayersNeuronCount.Length == 0)
             Debug.LogWarning("No hidden layers specified for species:" + this.name);
 
