@@ -170,8 +170,10 @@ namespace RansomeCorp.AI.Evolution
         {
             List<double> mutatedWeightGene = dna.WeightsAndBiases.Select(value =>
             {
-                if (Random.Range(0f, 1f) <= weightMutationPrevalence) return value;
-                return value *= 1 + Random.Range(-0.5f, 0.5f); 
+                double random01 = Random.Range(0f, 1f);
+                if (random01 <= weightMutationPrevalence) return value;
+                bool isTails = random01 < 0.5f;
+                return isTails ? value * (0.5 + random01) : (random01 * 2) - 1; // scale by +/-50% OR random new value between -1 and 1
             }).ToList();
 
             if (!(activationMutationPrevalence > 0))

@@ -18,6 +18,8 @@ public class SpeciesEvolver : MonoBehaviour
         get => GenerationPool.Where(b => b.IsAlive).OrderByDescending(b => b.Fitness).DefaultIfEmpty(null).First();
     }
 
+    private List<GenerationData> generationHistory = new List<GenerationData>();
+
     // public void LoadGeneration(PopulationData generation)
     // {
     //     TODO: generation size (and agent count)
@@ -146,14 +148,22 @@ public class SpeciesEvolver : MonoBehaviour
         Debug.Log("Generation " + GenerationCount + " of " + Species.name + " created and released");
     }
 
+    private void GenerationFinished()
+    {
+        GenerationData data = new GenerationData(GenerationCount, GenerationPool);
+        generationHistory.Add(data);
+        Debug.Log(
+            "Generation " + GenerationCount + " of " + Species.name + " finished.\n" +
+            "Best fitness: " + data.BestFitness + 
+            ", Avg.: " + data.AverageFitness
+        );
+        StartCoroutine(DoEvolution(GenerationPool));
+    }
+
     private void HandleIndividualDied(CarBrain deceased)
     {
         CurrentlyAlive.Remove(deceased);
-        if (CurrentlyAlive.Count == 0)
-        {
-            Debug.Log("Generation " + GenerationCount + " of " + Species.name + " finished");
-            StartCoroutine(DoEvolution(GenerationPool));
-        }
+        if (CurrentlyAlive.Count == 0) GenerationFinished();
     }
 
     private IEnumerator ShowSelectionProcess()
