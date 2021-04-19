@@ -51,11 +51,11 @@ namespace RansomeCorp.AI.Evolution
     public class Dna
     {
         public System.Action OnSelectedForBreedingCb { get; set; } = delegate { };
-        public readonly int Inputs;
-        public readonly int Outputs;
-        public readonly List<int> OutputsPerLayer;
-        public readonly List<double> WeightsAndBiases;
-        public readonly List<int> ActivationIndexes;
+        public int Inputs; // TODO: use props as can't make readonly because need to serialise for saving
+        public int Outputs;
+        public List<int> OutputsPerLayer;
+        public List<double> WeightsAndBiases;
+        public List<int> ActivationIndexes;
         public float RawFitnessRating { get; set; } = 0f;
         public DnaHeritage Heritage { get; private set; }
 

@@ -6,19 +6,19 @@ public class SavedPopulationView : MonoBehaviour
     public Button Button;
     public Text BtnText;
     
-    private PopulationData PopData;
-    private SpeciesEvolver EvolutionManager;
+    private PopulationData popData;
+    private SpeciesEvolver evolver;
 
-    public void Initialise(PopulationData popData, SpeciesEvolver em)
+    public void Initialise(PopulationData populationData, SpeciesEvolver se)
     {
-        EvolutionManager = em;
-        PopData = popData;
-        BtnText.text = popData.SaveName;
+        evolver = se;
+        popData = populationData;
+        BtnText.text = populationData.SaveName;
     }
 
     private void Load()
     {
-        // EvolutionManager.LoadGeneration(PopData);
+        evolver.LoadGeneration(popData);
     }
 
     private void Start()

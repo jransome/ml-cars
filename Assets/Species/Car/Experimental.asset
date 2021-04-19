@@ -32,17 +32,17 @@ MonoBehaviour:
   HeterogeneousHiddenActivation: 0
   OutputLayerActivation: 1
   GenerationSize: 50
-  ProportionUnchanged: 0.2
-  ProportionMutatantsOfUnchanged: 0.3
-  NewDnaRate: 0.02
-  OffspringMutationProbability: 0.3
-  MutationSeverity: 0.02
+  ProportionUnchanged: 0.1
+  ProportionMutatantsOfUnchanged: 0.2
+  NewDnaRate: 0
+  OffspringMutationProbability: 0.4
+  MutationSeverity: 0.03
   ActivationMutationSeverity: 0
   CrossoverSeverity: 0.5
   ActivationCrossoverSeverity: 0
   MaxTimeToReachNextGateSecs: 4
   MaxLifeSpanSecs: 0
-  GateCrossedReward: 6
-  OptimalDirectionReward: 3
+  GateCrossedReward: 12
+  OptimalDirectionReward: 2
   OptimalPositionReward: 6
-  MaxPositionDifferenceTolerance: 15
+  MaxPositionDifferenceTolerance: 6

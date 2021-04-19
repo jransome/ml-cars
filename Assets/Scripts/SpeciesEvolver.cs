@@ -20,13 +20,11 @@ public class SpeciesEvolver : MonoBehaviour
 
     public List<GenerationData> GenerationHistory = new List<GenerationData>();
 
-    // public void LoadGeneration(PopulationData generation)
-    // {
-    //     TODO: generation size (and agent count)
-    //     GenerationCount = generation.GenerationNumber;
-    //     DnaStructure = generation.DnaStructure;
-    //     ReleaseNewGeneration(generation.GenePool);
-    // }
+    public void LoadGeneration(PopulationData generation)
+    {
+        GenerationCount = generation.GenerationNumber;
+        ReleaseGeneration(generation.GenePool, GenerationPool); // depends on phenotypes already having been instanced
+    }
 
     public static List<Dna> CreateGenerationDna(CarSpecies species, List<Dna> previousGeneration = null) // TODO: move to darwin class
     {
@@ -146,11 +144,18 @@ public class SpeciesEvolver : MonoBehaviour
 
         // Show selection process for visual feedback if crossover was performed
         yield return SelectedForBreeding.Count > 0 ? StartCoroutine(ShowSelectionProcess()) : null;
+        ReleaseGeneration(newDnaList, previousGenerationPhenotypes);
+    }
 
-        for (int i = 0; i < newDnaList.Count; i++)
+    private void ReleaseGeneration(List<Dna> genePool, List<CarBrain> phenotypesPool)
+    {
+        if (genePool.Count != Species.GenerationSize) // TODO: loading a save with mismatching pop size
+            Debug.LogError("Phenotype/Genotype count mismatch! " + genePool.Count + "/" + Species.GenerationSize);
+
+        for (int i = 0; i < genePool.Count; i++)
         {
-            Dna newDna = newDnaList[i];
-            CarBrain carBrain = previousGenerationPhenotypes[i];
+            Dna newDna = genePool[i];
+            CarBrain carBrain = phenotypesPool[i];
 
             newDna.OnSelectedForBreedingCb = () => SelectedForBreeding.Add(carBrain);
             carBrain.Arise(newDna, transform.position, transform.rotation);
@@ -216,6 +221,5 @@ public class SpeciesEvolver : MonoBehaviour
         var comparison = Dna.CompareWeights(dna1, dna2);
         string log = System.String.Format("{0} | {1:P2} of weights are different, {2:P2} absolute value difference", relation, comparison.Item1, comparison.Item2);
         Debug.Log(log);
-        // Debug.Log("nWeights diff: " + comparison.Item1.ToString("N2") + " abs val diff: " + comparison.Item2.ToString("N2"));
     }
 }

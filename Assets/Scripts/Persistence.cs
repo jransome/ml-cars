@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using RansomeCorp.AI.Evolution;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -24,6 +24,7 @@ public class Persistence
         writer.Write(JsonUtility.ToJson(popData, true));
         writer.Flush();
         fs.Close();
+        Debug.Log("Population " + popData.SaveName + " saved to " + saveDirectory);
     }
 
     private static PopulationData ReadFile(string path)
@@ -37,15 +38,12 @@ public class Persistence
 public struct PopulationData
 {
     public string SaveName;
-    // public int GenerationNumber;
-    // public List<Dna> GenePool;
-    // public DnaStructure DnaStructure;
-
-    // public PopulationData(List<Dna> genePool, int generationNumber = 1, string saveName = null)
-    // {
-    //     SaveName = saveName == null ? "population_" + System.DateTime.Now.ToString("HHmmss_ddMMyyyy") : saveName;
-    //     GenerationNumber = generationNumber;
-    //     GenePool = genePool;
-    //     DnaStructure = genePool[0].structure;
-    // }
+    public int GenerationNumber;
+    public List<Dna> GenePool;
+    public PopulationData(List<Dna> genePool, int generationNumber, string saveName = null)
+    {
+        SaveName = saveName == null ? "population_" + System.DateTime.Now.ToString("HHmmss_ddMMyyyy") : saveName;
+        GenerationNumber = generationNumber;
+        GenePool = genePool;
+    }
 }

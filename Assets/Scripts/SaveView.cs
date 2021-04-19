@@ -1,47 +1,42 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class SaveView : MonoBehaviour
 {
-    public SpeciesEvolver EvolutionManager;
+    public SpeciesEvolver SpeciesEvolver;
     public InputField SaveName;
     public Button SaveButton;
     public GameObject SavedPopPrefab;
     public Transform SavedPopsPanel;
 
     private List<GameObject> ActiveSavedPopViews;
-    
+
     private void Save()
     {
-        // for testing
-        // DnaStructure structure = new DnaStructure(2, 2, 2, 2);
-        // List<Dna> TestGenes = new List<Dna> {
-        //     new Dna(structure),
-        //     new Dna(structure),
-        //     new Dna(structure),
-        // };
-        // PopulationData data = new PopulationData(TestGenes, 1, SaveName.text);
-        // Persistence.Save(data);
-        // Persistence.Save(new PopulationData(EvolutionManager.GenePool, EvolutionManager.GenerationCount, SaveName.text));
+        PopulationData data = new PopulationData(
+            SpeciesEvolver.GenerationPool.ConvertAll(b => b.Dna),
+            SpeciesEvolver.GenerationCount,
+            SaveName.text
+        );
+        Persistence.Save(data);
 
-        ClearSaves();
-        PopulateSaves();
+        ClearSaveViews();
+        PopulateSaveViews();
     }
 
-    private void PopulateSaves()
+    private void PopulateSaveViews()
     {
-        ActiveSavedPopViews = Persistence.GetSavedPopulations().Select(popData => 
+        ActiveSavedPopViews = Persistence.GetSavedPopulations().Select(popData =>
         {
             GameObject go = Instantiate(SavedPopPrefab, SavedPopsPanel);
-            go.GetComponent<SavedPopulationView>().Initialise(popData, EvolutionManager);
+            go.GetComponent<SavedPopulationView>().Initialise(popData, SpeciesEvolver);
             return go;
         }).ToList();
     }
 
-    private void ClearSaves()
+    private void ClearSaveViews()
     {
         foreach (GameObject view in ActiveSavedPopViews) Destroy(view);
     }
@@ -49,6 +44,6 @@ public class SaveView : MonoBehaviour
     private void Start()
     {
         SaveButton.onClick.AddListener(Save);
-        PopulateSaves();
+        PopulateSaveViews();
     }
 }
