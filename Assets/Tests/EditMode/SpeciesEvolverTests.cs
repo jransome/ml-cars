@@ -61,8 +61,11 @@ public class SpeciesEvolverTests
             return dna;
         }).ToList();
 
+        List<GenerationData> generationHistory = new List<GenerationData>();
+        generationHistory.Add(new GenerationData(1, previousGen));
+
         // Act
-        List<Dna> TNG = SpeciesEvolver.CreateGenerationDna(species, previousGen);
+        List<Dna> TNG = SpeciesEvolver.CreateGenerationDna(species, generationHistory);
 
         // Assert
         int[] expectedOutputsPerLayer = new int[]

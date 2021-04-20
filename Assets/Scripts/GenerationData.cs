@@ -1,22 +1,21 @@
 using RansomeCorp.AI.Evolution;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
 public class GenerationData
 {
     public readonly float TotalFitness = 0;
     public readonly float BestFitness = 0;
     public readonly float AverageFitness = 0;
-    public readonly ReadOnlyCollection<Dna> GenePool;
+    public readonly List<Dna> GenePool;
 
-    public GenerationData(int generationCount, List<CarBrain> generationPool)
+    public GenerationData(int generationCount, List<Dna> genePool)
     {
-        GenePool = new ReadOnlyCollection<Dna>(generationPool.ConvertAll(b => b.Dna));
+        GenePool = genePool;
 
-        foreach (var brain in generationPool)
+        foreach (var dna in genePool)
         {
-            TotalFitness += brain.Fitness;
-            if (brain.Fitness > BestFitness) BestFitness = brain.Fitness;
+            TotalFitness += dna.RawFitnessRating;
+            if (dna.RawFitnessRating > BestFitness) BestFitness = dna.RawFitnessRating;
         }
 
         AverageFitness = TotalFitness / GenePool.Count;

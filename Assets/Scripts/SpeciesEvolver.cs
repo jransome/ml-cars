@@ -26,9 +26,9 @@ public class SpeciesEvolver : MonoBehaviour
         ReleaseGeneration(generation.GenePool, GenerationPool); // depends on phenotypes already having been instanced
     }
 
-    public static List<Dna> CreateGenerationDna(CarSpecies species, List<Dna> previousGeneration = null) // TODO: move to darwin class
+    public static List<Dna> CreateGenerationDna(CarSpecies species, List<GenerationData> history = null) // TODO: move to darwin class
     {
-        if (previousGeneration == null)
+        if (history == null)
         {
             Debug.Log("Creating randomly seeded new " + species.name + " generation of " + species.GenerationSize + " agents.");
             return Enumerable.Range(0, species.GenerationSize).Select((_) =>
@@ -42,6 +42,7 @@ public class SpeciesEvolver : MonoBehaviour
             ).ToList();
         }
 
+        List<Dna> previousGeneration = history.Last().GenePool;
         List<Dna> TNG = new List<Dna>();
 
         // Add fresh dna into next gen
@@ -137,7 +138,7 @@ public class SpeciesEvolver : MonoBehaviour
         Debug.Log("Creating generation " + ++GenerationCount + " of " + Species.name);
         List<Dna> newDnaList = isFirstGeneration ?
             SpeciesEvolver.CreateGenerationDna(Species) :
-            SpeciesEvolver.CreateGenerationDna(Species, previousGenerationPhenotypes.ConvertAll(p => p.Dna));
+            SpeciesEvolver.CreateGenerationDna(Species, GenerationHistory);
 
         if (previousGenerationPhenotypes.Count != newDnaList.Count)
             Debug.LogError("Phenotype/Genotype count mismatch! " + newDnaList.Count + "/" + previousGenerationPhenotypes.Count);
@@ -166,7 +167,7 @@ public class SpeciesEvolver : MonoBehaviour
 
     private void GenerationFinished()
     {
-        GenerationData data = new GenerationData(GenerationCount, GenerationPool);
+        GenerationData data = new GenerationData(GenerationCount, GenerationPool.ConvertAll(b => b.Dna));
         GenerationHistory.Add(data);
         Debug.Log(
             "Generation " + GenerationCount + " of " + Species.name + " finished.\n" +
