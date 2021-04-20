@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class CarBrain : MonoBehaviour
 {
-    [SerializeField] private CarController carController;
+    [SerializeField, SerializeReference] private AgentController agentController;
     [SerializeField] private CarFitness fitnessCalculator;
     [SerializeField] private DistanceSensors distanceSensors;
     [SerializeField] private PhysicsSensors physicsSensors;
@@ -45,7 +45,7 @@ public class CarBrain : MonoBehaviour
             Debug.LogError("Network not configured with expected number of outputs");
 
         ThrottleDecision = SteeringDecision = BrakingDecision = 0;
-        carController.ResetToPosition(startPosition, startRotation);
+        agentController.ResetToPosition(startPosition, startRotation);
         fitnessCalculator.Reset();
 
         neuralNetwork = new NeuralNetwork(dna);
@@ -63,6 +63,13 @@ public class CarBrain : MonoBehaviour
             SteeringDecision = (float)outputs[0];
             ThrottleDecision = isThrottling ? (float)outputs[1] : 0f;
             BrakingDecision = isThrottling ? 0f : -(float)outputs[1];
+
+            // sigmoid
+            // var tOutputMapped = (outputs[1] - 0.5) * 2;
+            // bool isThrottling = tOutputMapped > 0;
+            // SteeringDecision = ((float)outputs[0] - 0.5f) * 2;
+            // ThrottleDecision = isThrottling ? (float)outputs[1] : 0f;
+            // BrakingDecision = isThrottling ? 0f : -(float)outputs[1];
 
             yield return new WaitForSeconds(0.1f);
         }
@@ -82,15 +89,15 @@ public class CarBrain : MonoBehaviour
         Dna.RawFitnessRating = fitnessCalculator.Fitness;
         StopAllCoroutines();
         OnDeathCb(this);
-        carController.Brake(1f);
+        agentController.Brake(1f);
         heritageIndicator.material.color = Color.red;
     }
 
     private void Update()
     {
         if (!IsAlive) return;
-        carController.Throttle(ThrottleDecision);
-        carController.Steer(SteeringDecision);
-        carController.Brake(BrakingDecision);
+        agentController.Throttle(ThrottleDecision);
+        agentController.Steer(SteeringDecision);
+        agentController.Brake(BrakingDecision);
     }
 }

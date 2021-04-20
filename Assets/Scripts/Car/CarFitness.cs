@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public class CarFitness : MonoBehaviour // TODO: refactor as plain class?
@@ -12,8 +13,7 @@ public class CarFitness : MonoBehaviour // TODO: refactor as plain class?
     [SerializeField] private float rawFitness;
     [SerializeField] private float timeOfBirth;
     [SerializeField] private float lastGateCrossedTime;
-    [SerializeField] private int gatesCrossed;
-    [SerializeField] private RacingGate lastGateCrossed;
+    [SerializeField] private List<RacingGate> gatesCrossed = new List<RacingGate>();
 
     private CarSpecies species;
     private Action callDeath;
@@ -26,6 +26,7 @@ public class CarFitness : MonoBehaviour // TODO: refactor as plain class?
         colliderTrigger.TriggerEntered += HandleColliderTriggerEnter;
         callDeath = () =>
         {
+            if (deathCalled) return;
             deathCalled = true;
             DieCallback();
         };
@@ -37,8 +38,7 @@ public class CarFitness : MonoBehaviour // TODO: refactor as plain class?
         rawFitness = 0f;
         timeOfBirth = Time.time;
         lastGateCrossedTime = timeOfBirth;
-        gatesCrossed = 0;
-        lastGateCrossed = null;
+        gatesCrossed.Clear();
     }
 
     private void UpdateFitness(float currentTime)
@@ -51,17 +51,17 @@ public class CarFitness : MonoBehaviour // TODO: refactor as plain class?
     private void UpdateFitness(RacingGate gate)
     {
         if (deathCalled) return;
-        if (gate == lastGateCrossed)
+        if (gatesCrossed.Contains(gate))
         {
             callDeath();
             return;
         }
 
-        lastGateCrossed = gate;
+        gatesCrossed.Add(gate);
         lastGateCrossedTime = Time.time;
 
         // fitnesses squared to give greater weighting to slightly higher fitness scores
-        rawFitness += Mathf.Pow(++gatesCrossed * species.GateCrossedReward, 2);
+        rawFitness += Mathf.Pow(gatesCrossed.Count * species.GateCrossedReward, 2);
         float normalisedInverseDistance = (species.MaxPositionDifferenceTolerance - Vector3.Distance(transform.position, gate.OptimalPosition)) / species.MaxPositionDifferenceTolerance;
         rawFitness += Mathf.Pow(normalisedInverseDistance * species.OptimalPositionReward, 2);
         rawFitness += Mathf.Pow(Vector3.Dot(transform.forward, gate.OptimalDirection) * species.OptimalDirectionReward, 2);
@@ -71,6 +71,15 @@ public class CarFitness : MonoBehaviour // TODO: refactor as plain class?
     {
         if (other.CompareTag("RacingGate"))
             UpdateFitness(other.GetComponent<RacingGate>());
+    }
+
+    private void OnCollisionEnter(Collision col)
+    {
+        if (deathCalled) return;
+        if (col.gameObject.tag == "Terrain") {
+            callDeath();
+            rawFitness -= 20000;
+        }
     }
 
     private void Update()

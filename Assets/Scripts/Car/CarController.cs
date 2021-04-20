@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class CarController : MonoBehaviour
+public class CarController : AgentController
 {
     public bool IsHumanControlled = false;
     [SerializeField] private Rigidbody rb = null;
@@ -9,7 +9,7 @@ public class CarController : MonoBehaviour
     [SerializeField] private WheelCollider[] wheels = null;
     [SerializeField] private Transform[] frontWheelModels = null;
 
-    public void Throttle(float input)
+    public override void Throttle(float input)
     {
         for (int i = 0; i < 2; i++) // front wheels
             wheels[i].motorTorque = input * torque;
@@ -18,7 +18,7 @@ public class CarController : MonoBehaviour
             w.brakeTorque = 0; // release brakes on rear wheels
     }
 
-    public void Steer(float input)
+    public override void Steer(float input)
     {
         float angle = input * maxLockDegrees;
         for (int i = 0; i < 2; i++) // front wheels
@@ -28,14 +28,14 @@ public class CarController : MonoBehaviour
         }
     }
 
-    public void Brake(float input)
+    public override void Brake(float input)
     {
         input = Mathf.Clamp01(input);
         foreach (WheelCollider w in wheels)
             w.brakeTorque = input * torque;
     }
 
-    public void ResetToPosition(Vector3 startPosition, Quaternion startRotation)
+    public override void ResetToPosition(Vector3 startPosition, Quaternion startRotation)
     {
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
