@@ -77,8 +77,8 @@ public class CarFitness : MonoBehaviour // TODO: refactor as plain class?
     {
         if (deathCalled) return;
         if (col.gameObject.tag == "Terrain") {
-            callDeath();
-            rawFitness -= 20000;
+            // callDeath();
+            // rawFitness -= 20000;
         }
     }
 

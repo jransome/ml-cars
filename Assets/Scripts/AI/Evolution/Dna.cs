@@ -48,7 +48,7 @@ namespace RansomeCorp.AI.Evolution
     }
 
     [System.Serializable]
-    public class Dna
+    public class Dna : System.IEquatable<Dna>
     {
         public System.Action OnSelectedForBreedingCb { get; set; } = delegate { };
         public int Inputs; // TODO: use props as can't make readonly because need to serialise for saving
@@ -56,11 +56,18 @@ namespace RansomeCorp.AI.Evolution
         public List<int> OutputsPerLayer;
         public List<double> WeightsAndBiases;
         public List<int> ActivationIndexes;
-        public float RawFitnessRating { get; set; } = 0f;
+        public float RawFitnessRating { get; set; } = 1f;
         public DnaHeritage Heritage { get; private set; }
 
-        private Dna(int inputs, int outputs, int[] outputsPerLayer, List<double> weightsAndBiases, List<int> activationIndexes, DnaHeritage origin = DnaHeritage.New)
+        public readonly int Id;
+        public readonly List<Dna> Parents;
+        static int idCounter = 0;
+
+        private Dna(int inputs, int outputs, int[] outputsPerLayer, List<double> weightsAndBiases, List<int> activationIndexes, DnaHeritage origin = DnaHeritage.New, List<Dna> parents = null)
         {
+            Id = idCounter++;
+            Parents = parents;
+
             Inputs = inputs;
             Outputs = outputs;
             OutputsPerLayer = new List<int>(outputsPerLayer);
@@ -102,53 +109,59 @@ namespace RansomeCorp.AI.Evolution
             return new Dna(inputs, outputs, outputsPerLayer, weightsAndBiases, activationIndexes);
         }
 
-        public static List<Dna> CreateOffspring(Dna parent1, Dna parent2, float weightCrossoverProportion = 0.5f, float activationCrossoverProportion = 0)
+        public static List<Dna> CreateOffspring(Dna parent1, Dna parent2, bool useSinglePointCrossover, float weightCrossoverProportion = 0.5f, float activationCrossoverProportion = 0)
         {
             // Sexi time
             parent1.OnSelectedForBreedingCb();
             parent2.OnSelectedForBreedingCb();
 
-            // Weight crossover
             if (parent1.WeightsAndBiases.Count != parent2.WeightsAndBiases.Count)
                 Debug.LogError("Inter-species mating is happening... this hasn't been coded for!!");
 
             var child1WeightGene = new List<double>();
             var child2WeightGene = new List<double>();
-
-            for (int i = 0; i < Mathf.Min(parent1.WeightsAndBiases.Count, parent2.WeightsAndBiases.Count); i++)
-            {
-                if (Random.Range(0f, 1f) <= weightCrossoverProportion)
-                {
-                    child1WeightGene.Add(parent2.WeightsAndBiases[i]);
-                    child2WeightGene.Add(parent1.WeightsAndBiases[i]);
-                }
-                else
-                {
-                    child1WeightGene.Add(parent1.WeightsAndBiases[i]);
-                    child2WeightGene.Add(parent2.WeightsAndBiases[i]);
-                }
-            }
-
-            // Activation crossover
             var child1ActivationGene = new List<int>(parent1.ActivationIndexes);
             var child2ActivationGene = new List<int>(parent2.ActivationIndexes);
 
-            if (activationCrossoverProportion > 0)
+            if (useSinglePointCrossover)
             {
-                child1ActivationGene = new List<int>();
-                child2ActivationGene = new List<int>();
-
-                for (int i = 0; i < Mathf.Min(parent1.ActivationIndexes.Count, parent2.ActivationIndexes.Count); i++)
+                int slicePoint = Random.Range(1, parent1.WeightsAndBiases.Count - 1);
+                child1WeightGene = parent1.WeightsAndBiases.Take(slicePoint).Concat(parent2.WeightsAndBiases.Skip(slicePoint)).ToList();
+                child2WeightGene = parent2.WeightsAndBiases.Take(slicePoint).Concat(parent1.WeightsAndBiases.Skip(slicePoint)).ToList();
+            }
+            else
+            {
+                for (int i = 0; i < Mathf.Min(parent1.WeightsAndBiases.Count, parent2.WeightsAndBiases.Count); i++)
                 {
-                    if (Random.Range(0f, 1f) <= activationCrossoverProportion)
+                    if (Random.Range(0f, 1f) <= weightCrossoverProportion)
                     {
-                        child1ActivationGene.Add(parent2.ActivationIndexes[i]);
-                        child2ActivationGene.Add(parent1.ActivationIndexes[i]);
+                        child1WeightGene.Add(parent2.WeightsAndBiases[i]);
+                        child2WeightGene.Add(parent1.WeightsAndBiases[i]);
                     }
                     else
                     {
-                        child1ActivationGene.Add(parent1.ActivationIndexes[i]);
-                        child2ActivationGene.Add(parent2.ActivationIndexes[i]);
+                        child1WeightGene.Add(parent1.WeightsAndBiases[i]);
+                        child2WeightGene.Add(parent2.WeightsAndBiases[i]);
+                    }
+                }
+
+                if (activationCrossoverProportion > 0)
+                {
+                    child1ActivationGene = new List<int>();
+                    child2ActivationGene = new List<int>();
+
+                    for (int i = 0; i < Mathf.Min(parent1.ActivationIndexes.Count, parent2.ActivationIndexes.Count); i++)
+                    {
+                        if (Random.Range(0f, 1f) <= activationCrossoverProportion)
+                        {
+                            child1ActivationGene.Add(parent2.ActivationIndexes[i]);
+                            child2ActivationGene.Add(parent1.ActivationIndexes[i]);
+                        }
+                        else
+                        {
+                            child1ActivationGene.Add(parent1.ActivationIndexes[i]);
+                            child2ActivationGene.Add(parent2.ActivationIndexes[i]);
+                        }
                     }
                 }
             }
@@ -158,38 +171,60 @@ namespace RansomeCorp.AI.Evolution
             int outputs = parent1.Outputs;
             int[] outputsPerLayer = parent1.OutputsPerLayer.ToArray();
 
+            bool p1p2 = parent1.WeightsAndBiases.SequenceEqual(parent2.WeightsAndBiases);
+            bool p1c1 = parent1.WeightsAndBiases.SequenceEqual(child1WeightGene);
+            bool p1c2 = parent1.WeightsAndBiases.SequenceEqual(child2WeightGene);
+            bool p2c1 = parent2.WeightsAndBiases.SequenceEqual(child1WeightGene);
+            bool p2c2 = parent2.WeightsAndBiases.SequenceEqual(child2WeightGene);
+
+            if (p1p2)
+                Debug.LogError("p1==c2");
+            if (p1c1)
+                Debug.LogError("p1==c1");
+            if (p1c2)
+                Debug.LogError("p1==c2");
+            if (p2c1)
+                Debug.LogError("p2==c1");
+            if (p2c2)
+                Debug.LogError("p2==c2");
+
             return new List<Dna>()
             {
-                new Dna(inputs, outputs, outputsPerLayer, child1WeightGene, child1ActivationGene, DnaHeritage.Bred),
-                new Dna(inputs, outputs, outputsPerLayer, child2WeightGene, child2ActivationGene, DnaHeritage.Bred),
+                new Dna(inputs, outputs, outputsPerLayer, child1WeightGene, child1ActivationGene, DnaHeritage.Bred, new List<Dna>(){ parent1, parent2 }),
+                new Dna(inputs, outputs, outputsPerLayer, child2WeightGene, child2ActivationGene, DnaHeritage.Bred, new List<Dna>(){ parent1, parent2 }),
             };
         }
 
         public static Dna CloneAndMutate(Dna dna, DnaHeritage origin, float weightMutationPrevalence, float activationMutationPrevalence = 0)
         {
-            List<double> mutatedWeightGene = dna.WeightsAndBiases.Select(value =>
+            if (!(weightMutationPrevalence > 0))
+            {
+                Debug.LogWarning("Attempted to mutate with a factor of zero");
+                return Dna.Clone(dna);
+            }
+
+            List<double> mutatedWeightGene = dna.WeightsAndBiases.GuaranteedApplyToPercentage(weightMutationPrevalence, (weight) =>
             {
                 double random01 = Random.Range(0f, 1f);
-                if (random01 > weightMutationPrevalence) return value;
-                bool shouldScramble = random01 < 0.25f; 
-                return shouldScramble ? (random01 * 2) - 1 : value * (0.5 + random01); // scale by +/-50% OR random new value between -1 and 1
-            }).ToList();
+                bool shouldScramble = random01 < 0.25f;
+                return shouldScramble ? (random01 * 2) - 1 : weight * (0.5 + random01); // scale by +/-50% OR random new value between -1 and 1
+            });
+            if (mutatedWeightGene.SequenceEqual(dna.WeightsAndBiases)) Debug.LogError("Failed to mutate weights???");
 
-            if (!(activationMutationPrevalence > 0))
-                return new Dna(dna.Inputs, dna.Outputs, dna.OutputsPerLayer.ToArray(), mutatedWeightGene, dna.ActivationIndexes.ToList(), origin);
+            List<int> activationGene;
+            if (!(activationMutationPrevalence > 0)) activationGene = dna.ActivationIndexes;
+            else
+            {
+                int startIndexOfOutputLayerActivation = dna.ActivationIndexes.Count - dna.Outputs;
+                activationGene = dna.ActivationIndexes
+                    .Take(startIndexOfOutputLayerActivation) // preserve the output layer activations
+                    .ToList()
+                    .GuaranteedApplyToPercentage(activationMutationPrevalence, (_) => Random.Range(0, Activation.FunctionsCount))
+                    .Concat(dna.ActivationIndexes.Skip(startIndexOfOutputLayerActivation))
+                    .ToList();
+            }
 
-            int startIndexOfOutputLayerActivation = dna.ActivationIndexes.Count - dna.Outputs;
-            List<int> mutatedActivationGene = dna.ActivationIndexes
-                .Take(startIndexOfOutputLayerActivation) // preserve the output layer activations
-                .Select(value =>
-                {
-                    if (Random.Range(0f, 1f) <= activationMutationPrevalence) return value;
-                    return Random.Range(0, Activation.FunctionsCount);
-                })
-                .Concat(dna.ActivationIndexes.Skip(startIndexOfOutputLayerActivation))
-                .ToList();
-
-            return new Dna(dna.Inputs, dna.Outputs, dna.OutputsPerLayer.ToArray(), mutatedWeightGene, mutatedActivationGene, origin);
+            return new Dna(dna.Inputs, dna.Outputs, dna.OutputsPerLayer.ToArray(), mutatedWeightGene, activationGene, origin, new List<Dna>() { dna });
         }
 
         public static Dna Clone(Dna dna)
@@ -200,19 +235,15 @@ namespace RansomeCorp.AI.Evolution
                 dna.OutputsPerLayer.ToArray(),
                 new List<double>(dna.WeightsAndBiases),
                 new List<int>(dna.ActivationIndexes),
-                DnaHeritage.Unchanged
+                DnaHeritage.Unchanged,
+                new List<Dna>() { dna }
             );
-        }
-
-        public static bool CompareTopologies(Dna dna1, Dna dna2)
-        {
-            return dna1.Inputs != dna2.Inputs || dna1.Outputs != dna2.Outputs || Enumerable.SequenceEqual(dna1.OutputsPerLayer, dna2.OutputsPerLayer);
         }
 
         // Returns tuple containing 1) percentage of weight values that differ, and 2) the absolute difference in weight values of dna2 as a percentage of the aggregated absolute weight values of dna1
         public static System.Tuple<float, double> CompareWeights(Dna dna1, Dna dna2)
         {
-            if (!CompareTopologies(dna1, dna2))
+            if (!TopologiesEqual(dna1, dna2))
                 throw new System.ArgumentException("Can't compare dna weights of different topologies!");
 
             if (dna1.WeightsAndBiases.Count != dna2.WeightsAndBiases.Count) // should always be false if topologies are the same. but just in case...
@@ -230,6 +261,28 @@ namespace RansomeCorp.AI.Evolution
             double dna1TotalWeight = dna1.WeightsAndBiases.Aggregate(0.0, (total, weight) => total + System.Math.Abs(weight));
             double weightDifferenceAsProportion = accumulatedAbsoluteDifference / dna1TotalWeight;
             return new System.Tuple<float, double>((float)nWeightsDiffering / (float)dna1.WeightsAndBiases.Count, weightDifferenceAsProportion);
+        }
+
+        public static bool TopologiesEqual(Dna dna1, Dna dna2)
+        {
+            return dna1.Inputs == dna2.Inputs
+                && dna1.Outputs == dna2.Outputs
+                && Enumerable.SequenceEqual(dna1.OutputsPerLayer, dna2.OutputsPerLayer);
+        }
+
+        public bool Equals(Dna other)
+        {
+            return Object.ReferenceEquals(this, other)
+                || (TopologiesEqual(this, other)
+                && ActivationIndexes.SequenceEqual(other.ActivationIndexes)
+                && WeightsAndBiases.SequenceEqual(other.WeightsAndBiases));
+        }
+
+        // If Equals() returns true for a pair of objects then GetHashCode() must return the same value for these objects.
+        public override int GetHashCode()
+        {
+            // return the 'combined' hashcode of all pertinant fields by putting them in a tuple
+            return (Inputs, Outputs, OutputsPerLayer, ActivationIndexes, WeightsAndBiases).GetHashCode();
         }
     }
 }

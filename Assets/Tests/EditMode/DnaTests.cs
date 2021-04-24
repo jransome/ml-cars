@@ -107,7 +107,7 @@ public class DnaTests
         Dna parent2Dna = Dna.GenerateRandomDnaEncoding(nInputs, hiddenLayers, nOutputs, (ActivationType)outputLayerActivationIndex, true);
 
         // Act
-        List<Dna> offspring = Dna.CreateOffspring(parent1Dna, parent2Dna, 0.5f, 0.5f);
+        List<Dna> offspring = Dna.CreateOffspring(parent1Dna, parent2Dna, false, 0.5f, 0.5f);
 
         // Assert
         offspring.Should().HaveCount(2);
@@ -148,7 +148,7 @@ public class DnaTests
         Dna parent2Dna = Dna.GenerateRandomDnaEncoding(nInputs, hiddenLayers, nOutputs, (ActivationType)outputLayerActivationIndex, true);
 
         // Act
-        List<Dna> offspring = Dna.CreateOffspring(parent1Dna, parent2Dna, 0.5f, 0);
+        List<Dna> offspring = Dna.CreateOffspring(parent1Dna, parent2Dna, false, 0.5f, 0);
 
         // Assert
         offspring.Should().HaveCount(2);
@@ -179,10 +179,10 @@ public class DnaTests
     public void PerformsDnaMutation()
     {
         // Arrange
-        const int nInputs = 20;
-        const int nOutputs = 8;
+        const int nInputs = 2;
+        const int nOutputs = 2;
         const int outputLayerActivationIndex = 3;
-        int[] hiddenLayers = new int[] { 30, 4, 12 };
+        int[] hiddenLayers = new int[] { 7 };
         Dna originalDna = Dna.GenerateRandomDnaEncoding(nInputs, hiddenLayers, nOutputs, (ActivationType)outputLayerActivationIndex, true);
 
         // Act
@@ -207,10 +207,10 @@ public class DnaTests
     public void PerformsDnaMutationWithoutActivation()
     {
         // Arrange
-        const int nInputs = 20;
-        const int nOutputs = 8;
+        const int nInputs = 2;
+        const int nOutputs = 2;
         const int outputLayerActivationIndex = 3;
-        int[] hiddenLayers = new int[] { 30, 4, 12 };
+        int[] hiddenLayers = new int[] { 7 };
         Dna originalDna = Dna.GenerateRandomDnaEncoding(nInputs, hiddenLayers, nOutputs, (ActivationType)outputLayerActivationIndex, true);
 
         // Act
@@ -229,7 +229,7 @@ public class DnaTests
     }
 
     [Test]
-    public void CompareWeightsOfIdentical()
+    public void CompareWeightsReturnsExpectedResultOfIdentical()
     {
         // Arrange
         const int nInputs = 20;
@@ -249,7 +249,7 @@ public class DnaTests
     }
 
     [Test]
-    public void CompareWeightsOfDifferent()
+    public void CompareWeightsReturnsExpectedResultOfDifferent()
     {
         // Arrange
         const int nInputs = 9;

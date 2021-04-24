@@ -28,16 +28,17 @@ MonoBehaviour:
   - 70
   - -70
   SensorDistance: 80
-  HiddenLayersNeuronCount: 08000000
+  HiddenLayersNeuronCount: 06000000
   HeterogeneousHiddenActivation: 0
   OutputLayerActivation: 1
   GenerationSize: 50
-  ProportionUnchanged: 0.1
+  ProportionUnchanged: 0.05
   ProportionMutatantsOfUnchanged: 0.1
-  NewDnaRate: 0.02
+  NewDnaRate: 0.05
   OffspringMutationProbability: 0.5
-  MutationSeverity: 0.02
+  MutationSeverity: 0.03
   ActivationMutationSeverity: 0
+  UseSinglePointCrossover: 0
   CrossoverSeverity: 0.5
   ActivationCrossoverSeverity: 0
   MaxTimeToReachNextGateSecs: 5

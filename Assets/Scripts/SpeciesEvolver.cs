@@ -71,7 +71,7 @@ public class SpeciesEvolver : MonoBehaviour
                     .Select(dna =>
                     {
                         Dna clone = Dna.Clone(dna);
-                        DebugDnaDiff(dna, clone, "Clone/Clone");
+                        // DebugDnaDiff(dna, clone, "Clone/Clone");
                         return clone;
                     })
             );
@@ -96,11 +96,12 @@ public class SpeciesEvolver : MonoBehaviour
         {
             Dna parent1 = Darwin.SelectRandomBasedOnFitness(previousGeneration);
             Dna parent2 = Darwin.SelectRandomBasedOnFitness(previousGeneration, parent1);
-            DebugDnaDiff(parent1, parent2, "Parent/Parent");
+            // DebugDnaDiff(parent1, parent2, "Parent/Parent");
 
             List<Dna> children = Dna.CreateOffspring(
                 parent1,
                 parent2,
+                species.UseSinglePointCrossover,
                 species.CrossoverSeverity,
                 species.ActivationCrossoverSeverity
             ).ConvertAll(child =>
@@ -108,27 +109,28 @@ public class SpeciesEvolver : MonoBehaviour
                 if (Random.Range(0f, 1f) > species.OffspringMutationProbability)
                 {
                     nOffspring++;
-                    DebugDnaDiff(parent1, child, "Parent/Child");
+                    // DebugDnaDiff(parent1, child, "Parent/Child");
                     return child;
                 }
 
                 nMutatedOffspring++;
                 Dna mutantChild = Dna.CloneAndMutate(child, DnaHeritage.BredAndMutated, species.MutationSeverity, species.ActivationMutationSeverity);
-                DebugDnaDiff(parent1, mutantChild, "Parent/Mutant Child");
+                // DebugDnaDiff(parent1, mutantChild, "Parent/Mutant Child");
                 return mutantChild;
             });
 
             TNG.AddRange(children);
         }
 
-        Debug.Log(
-            "Created next generation of " + species.name + " with " + TNG.Count + " agents\n" +
-            nNew + " new, " +
-            nOffspring + " decendants, " +
-            nMutatedOffspring + " mutated descendants " +
-            nUnchanged + " elites from previous " +
-            nMutatedUnchanged + " mutated elites from previous "
-        );
+        // Debug.Log(
+        //     "Created next generation of " + species.name + " with " + TNG.Count + " agents\n" +
+        //     nNew + " new, " +
+        //     nOffspring + " decendants, " +
+        //     nMutatedOffspring + " mutated descendants " +
+        //     nUnchanged + " elites from previous " +
+        //     nMutatedUnchanged + " mutated elites from previous "
+        // );
+        DebugGenerationDiff(previousGeneration, TNG);
 
         return TNG;
     }
@@ -222,5 +224,57 @@ public class SpeciesEvolver : MonoBehaviour
         var comparison = Dna.CompareWeights(dna1, dna2);
         string log = System.String.Format("{0} | {1:P2} of weights are different, {2:P2} absolute value difference", relation, comparison.Item1, comparison.Item2);
         Debug.Log(log);
+    }
+
+    struct Identicle
+    {
+        public Dna NextGenDna;
+        public List<Dna> ClonesInPrevGen;
+
+        public Identicle(Dna dna, List<Dna> clonesInPrevGen)
+        {
+            NextGenDna = dna;
+            ClonesInPrevGen = clonesInPrevGen;
+        }
+    }
+
+    static void DebugGenerationDiff(List<Dna> gen1, List<Dna> gen2)
+    {
+        // remove clones from previous
+        var shouldBeUniques = gen2.Where(d => d.Heritage != DnaHeritage.Unchanged).ToList();
+        List<Identicle> identicles = new List<Identicle>();
+
+        foreach (Dna g2Dna in shouldBeUniques)
+        {
+            var clones = gen1.Where(g1Dna => g1Dna.Equals(g2Dna));
+            if (clones.Count() > 0) identicles.Add(new Identicle(g2Dna, clones.ToList()));
+        }
+
+        if (identicles.Count > 0)
+        {
+            string log = System.String.Format(
+                "{0} dna instances identicle to previous gen out of {1}. {2} mutant elites, {3} offspring, {4} mutated offspring",
+                identicles.Count,
+                shouldBeUniques.Count,
+                identicles.Where(i => i.NextGenDna.Heritage == DnaHeritage.Mutated).Count(),
+                identicles.Where(i => i.NextGenDna.Heritage == DnaHeritage.Bred).Count(),
+                identicles.Where(i => i.NextGenDna.Heritage == DnaHeritage.BredAndMutated).Count()
+            );
+            Debug.LogError(log);
+        }
+
+        var occurrences = gen2.ToDictionary(dna => dna, (_) => 1);
+        for (int i = 0; i < gen2.Count; i++)
+        {
+            Dna pop = gen2[i];
+            for (int j = 0; j < gen2.Count; j++)
+                if (i != j && pop.Equals(gen2[j])) occurrences[pop] += 1;
+        }
+
+        int intraGenerationClones = occurrences.Values.Where(occurrenceCount => occurrenceCount > 1).Count();
+        if (intraGenerationClones > 0)
+        {
+            Debug.LogError(intraGenerationClones + " duplicates detected within generation");
+        }
     }
 }

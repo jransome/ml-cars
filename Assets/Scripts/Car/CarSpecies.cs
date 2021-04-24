@@ -40,6 +40,7 @@ public class CarSpecies : ScriptableObject
     public float OffspringMutationProbability = 0.5f;
     public float MutationSeverity = 0.2f;
     public float ActivationMutationSeverity = 0.01f;
+    public bool UseSinglePointCrossover = true;
     public float CrossoverSeverity = 0.5f; // TODO: this doesn't make sense as 0.5 is actually the max value - ie child = half/half of parents
     public float ActivationCrossoverSeverity = 0.05f;
 
