@@ -1,12 +1,13 @@
 using RansomeCorp.AI.Evolution;
 using System.Collections.Generic;
 
+[System.Serializable]
 public class GenerationData
 {
-    public readonly float TotalFitness = 0;
-    public readonly float BestFitness = 0;
-    public readonly float AverageFitness = 0;
-    public readonly List<Dna> GenePool;
+    public float TotalFitness = 0;
+    public float BestFitness = 0;
+    public float AverageFitness = 0;
+    public List<Dna> GenePool;
 
     public GenerationData(int generationCount, List<Dna> genePool)
     {

@@ -7,6 +7,11 @@ using UnityEngine;
 public class SpeciesEvolver : MonoBehaviour
 {
     public CarSpecies Species;
+    public SpawnPoints SpawnPoints;
+    public int GenerationsPerSpawnPoint = 15;
+    public List<GenerationData> GenerationHistory = new List<GenerationData>();
+
+    private Transform spawnPoint;
 
     public int GenerationCount { get; private set; } = 0;
     public List<CarBrain> GenerationPool { get; private set; } = new List<CarBrain>();
@@ -17,8 +22,6 @@ public class SpeciesEvolver : MonoBehaviour
     {
         get => GenerationPool.Where(b => b.IsAlive).OrderByDescending(b => b.Fitness).DefaultIfEmpty(null).First();
     }
-
-    public List<GenerationData> GenerationHistory = new List<GenerationData>();
 
     public void LoadGeneration(PopulationData generation)
     {
@@ -133,6 +136,8 @@ public class SpeciesEvolver : MonoBehaviour
     private IEnumerator DoEvolution(List<CarBrain> previousGenerationPhenotypes, bool isFirstGeneration = false)
     {
         Debug.Log("Creating generation " + ++GenerationCount + " of " + Species.name);
+        if (GenerationCount % GenerationsPerSpawnPoint == 0) spawnPoint = SpawnPoints.GetNext(spawnPoint);
+
         List<Dna> newDnaList = isFirstGeneration ?
             SpeciesEvolver.CreateGenerationDna(Species) :
             SpeciesEvolver.CreateGenerationDna(Species, GenerationHistory);
@@ -156,7 +161,7 @@ public class SpeciesEvolver : MonoBehaviour
             CarBrain carBrain = phenotypesPool[i];
 
             newDna.OnSelectedForBreedingCb = () => SelectedForBreeding.Add(carBrain);
-            carBrain.Arise(newDna, transform.position, transform.rotation);
+            carBrain.Arise(newDna, spawnPoint.transform.position, spawnPoint.transform.rotation);
         }
         CurrentlyAlive = new List<CarBrain>(GenerationPool);
         Debug.Log("Generation " + GenerationCount + " of " + Species.name + " created and released");
@@ -204,12 +209,13 @@ public class SpeciesEvolver : MonoBehaviour
         {
             CarBrain b = Instantiate(Species.PopulationPrefab).GetComponent<CarBrain>();
             GenerationPool.Add(b);
-            b.Initialise(Species, transform.position, transform.rotation, HandleIndividualDied);
+            b.Initialise(Species, spawnPoint.transform.position, spawnPoint.transform.rotation, HandleIndividualDied);
         }
     }
 
     private void Start()
     {
+        spawnPoint = SpawnPoints.Points[0];
         InstantiatePhenotypes();
         StartCoroutine(DoEvolution(GenerationPool, true));
     }
