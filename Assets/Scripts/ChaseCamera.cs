@@ -5,13 +5,18 @@ public class ChaseCamera : MonoBehaviour
     public SpeciesEvolver EvolutionManager;
     public float OrbitSpeed = 2f;
     private Transform chaseTransform;
+    private float lastCameraUpdate = 0f;
 
     private void Update()
     {
-        CarBrain carToTrack = EvolutionManager.MostSuccessfulAlive;
+        if (Input.GetKeyUp(KeyCode.Alpha1)) Time.timeScale = 1;
+        if (Input.GetKeyUp(KeyCode.Alpha6)) Time.timeScale = 6;
 
-        if (carToTrack)
-            chaseTransform = carToTrack.transform;
+        if (Time.time > lastCameraUpdate + 1f && EvolutionManager.MostSuccessfulAlive != null)
+        {
+            lastCameraUpdate = Time.time;
+            chaseTransform = EvolutionManager.MostSuccessfulAlive.transform;
+        }
 
         if (chaseTransform != null)
         {
