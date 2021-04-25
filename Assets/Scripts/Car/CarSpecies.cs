@@ -9,10 +9,10 @@ public class CarSpecies : ScriptableObject
     public readonly static Dictionary<DnaHeritage, Color> LineageColours = new Dictionary<DnaHeritage, Color>()
     {
         { DnaHeritage.New, Color.yellow },
-        { DnaHeritage.Unchanged, Color.grey },
-        { DnaHeritage.Bred, Color.blue },
-        { DnaHeritage.BredAndMutated, Color.green },
-        { DnaHeritage.Mutated, Color.magenta },
+        { DnaHeritage.Elite, Color.grey },
+        { DnaHeritage.Offspring, Color.blue },
+        { DnaHeritage.MutatedOffspring, Color.green },
+        { DnaHeritage.MutatedElite, Color.magenta },
     };
 
     [Header("General")]
@@ -40,9 +40,8 @@ public class CarSpecies : ScriptableObject
     public float OffspringMutationProbability = 0.5f;
     public float MutationSeverity = 0.2f;
     public float ActivationMutationSeverity = 0.01f;
-    public bool UseSinglePointCrossover = true;
-    public float CrossoverSeverity = 0.5f; // TODO: this doesn't make sense as 0.5 is actually the max value - ie child = half/half of parents
-    public float ActivationCrossoverSeverity = 0.05f;
+    public int CrossoverPasses = 5; // how many times to cross parent dna in offspring production. higher numbers = closer to uniform crossover
+    public bool IncludeActivationCrossover = false;
 
     [Header("Fitness hyperparameters")]
     public float MaxTimeToReachNextGateSecs = 5f;

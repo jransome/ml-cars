@@ -90,7 +90,7 @@ public class SpeciesEvolverTests
         species.ProportionMutatantsOfUnchanged = 0.2f;
         species.OffspringMutationProbability = 0.5f;
         species.NewDnaRate = 0.05f;
-        species.UseSinglePointCrossover = false;
+        species.CrossoverPasses = 5;
 
         List<Dna> seedGeneration = Enumerable.Range(0, species.GenerationSize).Select((_, index) =>
         {
@@ -146,16 +146,16 @@ public class SpeciesEvolverTests
 
         // Expected proportions
         TNG.Where(d => d.Heritage == DnaHeritage.New).Should().HaveCount(expectedNumberNew);
-        TNG.Where(d => d.Heritage == DnaHeritage.Unchanged).Should().HaveCount(expectedNumberUnchanged);
-        TNG.Where(d => d.Heritage == DnaHeritage.Mutated).Should().HaveCount(expectedNumberMutantsOfUnchanged);
-        TNG.Where(d => d.Heritage == DnaHeritage.BredAndMutated).Count().Should().BeInRange(
+        TNG.Where(d => d.Heritage == DnaHeritage.Elite).Should().HaveCount(expectedNumberUnchanged);
+        TNG.Where(d => d.Heritage == DnaHeritage.MutatedElite).Should().HaveCount(expectedNumberMutantsOfUnchanged);
+        TNG.Where(d => d.Heritage == DnaHeritage.MutatedOffspring).Count().Should().BeInRange(
             Mathf.RoundToInt(expectedNumberMutatedOffspring * 0.5f),
             Mathf.RoundToInt(expectedNumberMutatedOffspring * 1.5f)
         );
         TNG.Where(d =>
                 d.Heritage != DnaHeritage.New
-                && d.Heritage != DnaHeritage.Unchanged
-                && d.Heritage != DnaHeritage.Mutated
+                && d.Heritage != DnaHeritage.Elite
+                && d.Heritage != DnaHeritage.MutatedElite
             )
             .Should().HaveCount(expectedNumberOffspring);
         previousGen.Concat(TNG).Should().OnlyHaveUniqueItems();
@@ -165,8 +165,8 @@ public class SpeciesEvolverTests
         AssertPopulationHeterogeneity(TNG);
 
         // Genetic variation from previous
-        foreach (Dna g2Dna in TNG.Where(d => d.Heritage != DnaHeritage.Unchanged))
-            previousGen.Any(g1Dna => g1Dna.WeightsAndBiases.SequenceEqual(g2Dna.WeightsAndBiases)).Should().BeFalse();
+        foreach (Dna g2Dna in TNG.Where(d => d.Heritage != DnaHeritage.Elite))
+            previousGen.Any(g1Dna => g1Dna.Equals(g2Dna)).Should().BeFalse();
     }
 
     static void AssertPopulationHeterogeneity(List<Dna> population)

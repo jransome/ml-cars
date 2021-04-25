@@ -41,10 +41,10 @@ namespace RansomeCorp.AI.Evolution
     public enum DnaHeritage
     {
         New,
-        Unchanged,
-        Bred,
-        BredAndMutated,
-        Mutated,
+        Elite,
+        Offspring,
+        MutatedOffspring,
+        MutatedElite,
     }
 
     [System.Serializable]
@@ -109,89 +109,31 @@ namespace RansomeCorp.AI.Evolution
             return new Dna(inputs, outputs, outputsPerLayer, weightsAndBiases, activationIndexes);
         }
 
-        public static List<Dna> CreateOffspring(Dna parent1, Dna parent2, bool useSinglePointCrossover, float weightCrossoverProportion = 0.5f, float activationCrossoverProportion = 0)
+        public static List<Dna> CreateOffspring(Dna parent1, Dna parent2, int crossoverPasses, bool includeActivationCrossover)
         {
+            int weightsCount = parent1.WeightsAndBiases.Count;
+            if (weightsCount != parent2.WeightsAndBiases.Count)
+                Debug.LogError("Inter-species mating is happening... this hasn't been coded for!!");
+
+            if (parent1.WeightsAndBiases.SequenceEqual(parent2.WeightsAndBiases))
+                Debug.LogError("Tried to cross 2 identical parents!");
+
             // Sexi time
             parent1.OnSelectedForBreedingCb();
             parent2.OnSelectedForBreedingCb();
 
-            if (parent1.WeightsAndBiases.Count != parent2.WeightsAndBiases.Count)
-                Debug.LogError("Inter-species mating is happening... this hasn't been coded for!!");
+            var childWeightGenes = parent1.WeightsAndBiases.SinglePointCrossover(parent2.WeightsAndBiases, crossoverPasses);
 
-            var child1WeightGene = new List<double>();
-            var child2WeightGene = new List<double>();
-            var child1ActivationGene = new List<int>(parent1.ActivationIndexes);
-            var child2ActivationGene = new List<int>(parent2.ActivationIndexes);
-
-            if (useSinglePointCrossover)
-            {
-                int slicePoint = Random.Range(1, parent1.WeightsAndBiases.Count - 1);
-                child1WeightGene = parent1.WeightsAndBiases.Take(slicePoint).Concat(parent2.WeightsAndBiases.Skip(slicePoint)).ToList();
-                child2WeightGene = parent2.WeightsAndBiases.Take(slicePoint).Concat(parent1.WeightsAndBiases.Skip(slicePoint)).ToList();
-            }
-            else
-            {
-                for (int i = 0; i < Mathf.Min(parent1.WeightsAndBiases.Count, parent2.WeightsAndBiases.Count); i++)
-                {
-                    if (Random.Range(0f, 1f) <= weightCrossoverProportion)
-                    {
-                        child1WeightGene.Add(parent2.WeightsAndBiases[i]);
-                        child2WeightGene.Add(parent1.WeightsAndBiases[i]);
-                    }
-                    else
-                    {
-                        child1WeightGene.Add(parent1.WeightsAndBiases[i]);
-                        child2WeightGene.Add(parent2.WeightsAndBiases[i]);
-                    }
-                }
-
-                if (activationCrossoverProportion > 0)
-                {
-                    child1ActivationGene = new List<int>();
-                    child2ActivationGene = new List<int>();
-
-                    for (int i = 0; i < Mathf.Min(parent1.ActivationIndexes.Count, parent2.ActivationIndexes.Count); i++)
-                    {
-                        if (Random.Range(0f, 1f) <= activationCrossoverProportion)
-                        {
-                            child1ActivationGene.Add(parent2.ActivationIndexes[i]);
-                            child2ActivationGene.Add(parent1.ActivationIndexes[i]);
-                        }
-                        else
-                        {
-                            child1ActivationGene.Add(parent1.ActivationIndexes[i]);
-                            child2ActivationGene.Add(parent2.ActivationIndexes[i]);
-                        }
-                    }
-                }
-            }
+            // Activation crossing may need rework. Currently independent of weight crossover so no adjacency effect exists
+            var childActivationGenes = includeActivationCrossover ?
+                parent1.ActivationIndexes.SinglePointCrossover(parent2.ActivationIndexes, crossoverPasses) :
+                new List<List<int>>(2) { parent1.ActivationIndexes, parent2.ActivationIndexes };
 
             // Return children. Inputs, outputs and network structure should be the same in both parents
-            int inputs = parent1.Inputs;
-            int outputs = parent1.Outputs;
-            int[] outputsPerLayer = parent1.OutputsPerLayer.ToArray();
-
-            bool p1p2 = parent1.WeightsAndBiases.SequenceEqual(parent2.WeightsAndBiases);
-            bool p1c1 = parent1.WeightsAndBiases.SequenceEqual(child1WeightGene);
-            bool p1c2 = parent1.WeightsAndBiases.SequenceEqual(child2WeightGene);
-            bool p2c1 = parent2.WeightsAndBiases.SequenceEqual(child1WeightGene);
-            bool p2c2 = parent2.WeightsAndBiases.SequenceEqual(child2WeightGene);
-
-            if (p1p2)
-                Debug.LogError("p1==c2");
-            if (p1c1)
-                Debug.LogError("p1==c1");
-            if (p1c2)
-                Debug.LogError("p1==c2");
-            if (p2c1)
-                Debug.LogError("p2==c1");
-            if (p2c2)
-                Debug.LogError("p2==c2");
-
             return new List<Dna>()
             {
-                new Dna(inputs, outputs, outputsPerLayer, child1WeightGene, child1ActivationGene, DnaHeritage.Bred, new List<Dna>(){ parent1, parent2 }),
-                new Dna(inputs, outputs, outputsPerLayer, child2WeightGene, child2ActivationGene, DnaHeritage.Bred, new List<Dna>(){ parent1, parent2 }),
+                new Dna(parent1.Inputs, parent1.Outputs, parent1.OutputsPerLayer.ToArray(), childWeightGenes[0], childActivationGenes[0], DnaHeritage.Offspring, new List<Dna>(){ parent1, parent2 }),
+                new Dna(parent1.Inputs, parent1.Outputs, parent1.OutputsPerLayer.ToArray(), childWeightGenes[1], childActivationGenes[1], DnaHeritage.Offspring, new List<Dna>(){ parent1, parent2 }),
             };
         }
 
@@ -235,32 +177,9 @@ namespace RansomeCorp.AI.Evolution
                 dna.OutputsPerLayer.ToArray(),
                 new List<double>(dna.WeightsAndBiases),
                 new List<int>(dna.ActivationIndexes),
-                DnaHeritage.Unchanged,
+                DnaHeritage.Elite,
                 new List<Dna>() { dna }
             );
-        }
-
-        // Returns tuple containing 1) percentage of weight values that differ, and 2) the absolute difference in weight values of dna2 as a percentage of the aggregated absolute weight values of dna1
-        public static System.Tuple<float, double> CompareWeights(Dna dna1, Dna dna2)
-        {
-            if (!TopologiesEqual(dna1, dna2))
-                throw new System.ArgumentException("Can't compare dna weights of different topologies!");
-
-            if (dna1.WeightsAndBiases.Count != dna2.WeightsAndBiases.Count) // should always be false if topologies are the same. but just in case...
-                throw new System.ArgumentException("Weights arrays not equal???");
-
-            double accumulatedAbsoluteDifference = 0;
-            int nWeightsDiffering = 0;
-            for (int i = 0; i < dna1.WeightsAndBiases.Count; i++)
-            {
-                double absoluteDifference = System.Math.Abs(dna1.WeightsAndBiases[i] - dna2.WeightsAndBiases[i]);
-                accumulatedAbsoluteDifference += absoluteDifference;
-                if (absoluteDifference > 0) nWeightsDiffering++;
-            }
-
-            double dna1TotalWeight = dna1.WeightsAndBiases.Aggregate(0.0, (total, weight) => total + System.Math.Abs(weight));
-            double weightDifferenceAsProportion = accumulatedAbsoluteDifference / dna1TotalWeight;
-            return new System.Tuple<float, double>((float)nWeightsDiffering / (float)dna1.WeightsAndBiases.Count, weightDifferenceAsProportion);
         }
 
         public static bool TopologiesEqual(Dna dna1, Dna dna2)

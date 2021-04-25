@@ -62,75 +62,70 @@ public class SpeciesEvolver : MonoBehaviour
 
         //  Preserve top survivors 
         var previousGenerationOrderedByFitness = previousGeneration.OrderByDescending((dna => dna.RawFitnessRating));
-        int nUnchanged = Mathf.RoundToInt(species.GenerationSize * species.ProportionUnchanged);
-        if (nUnchanged > 0)
-        {
-            TNG.AddRange(
-                previousGenerationOrderedByFitness
-                    .Take(nUnchanged)
-                    .Select(dna =>
-                    {
-                        Dna clone = Dna.Clone(dna);
-                        // DebugDnaDiff(dna, clone, "Clone/Clone");
-                        return clone;
-                    })
-            );
-        }
+        int nElites = Mathf.RoundToInt(species.GenerationSize * species.ProportionUnchanged);
+        if (nElites > 0) TNG.AddRange(previousGenerationOrderedByFitness.Take(nElites).Select(dna => Dna.Clone(dna)));
 
         // Add mutated versions of elites
-        int nMutatedUnchanged = Mathf.RoundToInt(species.GenerationSize * species.ProportionMutatantsOfUnchanged);
-        if (((species.GenerationSize - (nUnchanged + nMutatedUnchanged + nNew)) % 2 == 1)) nMutatedUnchanged++; // make sure remaining spaces for offspring is an even number
-        for (int i = 0; i < nMutatedUnchanged; i++)
+        int nMutatedElites = Mathf.RoundToInt(species.GenerationSize * species.ProportionMutatantsOfUnchanged);
+        if (((species.GenerationSize - (nElites + nMutatedElites + nNew)) % 2 == 1)) nMutatedElites++; // make sure remaining spaces for offspring is an even number
+        for (int i = 0; i < nMutatedElites; i++)
         {
             Dna randomElite = Darwin.SelectRandomBasedOnFitness(
                 previousGenerationOrderedByFitness.Take(Mathf.RoundToInt(species.GenerationSize * 0.2f)).ToList()
             );
-            Dna mutatedElite = Dna.CloneAndMutate(randomElite, DnaHeritage.Mutated, species.MutationSeverity, species.ActivationMutationSeverity);
+            Dna mutatedElite = Dna.CloneAndMutate(randomElite, DnaHeritage.MutatedElite, species.MutationSeverity, species.ActivationMutationSeverity);
             TNG.Add(mutatedElite);
         }
 
         // Populate the rest with offspring of previous
         int nOffspring = 0, nMutatedOffspring = 0;
-        int freeSpacesForOffspring = nUnchanged + nMutatedUnchanged + nNew;
-        for (int i = 0; i < Mathf.RoundToInt((species.GenerationSize - freeSpacesForOffspring) / 2); i++)
+        int freeSpacesForOffspring = species.GenerationSize - (nElites + nMutatedElites + nNew);
+        int targetNumMutatedOffspring = Mathf.RoundToInt(freeSpacesForOffspring * species.OffspringMutationProbability);
+        for (int i = 0; i < Mathf.RoundToInt(freeSpacesForOffspring / 2); i++)
         {
             Dna parent1 = Darwin.SelectRandomBasedOnFitness(previousGeneration);
             Dna parent2 = Darwin.SelectRandomBasedOnFitness(previousGeneration, parent1);
-            // DebugDnaDiff(parent1, parent2, "Parent/Parent");
+            if (parent1.Id == parent2.Id) Debug.LogError("FAILFAILFAILFAILFAILFAILFAILFAILFAILFAILFAILFAILFAILFAILFAILFAILFAILFAILFAILFAILFAILFAILFAILFAILFAILFAILFAIL");
+            List<Dna> children = new List<Dna>(2);
 
-            List<Dna> children = Dna.CreateOffspring(
-                parent1,
-                parent2,
-                species.UseSinglePointCrossover,
-                species.CrossoverSeverity,
-                species.ActivationCrossoverSeverity
-            ).ConvertAll(child =>
+            /* Attempts at crossover may fail if the genomes of the 2 parents are too similar. If for example:
+                p1 = 1,2,3,4
+                p2 = 1,2,3,5
+            then no matter how we try to cross them, the children will end up as clones of the parents. To mitigate this
+            we try a few times and if we consistently fail, then we mutate the dna as a fallback
+            */
+            bool crossoverFailed = false;
+            for (int crossoverAttempt = 0; crossoverAttempt < 5; crossoverAttempt++)
             {
-                if (Random.Range(0f, 1f) > species.OffspringMutationProbability)
-                {
-                    nOffspring++;
-                    // DebugDnaDiff(parent1, child, "Parent/Child");
-                    return child;
-                }
+                children = Dna.CreateOffspring(
+                    parent1,
+                    parent2,
+                    species.CrossoverPasses,
+                    species.IncludeActivationCrossover
+                );
+                crossoverFailed = parent1.Equals(children[0]) || parent1.Equals(children[1]) || parent2.Equals(children[0]) || parent2.Equals(children[1]);
+                if (!crossoverFailed) break;
+            }
+            if (crossoverFailed) Debug.Log("Crossover failed after several attempts - selected parent genomes are likely too similar");
 
-                nMutatedOffspring++;
-                Dna mutantChild = Dna.CloneAndMutate(child, DnaHeritage.BredAndMutated, species.MutationSeverity, species.ActivationMutationSeverity);
-                // DebugDnaDiff(parent1, mutantChild, "Parent/Mutant Child");
-                return mutantChild;
-            });
-
-            TNG.AddRange(children);
+            if (crossoverFailed || (nMutatedOffspring <= targetNumMutatedOffspring && Random.Range(0f, 1f) < species.OffspringMutationProbability))
+            {
+                TNG.AddRange(children.ConvertAll(c => Dna.CloneAndMutate(c, DnaHeritage.MutatedOffspring, species.MutationSeverity, species.ActivationMutationSeverity)));
+                nMutatedOffspring += 2;
+            }
+            else
+            {
+                TNG.AddRange(children);
+                nOffspring += 2;
+            }
         }
 
-        // Debug.Log(
-        //     "Created next generation of " + species.name + " with " + TNG.Count + " agents\n" +
-        //     nNew + " new, " +
-        //     nOffspring + " decendants, " +
-        //     nMutatedOffspring + " mutated descendants " +
-        //     nUnchanged + " elites from previous " +
-        //     nMutatedUnchanged + " mutated elites from previous "
-        // );
-        DebugGenerationDiff(previousGeneration, TNG);
+        string genSummary = string.Format(
+            "Created {0} agents of species {1}. {2} new, {3} elites, {4} mutated elites, {5} offspring, and {6} mutated offspring",
+            TNG.Count, species.name, nNew, nElites, nMutatedElites, nOffspring, nMutatedOffspring
+        );
+        Debug.Log(genSummary);
+        DnaUtils.DebugGenerationDiff(previousGeneration, TNG);
 
         return TNG;
     }
@@ -217,64 +212,5 @@ public class SpeciesEvolver : MonoBehaviour
     {
         InstantiatePhenotypes();
         StartCoroutine(DoEvolution(GenerationPool, true));
-    }
-
-    static void DebugDnaDiff(Dna dna1, Dna dna2, string relation)
-    {
-        var comparison = Dna.CompareWeights(dna1, dna2);
-        string log = System.String.Format("{0} | {1:P2} of weights are different, {2:P2} absolute value difference", relation, comparison.Item1, comparison.Item2);
-        Debug.Log(log);
-    }
-
-    struct Identicle
-    {
-        public Dna NextGenDna;
-        public List<Dna> ClonesInPrevGen;
-
-        public Identicle(Dna dna, List<Dna> clonesInPrevGen)
-        {
-            NextGenDna = dna;
-            ClonesInPrevGen = clonesInPrevGen;
-        }
-    }
-
-    static void DebugGenerationDiff(List<Dna> gen1, List<Dna> gen2)
-    {
-        // remove clones from previous
-        var shouldBeUniques = gen2.Where(d => d.Heritage != DnaHeritage.Unchanged).ToList();
-        List<Identicle> identicles = new List<Identicle>();
-
-        foreach (Dna g2Dna in shouldBeUniques)
-        {
-            var clones = gen1.Where(g1Dna => g1Dna.Equals(g2Dna));
-            if (clones.Count() > 0) identicles.Add(new Identicle(g2Dna, clones.ToList()));
-        }
-
-        if (identicles.Count > 0)
-        {
-            string log = System.String.Format(
-                "{0} dna instances identicle to previous gen out of {1}. {2} mutant elites, {3} offspring, {4} mutated offspring",
-                identicles.Count,
-                shouldBeUniques.Count,
-                identicles.Where(i => i.NextGenDna.Heritage == DnaHeritage.Mutated).Count(),
-                identicles.Where(i => i.NextGenDna.Heritage == DnaHeritage.Bred).Count(),
-                identicles.Where(i => i.NextGenDna.Heritage == DnaHeritage.BredAndMutated).Count()
-            );
-            Debug.LogError(log);
-        }
-
-        var occurrences = gen2.ToDictionary(dna => dna, (_) => 1);
-        for (int i = 0; i < gen2.Count; i++)
-        {
-            Dna pop = gen2[i];
-            for (int j = 0; j < gen2.Count; j++)
-                if (i != j && pop.Equals(gen2[j])) occurrences[pop] += 1;
-        }
-
-        int intraGenerationClones = occurrences.Values.Where(occurrenceCount => occurrenceCount > 1).Count();
-        if (intraGenerationClones > 0)
-        {
-            Debug.LogError(intraGenerationClones + " duplicates detected within generation");
-        }
     }
 }

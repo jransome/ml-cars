@@ -107,7 +107,7 @@ public class DnaTests
         Dna parent2Dna = Dna.GenerateRandomDnaEncoding(nInputs, hiddenLayers, nOutputs, (ActivationType)outputLayerActivationIndex, true);
 
         // Act
-        List<Dna> offspring = Dna.CreateOffspring(parent1Dna, parent2Dna, false, 0.5f, 0.5f);
+        List<Dna> offspring = Dna.CreateOffspring(parent1Dna, parent2Dna, 5, true);
 
         // Assert
         offspring.Should().HaveCount(2);
@@ -120,11 +120,13 @@ public class DnaTests
             child.Inputs.Should().Be(nInputs);
             child.Outputs.Should().Be(nOutputs);
             child.OutputsPerLayer.Should().Equal(parent1Dna.OutputsPerLayer);
+            child.WeightsAndBiases.Should().HaveCount(parent1Dna.WeightsAndBiases.Count);
             child.WeightsAndBiases.Should().NotBeEquivalentTo(parent1Dna.WeightsAndBiases);
             child.WeightsAndBiases.Should().NotBeEquivalentTo(parent2Dna.WeightsAndBiases);
+            child.ActivationIndexes.Should().HaveCount(parent1Dna.ActivationIndexes.Count);
             child.ActivationIndexes.Should().NotBeEquivalentTo(parent1Dna.ActivationIndexes);
             child.ActivationIndexes.Should().NotBeEquivalentTo(parent2Dna.ActivationIndexes);
-            child.Heritage.Should().Be(DnaHeritage.Bred);
+            child.Heritage.Should().Be(DnaHeritage.Offspring);
         }
 
         double offspringTotalWeights = offspring[0].WeightsAndBiases.Sum() + offspring[1].WeightsAndBiases.Sum();
@@ -148,7 +150,7 @@ public class DnaTests
         Dna parent2Dna = Dna.GenerateRandomDnaEncoding(nInputs, hiddenLayers, nOutputs, (ActivationType)outputLayerActivationIndex, true);
 
         // Act
-        List<Dna> offspring = Dna.CreateOffspring(parent1Dna, parent2Dna, false, 0.5f, 0);
+        List<Dna> offspring = Dna.CreateOffspring(parent1Dna, parent2Dna, 5, false);
 
         // Assert
         offspring.Should().HaveCount(2);
@@ -161,9 +163,10 @@ public class DnaTests
             child.Inputs.Should().Be(nInputs);
             child.Outputs.Should().Be(nOutputs);
             child.OutputsPerLayer.Should().Equal(parent1Dna.OutputsPerLayer);
+            child.WeightsAndBiases.Should().HaveCount(parent1Dna.WeightsAndBiases.Count);
             child.WeightsAndBiases.Should().NotBeEquivalentTo(parent1Dna.WeightsAndBiases);
             child.WeightsAndBiases.Should().NotBeEquivalentTo(parent2Dna.WeightsAndBiases);
-            child.Heritage.Should().Be(DnaHeritage.Bred);
+            child.Heritage.Should().Be(DnaHeritage.Offspring);
         }
 
         offspring[0].ActivationIndexes.Should().Equal(parent1Dna.ActivationIndexes);
@@ -186,7 +189,7 @@ public class DnaTests
         Dna originalDna = Dna.GenerateRandomDnaEncoding(nInputs, hiddenLayers, nOutputs, (ActivationType)outputLayerActivationIndex, true);
 
         // Act
-        Dna mutatedDna = Dna.CloneAndMutate(originalDna, DnaHeritage.Mutated, 0.02f, 0.8f);
+        Dna mutatedDna = Dna.CloneAndMutate(originalDna, DnaHeritage.MutatedElite, 0.02f, 0.8f);
 
         // Assert
         CheckDnaIsNotReferentiallyEqual(originalDna, mutatedDna);
@@ -200,7 +203,7 @@ public class DnaTests
             .Should().Equal(originalDna.ActivationIndexes.Skip(indexOfOutputLayerActivation), "preserves output layer activation functions");
         mutatedDna.WeightsAndBiases.Should().NotEqual(originalDna.WeightsAndBiases);
         mutatedDna.WeightsAndBiases.Should().HaveCount(originalDna.WeightsAndBiases.Count);
-        mutatedDna.Heritage.Should().Be(DnaHeritage.Mutated);
+        mutatedDna.Heritage.Should().Be(DnaHeritage.MutatedElite);
     }
 
     [Test]
@@ -214,7 +217,7 @@ public class DnaTests
         Dna originalDna = Dna.GenerateRandomDnaEncoding(nInputs, hiddenLayers, nOutputs, (ActivationType)outputLayerActivationIndex, true);
 
         // Act
-        Dna mutatedDna = Dna.CloneAndMutate(originalDna, DnaHeritage.Mutated, 0.02f, 0);
+        Dna mutatedDna = Dna.CloneAndMutate(originalDna, DnaHeritage.MutatedElite, 0.02f, 0);
 
         // Assert
         CheckDnaIsNotReferentiallyEqual(originalDna, mutatedDna);
@@ -225,7 +228,7 @@ public class DnaTests
         mutatedDna.ActivationIndexes.Should().HaveCount(originalDna.ActivationIndexes.Count);
         mutatedDna.WeightsAndBiases.Should().NotEqual(originalDna.WeightsAndBiases);
         mutatedDna.WeightsAndBiases.Should().HaveCount(originalDna.WeightsAndBiases.Count);
-        mutatedDna.Heritage.Should().Be(DnaHeritage.Mutated);
+        mutatedDna.Heritage.Should().Be(DnaHeritage.MutatedElite);
     }
 
     [Test]
@@ -239,7 +242,7 @@ public class DnaTests
         Dna dna2 = Dna.Clone(dna1);
 
         // Act
-        var comparisonResult = Dna.CompareWeights(dna1, dna2);
+        var comparisonResult = DnaUtils.CompareWeights(dna1, dna2);
 
         // Assert
         float percentWeightDiff = comparisonResult.Item1;
@@ -265,13 +268,53 @@ public class DnaTests
         dna1.WeightsAndBiases.Should().NotEqual(dna2.WeightsAndBiases);
 
         // Act
-        var comparisonResult = Dna.CompareWeights(dna1, dna2);
+        var comparisonResult = DnaUtils.CompareWeights(dna1, dna2);
 
         // Assert
         float percentWeightDiff = comparisonResult.Item1;
         double percentWeightValueDiff = comparisonResult.Item2;
         percentWeightDiff.Should().Be(0.01f); // ie. 1% of weights differ in value
         percentWeightValueDiff.Should().Be(0.5f); // ie. total weight values of dna2 differ by 50% (NOT 50% bigger)
+    }
+
+    [Test]
+    public void EqualsTest()
+    {
+        // Arrange
+        const int nInputs = 9;
+        const int nOutputs = 1;
+        int[] hiddenLayers = new int[] { 9 };
+        Dna dna1 = Dna.GenerateRandomDnaEncoding(nInputs, hiddenLayers, nOutputs, ActivationType.LeakyRelu, true);
+        Dna dna1ValueClone = Dna.Clone(dna1);
+        Dna dna1ReferenceClone = dna1;
+        Dna dna2 = Dna.Clone(dna1);
+        dna2.WeightsAndBiases[0] = 50;
+        
+        // Act/Assert
+        dna1.Equals(dna1).Should().BeTrue();
+
+        dna1.Equals(dna1ReferenceClone).Should().BeTrue();
+        dna1ReferenceClone.Equals(dna1).Should().BeTrue();
+
+        dna1.Equals(dna1ValueClone).Should().BeTrue();
+        dna1ValueClone.Equals(dna1).Should().BeTrue();
+        
+        dna1.Equals(dna2).Should().BeFalse();
+        dna2.Equals(dna1).Should().BeFalse();
+        
+        dna1ValueClone.Equals(dna2).Should().BeFalse();
+        dna2.Equals(dna1ValueClone).Should().BeFalse();
+        
+        dna1ReferenceClone.Equals(dna2).Should().BeFalse();
+        dna2.Equals(dna1ReferenceClone).Should().BeFalse();
+
+        dna1.WeightsAndBiases[1] = 100;
+
+        dna1.Equals(dna1ReferenceClone).Should().BeTrue(); // reference stays equal
+        dna1ReferenceClone.Equals(dna1).Should().BeTrue();
+
+        dna1.Equals(dna1ValueClone).Should().BeFalse(); // value changes
+        dna1ValueClone.Equals(dna1).Should().BeFalse();
     }
 
     private static void CheckDnaIsNotReferentiallyEqual(Dna dna1, Dna dna2)

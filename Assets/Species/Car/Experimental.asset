@@ -18,29 +18,30 @@ MonoBehaviour:
   SensorLayerMask:
     serializedVersion: 2
     m_Bits: 4294966779
-  DrawSensors: 0
+  DrawSensors: 1
   SensorAngles:
   - 0
   - 15
   - -15
   - 30
   - -30
-  - 70
-  - -70
+  - 50
+  - -50
+  - 80
+  - -80
   SensorDistance: 80
-  HiddenLayersNeuronCount: 06000000
+  HiddenLayersNeuronCount: 0600000004000000
   HeterogeneousHiddenActivation: 0
   OutputLayerActivation: 1
   GenerationSize: 50
-  ProportionUnchanged: 0.05
+  ProportionUnchanged: 0.1
   ProportionMutatantsOfUnchanged: 0.1
   NewDnaRate: 0.05
   OffspringMutationProbability: 0.5
   MutationSeverity: 0.03
   ActivationMutationSeverity: 0
-  UseSinglePointCrossover: 0
-  CrossoverSeverity: 0.5
-  ActivationCrossoverSeverity: 0
+  CrossoverPasses: 10
+  IncludeActivationCrossover: 0
   MaxTimeToReachNextGateSecs: 5
   MaxLifeSpanSecs: 0
   GateCrossedReward: 6
