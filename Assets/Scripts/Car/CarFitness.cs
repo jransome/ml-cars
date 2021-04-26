@@ -64,7 +64,7 @@ public class CarFitness : MonoBehaviour // TODO: refactor as plain class?
         rawFitness += Mathf.Pow(gatesCrossed.Count * species.GateCrossedReward, 2);
         float normalisedInverseDistance = (species.MaxPositionDifferenceTolerance - Vector3.Distance(transform.position, gate.OptimalPosition)) / species.MaxPositionDifferenceTolerance;
         rawFitness += Mathf.Pow(normalisedInverseDistance * species.OptimalPositionReward, 2);
-        rawFitness += Mathf.Pow(Vector3.Dot(transform.forward, gate.OptimalDirection) * species.OptimalDirectionReward, 2);
+        rawFitness += Mathf.Pow(Mathf.Abs(Vector3.Dot(transform.forward, gate.OptimalDirection)) * species.OptimalDirectionReward, 2);
     }
 
     private void HandleColliderTriggerEnter(Collider other)
