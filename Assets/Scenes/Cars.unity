@@ -3560,9 +3560,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Species: {fileID: 11400000, guid: b2fefb919cd611a42bdebc23c60ac67e, type: 2}
-  SpawnPoints: {fileID: 0}
-  GenerationsPerSpawnPoint: 15
-  GenerationHistory: []
+  SpawnLocations: {fileID: 0}
+  GenerationsPerSpawnLocation: 15
 --- !u!33 &434077623
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -8631,9 +8630,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Species: {fileID: 11400000, guid: b2fefb919cd611a42bdebc23c60ac67e, type: 2}
-  SpawnPoints: {fileID: 1183149642}
-  GenerationsPerSpawnPoint: 15
-  GenerationHistory: []
+  SpawnLocations: {fileID: 1183149642}
+  GenerationsPerSpawnLocation: 15
 --- !u!4 &985539030
 Transform:
   m_ObjectHideFlags: 0

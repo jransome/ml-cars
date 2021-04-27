@@ -67,7 +67,7 @@ public class SpeciesEvolverTests
         seedGeneration.Should().OnlyHaveUniqueItems(dna => dna.WeightsAndBiases); // checks the values in the weights and biases list
 
         List<GenerationData> generationHistory = new List<GenerationData>();
-        generationHistory.Add(new GenerationData(0, seedGeneration));
+        generationHistory.Add(new GenerationData(0, 0, seedGeneration));
 
         // Act
         List<Dna> TNG = SpeciesEvolver.CreateGenerationDna(species, generationHistory);
@@ -107,7 +107,7 @@ public class SpeciesEvolverTests
         AssertPopulationHeterogeneity(seedGeneration);
 
         List<GenerationData> generationHistory = new List<GenerationData>();
-        generationHistory.Add(new GenerationData(0, seedGeneration));
+        generationHistory.Add(new GenerationData(0, 0, seedGeneration));
 
         for (int i = 1; i < 101; i++)
         {
@@ -120,7 +120,7 @@ public class SpeciesEvolverTests
             // Fake fitness values for the next generation
             for (int j = 0; j < newGeneration.Count; j++)
                 newGeneration[j].RawFitnessRating = Mathf.Pow((1 + j), 2);
-            generationHistory.Add(new GenerationData(0, newGeneration));
+            generationHistory.Add(new GenerationData(0, 0, newGeneration));
         }
     }
 

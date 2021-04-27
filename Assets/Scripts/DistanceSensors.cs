@@ -6,7 +6,6 @@ public class DistanceSensors : MonoBehaviour
 {
     private CarSpecies species;
     private List<float> SensorAngles;
-    // private Dictionary<
 
     public void Initialise(CarSpecies carSpecies)
     {
@@ -37,14 +36,6 @@ public class DistanceSensors : MonoBehaviour
         SensorAngles.ForEach(a =>
         {
             Debug.DrawRay(transform.position, CalculateDirectionFromAngle(a) * species.SensorDistance, CheckDistance(a) < species.SensorDistance ? Color.red : Color.green);
-            // Debug.DrawRay(transform.position + transform.right * 0.01f, CalculateDirectionFromAngle(a) * raycastDistance, CheckDistance(a) < raycastDistance ? Color.red : Color.green);
-            // Debug.DrawRay(transform.position + transform.right * -0.01f, CalculateDirectionFromAngle(a) * raycastDistance, CheckDistance(a) < raycastDistance ? Color.red : Color.green);
-            // Debug.DrawRay(transform.position + transform.right * 0.02f, CalculateDirectionFromAngle(a) * raycastDistance, CheckDistance(a) < raycastDistance ? Color.red : Color.green);
-            // Debug.DrawRay(transform.position + transform.right * -0.02f, CalculateDirectionFromAngle(a) * raycastDistance, CheckDistance(a) < raycastDistance ? Color.red : Color.green);
-            // Debug.DrawRay(transform.position + transform.right * 0.03f, CalculateDirectionFromAngle(a) * raycastDistance, CheckDistance(a) < raycastDistance ? Color.red : Color.green);
-            // Debug.DrawRay(transform.position + transform.right * -0.03f, CalculateDirectionFromAngle(a) * raycastDistance, CheckDistance(a) < raycastDistance ? Color.red : Color.green);
-            // Debug.DrawRay(transform.position + transform.right * 0.04f, CalculateDirectionFromAngle(a) * raycastDistance, CheckDistance(a) < raycastDistance ? Color.red : Color.green);
-            // Debug.DrawRay(transform.position + transform.right * -0.04f, CalculateDirectionFromAngle(a) * raycastDistance, CheckDistance(a) < raycastDistance ? Color.red : Color.green);
         });
     }
 }

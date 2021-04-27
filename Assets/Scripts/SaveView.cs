@@ -15,12 +15,7 @@ public class SaveView : MonoBehaviour
 
     private void Save()
     {
-        PopulationData data = new PopulationData(
-            SpeciesEvolver.GenerationPool.ConvertAll(b => b.Dna),
-            SpeciesEvolver.GenerationCount,
-            SaveName.text
-        );
-        Persistence.Save(data);
+        Persistence.Save(SpeciesEvolver.GenerationHistory, SaveName.text);
 
         ClearSaveViews();
         PopulateSaveViews();

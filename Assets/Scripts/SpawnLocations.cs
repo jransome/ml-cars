@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpawnPoints : MonoBehaviour
+public class SpawnLocations : MonoBehaviour
 {
     public List<Transform> Points = new List<Transform>();
 
