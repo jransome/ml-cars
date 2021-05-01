@@ -60,13 +60,13 @@ namespace RansomeCorp.AI.Evolution
         public DnaHeritage Heritage { get; private set; }
 
         public readonly int Id;
-        // public readonly List<Dna> Parents;
+        public readonly List<Dna> Parents;
         static int idCounter = 0;
 
         private Dna(int inputs, int outputs, int[] outputsPerLayer, List<double> weightsAndBiases, List<int> activationIndexes, DnaHeritage origin = DnaHeritage.New, List<Dna> parents = null)
         {
             Id = idCounter++;
-            // Parents = parents;
+            Parents = parents;
 
             Inputs = inputs;
             Outputs = outputs;

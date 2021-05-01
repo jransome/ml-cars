@@ -58,8 +58,6 @@ namespace RansomeCorp.AI.Evolution
                     if (i != j && pop.Equals(gen2[j])) dnaOccurrences[pop] += 1;
             }
 
-            if (dnaOccurrences.Where(occurrence => occurrence.Value > 1).Count() > 1) Debug.LogError("clones?");
-
             Dictionary<Dna, int> intraGenerationClones = dnaOccurrences.Where(occurrence => occurrence.Value > 1).ToDictionary(o => o.Key, o => o.Value);
             if (intraGenerationClones.Count > 0)
             {
@@ -70,12 +68,14 @@ namespace RansomeCorp.AI.Evolution
                 // foreach (var q in query)
                 // {
                 //     var l = string.Format("{0} duplicates from {1} detected within generation", q.Key, q.)
-                Debug.LogError("clones");
                 // }
+                Debug.LogError("clones");
             }
         }
 
-        // Returns tuple containing 1) percentage of weight values that differ, and 2) the absolute difference in weight values of dna2 as a percentage of the aggregated absolute weight values of dna1
+        /// <summary>
+        /// Returns tuple containing 1) percentage of weight values that differ, and 2) the absolute difference in weight values of dna2 as a percentage of the aggregated absolute weight values of dna1
+        /// </summary>
         public static System.Tuple<float, double> CompareWeights(Dna dna1, Dna dna2)
         {
             if (!Dna.TopologiesEqual(dna1, dna2))

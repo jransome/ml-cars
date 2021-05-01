@@ -3,8 +3,9 @@ using UnityEngine;
 
 public class SpawnLocations : MonoBehaviour
 {
-    public List<Transform> Points = new List<Transform>();
+    public List<Transform> Locations = new List<Transform>();
 
-    public Transform GetNext(Transform current) => Points[(Points.IndexOf(current) + 1) % Points.Count];
-    public Transform GetRandom() => Points[Random.Range(0, Points.Count)];
+    public int GetIndex(Transform current) => Locations.IndexOf(current);
+    public Transform GetNext(Transform current) => Locations[(Locations.IndexOf(current) + 1) % Locations.Count];
+    public Transform GetRandom() => Locations[Random.Range(0, Locations.Count)];
 }

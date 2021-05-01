@@ -3561,6 +3561,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Species: {fileID: 11400000, guid: b2fefb919cd611a42bdebc23c60ac67e, type: 2}
   SpawnLocations: {fileID: 0}
+  CurrentSpawnLocation: {fileID: 0}
   GenerationsPerSpawnLocation: 15
 --- !u!33 &434077623
 MeshFilter:
@@ -8629,8 +8630,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10b804197aea0ba4dac0c43690d550ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Species: {fileID: 11400000, guid: b2fefb919cd611a42bdebc23c60ac67e, type: 2}
+  Species: {fileID: 11400000, guid: 6910dc636f4e4b84692493a0ba1e157f, type: 2}
   SpawnLocations: {fileID: 1183149642}
+  CurrentSpawnLocation: {fileID: 73113405}
   GenerationsPerSpawnLocation: 15
 --- !u!4 &985539030
 Transform:
@@ -10391,7 +10393,7 @@ GameObject:
   - component: {fileID: 1183149643}
   - component: {fileID: 1183149642}
   m_Layer: 0
-  m_Name: SpawnPoints
+  m_Name: SpawnLocations
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10409,7 +10411,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 674dd4c763ac7a04caaed0ea5000064a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Points:
+  Locations:
   - {fileID: 73113405}
   - {fileID: 590010510}
   - {fileID: 1460460014}

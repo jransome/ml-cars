@@ -5,12 +5,13 @@ using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
 
-public class SpeciesEvolverTests
+public class GenerationTests
 {
     [Test]
-    public void CreateSeedGenerationDnaTest()
+    public void CreateSeedGenerationTest()
     {
         // Arrange
+        int spawnIndex = 3;
         int[] hiddenLayers = new int[] { 4, 3, 6 };
         CarSpecies species = CarSpecies.CreateInstance(typeof(CarSpecies)) as CarSpecies;
         species.HiddenLayersNeuronCount = hiddenLayers;
@@ -24,13 +25,14 @@ public class SpeciesEvolverTests
         };
 
         // Act
-        List<Dna> TNG = SpeciesEvolver.CreateGenerationDna(species);
+        Generation TNG = Generation.CreateSeed(species, spawnIndex);
 
         // Assert
-        TNG.Should().HaveCount(species.GenerationSize);
-        TNG.Should().OnlyHaveUniqueItems();
-        AssertPopulationHeterogeneity(TNG);
-        foreach (Dna dna in TNG)
+        TNG.SpawnLocationIndex.Should().Be(spawnIndex);
+        TNG.GenePool.Should().HaveCount(species.GenerationSize);
+        TNG.GenePool.Should().OnlyHaveUniqueItems();
+        AssertDnaHeterogeneity(TNG.GenePool);
+        foreach (Dna dna in TNG.GenePool)
         {
             dna.Heritage.Should().Be(DnaHeritage.New);
             dna.OutputsPerLayer.Should().Equal(expectedOutputsPerLayer);
@@ -38,7 +40,7 @@ public class SpeciesEvolverTests
     }
 
     [Test]
-    public void CreateGenerationFromPreviousDnaTest()
+    public void CreateGenerationFromPreviousTest()
     {
         // Arrange
         int[] hiddenLayers = new int[] { 4, 3, 6 };
@@ -52,28 +54,14 @@ public class SpeciesEvolverTests
         species.OffspringMutationProbability = 0.5f;
         species.NewDnaRate = 0.05f;
 
-        List<Dna> seedGeneration = Enumerable.Range(0, species.GenerationSize).Select((_, index) =>
-        {
-            Dna dna = Dna.GenerateRandomDnaEncoding(
-                species.Inputs,
-                species.HiddenLayersNeuronCount,
-                CarSpecies.Outputs,
-                species.OutputLayerActivation,
-                species.HeterogeneousHiddenActivation
-            );
-            dna.RawFitnessRating = index * 5;
-            return dna;
-        }).ToList();
-        seedGeneration.Should().OnlyHaveUniqueItems(dna => dna.WeightsAndBiases); // checks the values in the weights and biases list
-
-        List<GenerationData> generationHistory = new List<GenerationData>();
-        generationHistory.Add(new GenerationData(0, 0, seedGeneration));
+        Generation seed = Generation.CreateSeed(species, 1);
+        AssertDnaHeterogeneity(seed.GenePool);
 
         // Act
-        List<Dna> TNG = SpeciesEvolver.CreateGenerationDna(species, generationHistory);
+        Generation TNG = Generation.FromPrevious(seed, 1);
 
         // Assert
-        AssertOnDerrivedGeneration(species, seedGeneration, TNG);
+        AssertOnDerrivedGenerationDna(species, seed.GenePool, TNG.GenePool);
     }
 
     [Test]
@@ -92,39 +80,26 @@ public class SpeciesEvolverTests
         species.NewDnaRate = 0.05f;
         species.CrossoverPasses = 5;
 
-        List<Dna> seedGeneration = Enumerable.Range(0, species.GenerationSize).Select((_, index) =>
-        {
-            Dna dna = Dna.GenerateRandomDnaEncoding(
-                species.Inputs,
-                species.HiddenLayersNeuronCount,
-                CarSpecies.Outputs,
-                species.OutputLayerActivation,
-                species.HeterogeneousHiddenActivation
-            );
-            dna.RawFitnessRating = Mathf.Pow(index, 2);
-            return dna;
-        }).ToList();
-        AssertPopulationHeterogeneity(seedGeneration);
+        Generation seed = Generation.CreateSeed(species, 1);
+        AssertDnaHeterogeneity(seed.GenePool);
 
-        List<GenerationData> generationHistory = new List<GenerationData>();
-        generationHistory.Add(new GenerationData(0, 0, seedGeneration));
-
+        Generation previous = seed;
         for (int i = 1; i < 101; i++)
         {
+            AssignFakeFitness(previous);
+            
             // Act
-            List<Dna> newGeneration = SpeciesEvolver.CreateGenerationDna(species, generationHistory);
+            Generation TNG = Generation.FromPrevious(previous, 1);
             Debug.Log("Created gen " + i);
-            // Assert
-            AssertOnDerrivedGeneration(species, generationHistory.Last().GenePool, newGeneration);
 
-            // Fake fitness values for the next generation
-            for (int j = 0; j < newGeneration.Count; j++)
-                newGeneration[j].RawFitnessRating = Mathf.Pow((1 + j), 2);
-            generationHistory.Add(new GenerationData(0, 0, newGeneration));
+            // Assert
+            AssertOnDerrivedGenerationDna(species, previous.GenePool, TNG.GenePool);
+
+            previous = TNG;
         }
     }
 
-    static void AssertOnDerrivedGeneration(CarSpecies species, List<Dna> previousGen, List<Dna> TNG)
+    static void AssertOnDerrivedGenerationDna(CarSpecies species, List<Dna> previousGenDna, List<Dna> TNGdna)
     {
         int[] expectedOutputsPerLayer = new int[] { species.Inputs }.Concat(species.HiddenLayersNeuronCount).Append(CarSpecies.Outputs).ToArray();
         int expectedNumberNew = Mathf.RoundToInt(species.NewDnaRate * 100);
@@ -137,7 +112,7 @@ public class SpeciesEvolverTests
         expectedNumberOffspring.Should().BeGreaterOrEqualTo(expectedNumberMutatedOffspring);
 
         // Topologies
-        foreach (Dna dna in TNG)
+        foreach (Dna dna in TNGdna)
         {
             dna.Inputs.Should().Be(species.Inputs);
             dna.OutputsPerLayer.Should().Equal(expectedOutputsPerLayer);
@@ -145,31 +120,31 @@ public class SpeciesEvolverTests
         }
 
         // Expected proportions
-        TNG.Where(d => d.Heritage == DnaHeritage.New).Should().HaveCount(expectedNumberNew);
-        TNG.Where(d => d.Heritage == DnaHeritage.Elite).Should().HaveCount(expectedNumberUnchanged);
-        TNG.Where(d => d.Heritage == DnaHeritage.MutatedElite).Should().HaveCount(expectedNumberMutantsOfUnchanged);
-        TNG.Where(d => d.Heritage == DnaHeritage.MutatedOffspring).Count().Should().BeInRange(
+        TNGdna.Where(d => d.Heritage == DnaHeritage.New).Should().HaveCount(expectedNumberNew);
+        TNGdna.Where(d => d.Heritage == DnaHeritage.Elite).Should().HaveCount(expectedNumberUnchanged);
+        TNGdna.Where(d => d.Heritage == DnaHeritage.MutatedElite).Should().HaveCount(expectedNumberMutantsOfUnchanged);
+        TNGdna.Where(d => d.Heritage == DnaHeritage.MutatedOffspring).Count().Should().BeInRange(
             Mathf.RoundToInt(expectedNumberMutatedOffspring * 0.5f),
             Mathf.RoundToInt(expectedNumberMutatedOffspring * 1.5f)
         );
-        TNG.Where(d =>
+        TNGdna.Where(d =>
                 d.Heritage != DnaHeritage.New
                 && d.Heritage != DnaHeritage.Elite
                 && d.Heritage != DnaHeritage.MutatedElite
             )
             .Should().HaveCount(expectedNumberOffspring);
-        previousGen.Concat(TNG).Should().OnlyHaveUniqueItems();
-        TNG.Should().HaveCount(species.GenerationSize);
+        previousGenDna.Concat(TNGdna).Should().OnlyHaveUniqueItems();
+        TNGdna.Should().HaveCount(species.GenerationSize);
 
         // Genetic variation
-        AssertPopulationHeterogeneity(TNG);
+        AssertDnaHeterogeneity(TNGdna);
 
         // Genetic variation from previous
-        foreach (Dna g2Dna in TNG.Where(d => d.Heritage != DnaHeritage.Elite))
-            previousGen.Any(g1Dna => g1Dna.Equals(g2Dna)).Should().BeFalse();
+        foreach (Dna g2Dna in TNGdna.Where(d => d.Heritage != DnaHeritage.Elite))
+            previousGenDna.Any(g1Dna => g1Dna.Equals(g2Dna)).Should().BeFalse();
     }
 
-    static void AssertPopulationHeterogeneity(List<Dna> population)
+    static void AssertDnaHeterogeneity(List<Dna> population)
     {
         population.Should().OnlyHaveUniqueItems(); // by reference
 
@@ -182,5 +157,11 @@ public class SpeciesEvolverTests
         }
 
         occurrences.Values.Should().OnlyContain(occurrenceCount => occurrenceCount == 1);
+    }
+
+    static void AssignFakeFitness(Generation g)
+    {
+        for (int i = 0; i < g.GenePool.Count; i++)
+            g.GenePool[i].RawFitnessRating = Mathf.Pow((1 + i), 2);
     }
 }

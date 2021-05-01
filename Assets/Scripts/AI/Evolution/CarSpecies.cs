@@ -1,19 +1,22 @@
-using RansomeCorp.AI.NeuralNet;
 using RansomeCorp.AI.Evolution;
+using RansomeCorp.AI.NeuralNet;
 using System.Collections.Generic;
 using UnityEngine;
 
+// TODO: where does this file live?
+// namespace RansomeCorp.AI.Evolution
+// {
 [CreateAssetMenu]
 public class CarSpecies : ScriptableObject
 {
     public readonly static Dictionary<DnaHeritage, Color> LineageColours = new Dictionary<DnaHeritage, Color>()
-    {
-        { DnaHeritage.New, Color.yellow },
-        { DnaHeritage.Elite, Color.grey },
-        { DnaHeritage.Offspring, Color.blue },
-        { DnaHeritage.MutatedOffspring, Color.green },
-        { DnaHeritage.MutatedElite, Color.magenta },
-    };
+        {
+            { DnaHeritage.New, Color.yellow },
+            { DnaHeritage.Elite, Color.grey },
+            { DnaHeritage.Offspring, Color.blue },
+            { DnaHeritage.MutatedOffspring, Color.green },
+            { DnaHeritage.MutatedElite, Color.magenta },
+        };
 
     [Header("General")]
     public GameObject PopulationPrefab = null;
@@ -68,3 +71,4 @@ public class CarSpecies : ScriptableObject
         Inputs = SensorAngles.Length + 3; // +3 for physics sensors
     }
 }
+// }

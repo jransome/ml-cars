@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class CarBrain : MonoBehaviour
 {
-    [SerializeField, SerializeReference] private AgentController agentController;
+    [SerializeField] private AgentController agentController;
     [SerializeField] private CarFitness fitnessCalculator;
     [SerializeField] private DistanceSensors distanceSensors;
     [SerializeField] private PhysicsSensors physicsSensors;

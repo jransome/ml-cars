@@ -129,7 +129,7 @@ public class DarwinTests
         var list2 = new List<int>() { 91, 92, 93, 94, 95, 96, 97, 98, 99 };
 
         // Act
-        var crossedLists = list1.SinglePointCrossover(list2, 5);
+        var crossedLists = list1.SinglePointCrossover(list2, 10);
 
         // Assert
         crossedLists[0].Should().HaveCount(9);

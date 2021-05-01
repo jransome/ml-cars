@@ -25,8 +25,8 @@ namespace RansomeCorp.AI.Evolution
         }
 
         /// <summary>
-        /// Crosses a list of T with another at a single point to produce two new lists. Iterations must 
-        /// be an odd number or there is a possibility that the result will be the same as the original.
+        /// Crosses a list of T with another at a single point to produce two new lists. Iterations must be an odd number
+        /// or there is a possibility that the result will be the same as the original (given two distinct sets).
         /// </summary>
         public static List<List<T>> SinglePointCrossover<T>(this List<T> list1, List<T> list2, int iterations = 1, int previousSlicePoint = -1)
         {

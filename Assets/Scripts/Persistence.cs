@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using RansomeCorp.AI.Evolution;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -17,7 +18,7 @@ public static class Persistence
             .ToList();
     }
 
-    public static void Save(List<GenerationData> generationHistory, string saveName)
+    public static void Save(List<Generation> generationHistory, string saveName)
     {
         SaveData saveData = new SaveData(generationHistory, saveName);
         SavePopulationData(saveData);
@@ -35,14 +36,14 @@ public static class Persistence
         string header = "Generation, Spawn Location Index, Total, Max, Average\n";
         StringBuilder csvString = new StringBuilder(header);
 
-        foreach (GenerationData g in saveData.GenerationHistory)
+        foreach (Generation g in saveData.GenerationHistory)
         {
             csvString.AppendLine(string.Join(",", new string[5] {
                 g.GenerationNumber.ToString(),
                 g.SpawnLocationIndex.ToString(),
-                g.TotalFitness.ToString("n2"),
-                g.BestFitness.ToString("n2"),
-                g.AverageFitness.ToString("n2"),
+                g.performanceData.TotalFitness.ToString("n2"),
+                g.performanceData.BestFitness.ToString("n2"),
+                g.performanceData.AverageFitness.ToString("n2"),
             }));
         }
 
@@ -78,10 +79,10 @@ public class SaveData
 
     public string FormatVersion;
     public string SaveName;
-    public List<GenerationData> GenerationHistory;
-    public SaveData(List<GenerationData> generationHistory, string saveName = null)
+    public List<Generation> GenerationHistory;
+    public SaveData(List<Generation> generationHistory, string saveName = null)
     {
-        saveName ??= "evolution_" + System.DateTime.Now.ToString("HHmmss_ddMMyyyy");
+        saveName ??= $"evolution_run_{System.DateTime.Now.ToString("HHmmss_ddMMyyyy")}";
 
         FormatVersion = CurrentFormatVersion;
         SaveName = saveName;
