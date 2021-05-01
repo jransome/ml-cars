@@ -36,8 +36,6 @@ public class DnaTests
         Dna randomlyGeneratedDna = Dna.GenerateRandomDnaEncoding(nInputs, hiddenLayers, nOutputs, (ActivationType)outputLayerActivationIndex, true);
 
         // Assert
-        randomlyGeneratedDna.Inputs.Should().Be(nInputs);
-        randomlyGeneratedDna.Outputs.Should().Be(nOutputs);
         randomlyGeneratedDna.OutputsPerLayer.Should().Equal(expectedOutputsPerLayer);
         randomlyGeneratedDna.WeightsAndBiases.Should().HaveCount(expectedNumberOfWeightsAndBiases);
         randomlyGeneratedDna.ActivationIndexes.Should().HaveCount(expectedNumberOfNeurons);
@@ -81,8 +79,6 @@ public class DnaTests
         Dna randomlyGeneratedDna = Dna.GenerateRandomDnaEncoding(nInputs, hiddenLayers, nOutputs, (ActivationType)neuronActivationIndex, false);
 
         // Assert
-        randomlyGeneratedDna.Inputs.Should().Be(nInputs);
-        randomlyGeneratedDna.Outputs.Should().Be(nOutputs);
         randomlyGeneratedDna.OutputsPerLayer.Should().BeEquivalentTo(expectedOutputsPerLayer);
         randomlyGeneratedDna.WeightsAndBiases.Should().HaveCount(expectedNumberOfWeightsAndBiases);
         randomlyGeneratedDna.ActivationIndexes.Should().HaveCount(expectedNumberOfNeurons);
@@ -118,8 +114,6 @@ public class DnaTests
         {
             CheckDnaIsNotReferentiallyEqual(child, parent1Dna);
             CheckDnaIsNotReferentiallyEqual(child, parent2Dna);
-            child.Inputs.Should().Be(nInputs);
-            child.Outputs.Should().Be(nOutputs);
             child.OutputsPerLayer.Should().Equal(parent1Dna.OutputsPerLayer);
             child.WeightsAndBiases.Should().HaveCount(parent1Dna.WeightsAndBiases.Count);
             child.WeightsAndBiases.Should().NotBeEquivalentTo(parent1Dna.WeightsAndBiases);
@@ -161,8 +155,6 @@ public class DnaTests
         {
             CheckDnaIsNotReferentiallyEqual(child, parent1Dna);
             CheckDnaIsNotReferentiallyEqual(child, parent2Dna);
-            child.Inputs.Should().Be(nInputs);
-            child.Outputs.Should().Be(nOutputs);
             child.OutputsPerLayer.Should().Equal(parent1Dna.OutputsPerLayer);
             child.WeightsAndBiases.Should().HaveCount(parent1Dna.WeightsAndBiases.Count);
             child.WeightsAndBiases.Should().NotBeEquivalentTo(parent1Dna.WeightsAndBiases);
@@ -195,8 +187,6 @@ public class DnaTests
         // Assert
         CheckDnaIsNotReferentiallyEqual(originalDna, mutatedDna);
         // Structure
-        mutatedDna.Inputs.Should().Be(nInputs);
-        mutatedDna.Outputs.Should().Be(nOutputs);
         mutatedDna.OutputsPerLayer.Should().Equal(originalDna.OutputsPerLayer);
         mutatedDna.Heritage.Should().Be(DnaHeritage.MutatedElite);
 
@@ -236,8 +226,6 @@ public class DnaTests
         // Assert
         CheckDnaIsNotReferentiallyEqual(originalDna, mutatedDna);
         // Structure
-        mutatedDna.Inputs.Should().Be(nInputs);
-        mutatedDna.Outputs.Should().Be(nOutputs);
         mutatedDna.OutputsPerLayer.Should().Equal(originalDna.OutputsPerLayer);
         mutatedDna.Heritage.Should().Be(DnaHeritage.MutatedElite);
 

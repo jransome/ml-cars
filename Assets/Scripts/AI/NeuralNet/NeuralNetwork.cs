@@ -36,8 +36,8 @@ namespace RansomeCorp.AI.NeuralNet
 
         public List<double> Think(List<double> inputs)
         {
-            if (inputs.Count != Dna.Inputs)
-                throw new System.ArgumentException("Network received " + inputs.Count + " inputs, but expected " + Dna.Inputs);
+            if (inputs.Count != Dna.OutputsPerLayer[0])
+                throw new System.ArgumentException($"Network received {inputs.Count} inputs, but expected {Dna.OutputsPerLayer[0]}");
 
             return FeedForward(inputs, Layers);
         }

@@ -38,10 +38,10 @@ public class CarBrain : MonoBehaviour
         if (IsAlive)
             Debug.LogWarning("Brain was not dead when reset - expected when loading a save");
 
-        if (GetSensorInputs().Count != dna.Inputs)
-            Debug.LogError("Network not configured with expected number of inputs. Received " + GetSensorInputs().Count + ", expected " + dna.Inputs);
+        if (GetSensorInputs().Count != dna.OutputsPerLayer[0])
+            Debug.LogError($"Network not configured with expected number of inputs. Received {GetSensorInputs().Count} expected {dna.OutputsPerLayer[0]}");
 
-        if (dna.Outputs != CarSpecies.Outputs)
+        if (dna.OutputsPerLayer.Last() != CarSpecies.Outputs)
             Debug.LogError("Network not configured with expected number of outputs");
 
         ThrottleDecision = SteeringDecision = BrakingDecision = 0;

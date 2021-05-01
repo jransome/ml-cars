@@ -51,25 +51,18 @@ namespace RansomeCorp.AI.Evolution
     public class Dna : System.IEquatable<Dna>
     {
         public System.Action OnSelectedForBreedingCb { get; set; } = delegate { };
-        public int Inputs; // TODO: use props as can't make readonly because need to serialise for saving
-        public int Outputs;
-        public List<int> OutputsPerLayer;
+        public List<int> OutputsPerLayer; // includes the input 'layer'. Indicates the number of neurons per layer
         public List<double> WeightsAndBiases;
         public List<int> ActivationIndexes;
         public float RawFitnessRating = 1f;
         public DnaHeritage Heritage { get; private set; }
 
         public readonly int Id;
-        public readonly List<Dna> Parents;
         static int idCounter = 0;
 
-        private Dna(int inputs, int outputs, int[] outputsPerLayer, List<double> weightsAndBiases, List<int> activationIndexes, DnaHeritage origin = DnaHeritage.New, List<Dna> parents = null)
+        private Dna(int[] outputsPerLayer, List<double> weightsAndBiases, List<int> activationIndexes, DnaHeritage origin = DnaHeritage.New)
         {
             Id = idCounter++;
-            Parents = parents;
-
-            Inputs = inputs;
-            Outputs = outputs;
             OutputsPerLayer = new List<int>(outputsPerLayer);
             WeightsAndBiases = new List<double>(weightsAndBiases);
             ActivationIndexes = new List<int>(activationIndexes);
@@ -106,7 +99,7 @@ namespace RansomeCorp.AI.Evolution
                 .Concat(Enumerable.Repeat((int)activationType, outputs))
                 .ToList();
 
-            return new Dna(inputs, outputs, outputsPerLayer, weightsAndBiases, activationIndexes);
+            return new Dna(outputsPerLayer, weightsAndBiases, activationIndexes);
         }
 
         public static List<Dna> CreateOffspring(Dna parent1, Dna parent2, int crossoverPasses, bool includeActivationCrossover)
@@ -132,8 +125,8 @@ namespace RansomeCorp.AI.Evolution
             // Return children. Inputs, outputs and network structure should be the same in both parents
             return new List<Dna>()
             {
-                new Dna(parent1.Inputs, parent1.Outputs, parent1.OutputsPerLayer.ToArray(), childWeightGenes[0], childActivationGenes[0], DnaHeritage.Offspring, new List<Dna>(){ parent1, parent2 }),
-                new Dna(parent1.Inputs, parent1.Outputs, parent1.OutputsPerLayer.ToArray(), childWeightGenes[1], childActivationGenes[1], DnaHeritage.Offspring, new List<Dna>(){ parent1, parent2 }),
+                new Dna(parent1.OutputsPerLayer.ToArray(), childWeightGenes[0], childActivationGenes[0], DnaHeritage.Offspring),
+                new Dna(parent1.OutputsPerLayer.ToArray(), childWeightGenes[1], childActivationGenes[1], DnaHeritage.Offspring),
             };
         }
 
@@ -157,7 +150,7 @@ namespace RansomeCorp.AI.Evolution
             if (!(activationMutationPrevalence > 0)) activationGene = dna.ActivationIndexes;
             else
             {
-                int startIndexOfOutputLayerActivation = dna.ActivationIndexes.Count - dna.Outputs;
+                int startIndexOfOutputLayerActivation = dna.ActivationIndexes.Count - dna.OutputsPerLayer.Last();
                 activationGene = dna.ActivationIndexes
                     .Take(startIndexOfOutputLayerActivation) // preserve the output layer activations
                     .ToList()
@@ -166,27 +159,22 @@ namespace RansomeCorp.AI.Evolution
                     .ToList();
             }
 
-            return new Dna(dna.Inputs, dna.Outputs, dna.OutputsPerLayer.ToArray(), mutatedWeightGene, activationGene, origin, new List<Dna>() { dna });
+            return new Dna(dna.OutputsPerLayer.ToArray(), mutatedWeightGene, activationGene, origin);
         }
 
         public static Dna Clone(Dna dna)
         {
             return new Dna(
-                dna.Inputs,
-                dna.Outputs,
                 dna.OutputsPerLayer.ToArray(),
                 new List<double>(dna.WeightsAndBiases),
                 new List<int>(dna.ActivationIndexes),
-                DnaHeritage.Elite,
-                new List<Dna>() { dna }
+                DnaHeritage.Elite
             );
         }
 
         public static bool TopologiesEqual(Dna dna1, Dna dna2)
         {
-            return dna1.Inputs == dna2.Inputs
-                && dna1.Outputs == dna2.Outputs
-                && Enumerable.SequenceEqual(dna1.OutputsPerLayer, dna2.OutputsPerLayer);
+            return Enumerable.SequenceEqual(dna1.OutputsPerLayer, dna2.OutputsPerLayer);
         }
 
         public bool Equals(Dna other)
@@ -201,7 +189,7 @@ namespace RansomeCorp.AI.Evolution
         public override int GetHashCode()
         {
             // return the 'combined' hashcode of all pertinant fields by putting them in a tuple
-            return (Inputs, Outputs, OutputsPerLayer, ActivationIndexes, WeightsAndBiases).GetHashCode();
+            return (OutputsPerLayer, ActivationIndexes, WeightsAndBiases).GetHashCode();
         }
     }
 }

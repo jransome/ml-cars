@@ -114,7 +114,6 @@ public class GenerationTests
         // Topologies
         foreach (Dna dna in TNGdna)
         {
-            dna.Inputs.Should().Be(species.Inputs);
             dna.OutputsPerLayer.Should().Equal(expectedOutputsPerLayer);
             dna.ActivationIndexes.Should().OnlyContain(i => i == (int)species.OutputLayerActivation);
         }

@@ -12,5 +12,3 @@ https://medium.com/@j.c.ransome/what-is-a-neural-network-and-how-can-i-teach-it-
 - add new tracks
 - experiment with changing the fitness function
 - make an interface out of CarBrain?
-
-- fix save/load
