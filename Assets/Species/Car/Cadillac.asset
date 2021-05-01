@@ -30,6 +30,8 @@ MonoBehaviour:
   - 80
   - -80
   SensorDistance: 80
+  VelocityNormalX: 10
+  VelocityNormalZ: 20
   HiddenLayersNeuronCount: 04000000
   HeterogeneousHiddenActivation: 0
   OutputLayerActivation: 1

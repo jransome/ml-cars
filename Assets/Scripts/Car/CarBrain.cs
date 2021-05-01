@@ -17,7 +17,7 @@ public class CarBrain : MonoBehaviour
 
     private Action<CarBrain> OnDeathCb = delegate { };
     private NeuralNetwork neuralNetwork;
-    public Dna Dna { get { return neuralNetwork.Dna; } }
+    private CarSpecies species;
     public bool IsAlive { get; private set; } = false;
     public float ThrottleDecision { get; private set; } = 0f;
     public float SteeringDecision { get; private set; } = 0f;
@@ -28,6 +28,7 @@ public class CarBrain : MonoBehaviour
     {
         IsAlive = false;
         OnDeathCb = onDeathCb;
+        this.species = species;
         distanceSensors.Initialise(species);
         fitnessCalculator.Initialise(species, this.Die);
         speciesIndicator.material.color = species.SpeciesColour;
@@ -64,19 +65,12 @@ public class CarBrain : MonoBehaviour
             ThrottleDecision = isThrottling ? (float)outputs[1] : 0f;
             BrakingDecision = isThrottling ? 0f : -(float)outputs[1];
 
-            // sigmoid
-            // var tOutputMapped = (outputs[1] - 0.5) * 2;
-            // bool isThrottling = tOutputMapped > 0;
-            // SteeringDecision = ((float)outputs[0] - 0.5f) * 2;
-            // ThrottleDecision = isThrottling ? (float)outputs[1] : 0f;
-            // BrakingDecision = isThrottling ? 0f : -(float)outputs[1];
-
             yield return new WaitForSeconds(0.1f);
         }
     }
 
     private List<double> GetSensorInputs() => distanceSensors.CalculateNormalisedDistances()
-        .Concat(physicsSensors.GetVelocityVectors())
+        .Concat(physicsSensors.GetNormalisedVelocityVectors(species.VelocityNormalX, species.VelocityNormalZ))
         .Concat(physicsSensors.GetAngularVelocityVector())
         .ToList();
 
@@ -86,7 +80,7 @@ public class CarBrain : MonoBehaviour
         if (!IsAlive) return;
 
         IsAlive = false;
-        Dna.RawFitnessRating = fitnessCalculator.Fitness;
+        neuralNetwork.Dna.RawFitnessRating = fitnessCalculator.Fitness;
         StopAllCoroutines();
         OnDeathCb(this);
         agentController.Brake(1f);

@@ -28,6 +28,10 @@ public class CarSpecies : ScriptableObject
     public float[] SensorAngles = new float[] { 0f, 15f, -15f };
     public float SensorDistance = 150f;
 
+    [Header("Physics sensors")] // values to normalise velocity sensors by, ie. when velocity value equals velocity normal, nn input = 1
+    public float VelocityNormalX = 10f;
+    public float VelocityNormalZ = 20f;
+
     [Header("Neural network")]
     public const int Outputs = 2;
     public int Inputs { get; private set; } // computed dynamically
