@@ -12,10 +12,11 @@ public static class Persistence
 
     public static List<SaveData> GetSavedPopulations()
     {
-        Debug.Log("Getting saved populations from " + saveDirectory);
-        return dirInfo.GetFiles()
+        List<SaveData> saves = dirInfo.GetFiles()
             .Select(f => ReadFile(Path.Combine(saveDirectory, f.Name)))
             .ToList();
+        Debug.Log($"Found {saves.Count} saved populations in {saveDirectory}");
+        return saves;
     }
 
     public static void Save(List<Generation> generationHistory, string saveName)
@@ -27,7 +28,7 @@ public static class Persistence
 
     private static void SavePopulationData(SaveData saveData)
     {
-        WriteToFile(saveData.SaveName + ".json", JsonUtility.ToJson(saveData, true));
+        WriteToFile($"{saveData.SaveName}.json", JsonUtility.ToJson(saveData, true));
         Debug.Log($"Population data saved at {saveDirectory}");
     }
 
@@ -41,13 +42,13 @@ public static class Persistence
             csvString.AppendLine(string.Join(",", new string[5] {
                 g.GenerationNumber.ToString(),
                 g.SpawnLocationIndex.ToString(),
-                g.PerformanceData.TotalFitness.ToString("n2"),
-                g.PerformanceData.BestFitness.ToString("n2"),
-                g.PerformanceData.AverageFitness.ToString("n2"),
+                g.PerformanceData.TotalFitness.ToString("F"),
+                g.PerformanceData.BestFitness.ToString("F"),
+                g.PerformanceData.AverageFitness.ToString("F"),
             }));
         }
 
-        WriteToFile(saveData.SaveName + "_fitness.csv", csvString.ToString());
+        WriteToFile($"{saveData.SaveName}_fitness.csv", csvString.ToString());
         Debug.Log($"Fitness data saved at {saveDirectory}");
     }
 
