@@ -6,10 +6,10 @@ public class SavedPopulationView : MonoBehaviour
     public Button Button;
     public Text BtnText;
     
-    private SaveData popData;
+    private GenerationSaveData popData;
     private SpeciesEvolver evolver;
 
-    public void Initialise(SaveData populationData, SpeciesEvolver se)
+    public void Initialise(GenerationSaveData populationData, SpeciesEvolver se)
     {
         evolver = se;
         popData = populationData;
@@ -18,7 +18,7 @@ public class SavedPopulationView : MonoBehaviour
 
     private void Load()
     {
-        evolver.LoadGeneration(popData);
+        evolver.LoadGeneration(popData.Generation);
     }
 
     private void Start()

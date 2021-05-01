@@ -10,9 +10,9 @@ public static class Persistence
     private static readonly string saveDirectory = Application.persistentDataPath;
     private static readonly DirectoryInfo dirInfo = new DirectoryInfo(saveDirectory);
 
-    public static List<SaveData> GetSavedPopulations()
+    public static List<GenerationSaveData> GetSavedPopulations()
     {
-        List<SaveData> saves = dirInfo.GetFiles()
+        List<GenerationSaveData> saves = dirInfo.GetFiles()
             .Where(f => f.Extension == ".json")
             .Select(f => ReadFile(Path.Combine(saveDirectory, f.Name)))
             .ToList();
@@ -22,23 +22,22 @@ public static class Persistence
 
     public static void Save(List<Generation> generationHistory, string saveName)
     {
-        SaveData saveData = new SaveData(generationHistory, saveName);
-        SavePopulationData(saveData);
-        SaveFitnessData(saveData);
+        SaveCurrentGenerationData(new GenerationSaveData(generationHistory.Last(), saveName));
+        SaveFitnessData(generationHistory, saveName);
     }
 
-    private static void SavePopulationData(SaveData saveData)
+    private static void SaveCurrentGenerationData(GenerationSaveData saveData)
     {
         WriteToFile($"{saveData.SaveName}.json", JsonUtility.ToJson(saveData, true));
         Debug.Log($"Population data saved at {saveDirectory}");
     }
 
-    private static void SaveFitnessData(SaveData saveData)
+    private static void SaveFitnessData(List<Generation> generationHistory, string saveName)
     {
         string header = "Generation, Spawn Location Index, Total, Max, Average\n";
         StringBuilder csvString = new StringBuilder(header);
 
-        foreach (Generation g in saveData.GenerationHistory)
+        foreach (Generation g in generationHistory)
         {
             csvString.AppendLine(string.Join(",", new string[5] {
                 g.GenerationNumber.ToString(),
@@ -49,7 +48,7 @@ public static class Persistence
             }));
         }
 
-        WriteToFile($"{saveData.SaveName}_fitness.csv", csvString.ToString());
+        WriteToFile($"{saveName}_fitness.csv", csvString.ToString());
         Debug.Log($"Fitness data saved at {saveDirectory}");
     }
 
@@ -62,12 +61,12 @@ public static class Persistence
         } // the streamwriter WILL be closed and flushed here, even if an exception is thrown.
     }
 
-    private static SaveData ReadFile(string path)
+    private static GenerationSaveData ReadFile(string path)
     {
         StreamReader reader = new StreamReader(File.OpenRead(path));
-        SaveData loadedSave = JsonUtility.FromJson<SaveData>(reader.ReadToEnd());
+        GenerationSaveData loadedSave = JsonUtility.FromJson<GenerationSaveData>(reader.ReadToEnd());
 
-        if (loadedSave.FormatVersion != SaveData.CurrentFormatVersion)
+        if (loadedSave.FormatVersion != GenerationSaveData.CurrentFormatVersion)
             Debug.LogError("Loaded incompatible save file!");
 
         return loadedSave;
@@ -75,17 +74,17 @@ public static class Persistence
 }
 
 [System.Serializable]
-public class SaveData
+public class GenerationSaveData
 {
     public static string CurrentFormatVersion = "0.1";
 
     public string FormatVersion;
     public string SaveName;
-    public List<Generation> GenerationHistory;
-    public SaveData(List<Generation> generationHistory, string saveName)
+    public Generation Generation;
+    public GenerationSaveData(Generation generation, string saveName)
     {
         FormatVersion = CurrentFormatVersion;
         SaveName = string.IsNullOrEmpty(saveName) ? $"evolution_run_{System.DateTime.Now.ToString("HHmmss_ddMMyyyy")}" : saveName;
-        GenerationHistory = generationHistory;
+        Generation = generation;
     }
 }

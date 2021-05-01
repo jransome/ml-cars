@@ -22,17 +22,17 @@ public class SpeciesEvolver : MonoBehaviour
         get => PhenotypesPool.Where(b => b.IsAlive).OrderByDescending(b => b.Fitness).DefaultIfEmpty(null).First();
     }
 
-    public void LoadGeneration(SaveData saveData)
+    public void LoadGeneration(Generation loadedGeneration)
     {
-        GenerationHistory = saveData.GenerationHistory;
-        Generation currentGen = GenerationHistory.Last();
+        GenerationHistory = new List<Generation>() { loadedGeneration };
 
         // In case the number of spawn locations changed since this generation was saved
-        Transform spawnLocation = currentGen.SpawnLocationIndex < SpawnLocations.Locations.Count ?
-            SpawnLocations.Locations[currentGen.SpawnLocationIndex] :
+        Transform spawnLocation = loadedGeneration.SpawnLocationIndex < SpawnLocations.Locations.Count ?
+            SpawnLocations.Locations[loadedGeneration.SpawnLocationIndex] :
             CurrentSpawnLocation;
 
-        ReleaseGeneration(currentGen, spawnLocation); // TODO: depends on phenotypes already having been instanced
+        Debug.Log("Loading previously saved generation");
+        ReleaseGeneration(loadedGeneration, spawnLocation); // TODO: depends on phenotypes already having been instanced
     }
 
     private IEnumerator CreateNextGeneration()
