@@ -9,6 +9,7 @@ public class SpeciesEvolver : MonoBehaviour
     public CarSpecies Species;
     public SpawnLocations SpawnLocations;
     public Transform CurrentSpawnLocation = null;
+    public bool SplitSpawnDirection = true;
     public int GenerationsPerSpawnLocation = 15;
 
     public List<Generation> GenerationHistory { get; private set; } = new List<Generation>();
@@ -81,7 +82,11 @@ public class SpeciesEvolver : MonoBehaviour
             CarBrain carBrain = PhenotypesPool[i];
 
             newDna.OnSelectedForBreedingCb = () => SelectedForBreeding.Add(carBrain);
-            carBrain.Arise(newDna, spawnLocation.transform.position, spawnLocation.transform.rotation);
+            carBrain.Arise(
+                newDna,
+                spawnLocation.transform.position,
+                spawnLocation.transform.rotation * (SplitSpawnDirection && i % 2 == 1 ? Quaternion.AngleAxis(180, Vector3.up) : Quaternion.identity)
+            );
         }
         CurrentlyAlive = new List<CarBrain>(PhenotypesPool);
         GenerationHistory.Add(TNG);

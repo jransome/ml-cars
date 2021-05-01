@@ -727,7 +727,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 73113404}
   m_LocalRotation: {x: -0, y: -0.9443123, z: -0, w: 0.3290507}
-  m_LocalPosition: {x: 487.2, y: 0, z: 176.5}
+  m_LocalPosition: {x: 489.07, y: 0, z: 178.76}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1183149643}
@@ -3562,6 +3562,7 @@ MonoBehaviour:
   Species: {fileID: 0}
   SpawnLocations: {fileID: 0}
   CurrentSpawnLocation: {fileID: 0}
+  SplitSpawnDirection: 1
   GenerationsPerSpawnLocation: 15
 --- !u!33 &434077623
 MeshFilter:
@@ -8632,7 +8633,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Species: {fileID: 11400000, guid: 6910dc636f4e4b84692493a0ba1e157f, type: 2}
   SpawnLocations: {fileID: 1183149642}
-  CurrentSpawnLocation: {fileID: 73113405}
+  CurrentSpawnLocation: {fileID: 1102101224}
+  SplitSpawnDirection: 0
   GenerationsPerSpawnLocation: 1500
 --- !u!4 &985539030
 Transform:
