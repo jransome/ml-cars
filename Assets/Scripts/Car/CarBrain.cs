@@ -36,7 +36,7 @@ public class CarBrain : MonoBehaviour
     public void Arise(Dna dna, Vector3 startPosition, Quaternion startRotation)
     {
         if (IsAlive)
-            Debug.LogWarning("Brain was not dead when reset"); // expected when loading a save
+            Debug.LogWarning("Brain was not dead when reset - expected when loading a save");
 
         if (GetSensorInputs().Count != dna.Inputs)
             Debug.LogError("Network not configured with expected number of inputs. Received " + GetSensorInputs().Count + ", expected " + dna.Inputs);

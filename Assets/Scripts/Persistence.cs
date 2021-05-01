@@ -13,6 +13,7 @@ public static class Persistence
     public static List<SaveData> GetSavedPopulations()
     {
         List<SaveData> saves = dirInfo.GetFiles()
+            .Where(f => f.Extension == ".json")
             .Select(f => ReadFile(Path.Combine(saveDirectory, f.Name)))
             .ToList();
         Debug.Log($"Found {saves.Count} saved populations in {saveDirectory}");
@@ -81,12 +82,10 @@ public class SaveData
     public string FormatVersion;
     public string SaveName;
     public List<Generation> GenerationHistory;
-    public SaveData(List<Generation> generationHistory, string saveName = null)
+    public SaveData(List<Generation> generationHistory, string saveName)
     {
-        saveName ??= $"evolution_run_{System.DateTime.Now.ToString("HHmmss_ddMMyyyy")}";
-
         FormatVersion = CurrentFormatVersion;
-        SaveName = saveName;
+        SaveName = string.IsNullOrEmpty(saveName) ? $"evolution_run_{System.DateTime.Now.ToString("HHmmss_ddMMyyyy")}" : saveName;
         GenerationHistory = generationHistory;
     }
 }
