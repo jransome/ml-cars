@@ -41,9 +41,9 @@ public static class Persistence
             csvString.AppendLine(string.Join(",", new string[5] {
                 g.GenerationNumber.ToString(),
                 g.SpawnLocationIndex.ToString(),
-                g.performanceData.TotalFitness.ToString("n2"),
-                g.performanceData.BestFitness.ToString("n2"),
-                g.performanceData.AverageFitness.ToString("n2"),
+                g.PerformanceData.TotalFitness.ToString("n2"),
+                g.PerformanceData.BestFitness.ToString("n2"),
+                g.PerformanceData.AverageFitness.ToString("n2"),
             }));
         }
 

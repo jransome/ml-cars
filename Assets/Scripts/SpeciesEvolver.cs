@@ -30,7 +30,7 @@ public class SpeciesEvolver : MonoBehaviour
         Transform spawnLocation = currentGen.SpawnLocationIndex < SpawnLocations.Locations.Count ?
             SpawnLocations.Locations[currentGen.SpawnLocationIndex] :
             CurrentSpawnLocation;
-        
+
         ReleaseGeneration(currentGen, spawnLocation); // TODO: depends on phenotypes already having been instanced
     }
 
@@ -40,14 +40,15 @@ public class SpeciesEvolver : MonoBehaviour
             CurrentSpawnLocation = SpawnLocations.GetNext(CurrentSpawnLocation);
 
         int spawnLocationIndex = SpawnLocations.GetIndex(CurrentSpawnLocation);
-        Debug.Log($"Creating generation {GenerationHistory.Count} of {Species.name} at spawn location {spawnLocationIndex}");
-
         Generation TNG = GenerationHistory.Count == 0 ?
             Generation.CreateSeed(Species, spawnLocationIndex) :
             Generation.FromPrevious(GenerationHistory.Last(), spawnLocationIndex);
 
         // Show selection process for visual feedback if crossover was performed
         yield return SelectedForBreeding.Count > 0 ? StartCoroutine(ShowSelectionProcess()) : null;
+
+        string composition = TNG.Composition.Aggregate("", (log, kvp) => log += $"{kvp.Value} {kvp.Key}, ");
+        Debug.Log($"Creating generation {GenerationHistory.Count} of {Species.name} at spawn location {spawnLocationIndex}. Population count{TNG.GenePool.Count}, comprising:\n {composition}");
         ReleaseGeneration(TNG, CurrentSpawnLocation);
     }
 
@@ -92,7 +93,7 @@ public class SpeciesEvolver : MonoBehaviour
         gen.Finish();
         Debug.Log(
             $"Generation {GenerationHistory.Count} of {Species.name} finished.\n" +
-            $"Fitness (Best/Average): {gen.performanceData.BestFitness}/{gen.performanceData.AverageFitness}"
+            $"Fitness (Best/Average): {gen.PerformanceData.BestFitness}/{gen.PerformanceData.AverageFitness}"
         );
         StartCoroutine(CreateNextGeneration());
     }

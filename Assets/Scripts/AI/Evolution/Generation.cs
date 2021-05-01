@@ -10,20 +10,23 @@ namespace RansomeCorp.AI.Evolution
         public int GenerationNumber;
         public int SpawnLocationIndex;
         public List<Dna> GenePool;
-        public GenerationPerformanceData performanceData;
+        public GenerationPerformanceData PerformanceData;
+        public Dictionary<DnaHeritage, int> Composition = new Dictionary<DnaHeritage, int>();
         CarSpecies species;
 
         private Generation(CarSpecies species, int generationNumber, int spawnIndex, IEnumerable<Dna> genes = null)
         {
             GenerationNumber = generationNumber;
             SpawnLocationIndex = spawnIndex;
-            GenePool = genes != null ? new List<Dna>(genes) : new List<Dna>(species.GenerationSize);
+            GenePool = new List<Dna>(species.GenerationSize);
             this.species = species;
         }
 
         public static Generation CreateSeed(CarSpecies species, int spawnLocationIndex)
         {
-            return new Generation(species, 0, spawnLocationIndex, GenerateRandomDna(species, species.GenerationSize));
+            Generation seed = new Generation(species, 0, spawnLocationIndex);
+            seed.AddMultipleDna(GenerateRandomDna(species, species.GenerationSize), false);
+            return seed;
         }
 
         public static Generation FromPrevious(Generation previous, int spawnLocationIndex)
@@ -56,7 +59,7 @@ namespace RansomeCorp.AI.Evolution
             }
 
             // Populate the rest with offspring of previous
-            int nOffspring = 0, nMutatedOffspring = 0;
+            int nMutatedOffspring = 0;
             int freeSpacesForOffspring = species.GenerationSize - (nElites + nMutatedElites + nNew);
             int targetNumMutatedOffspring = Mathf.RoundToInt(freeSpacesForOffspring * species.OffspringMutationProbability);
             for (int i = 0; i < Mathf.RoundToInt(freeSpacesForOffspring / 2); i++)
@@ -93,17 +96,10 @@ namespace RansomeCorp.AI.Evolution
                 else
                 {
                     TNG.AddMultipleDna(children, true);
-                    nOffspring += 2;
                 }
             }
 
-            string genSummary = string.Format(
-                "Created {0} agents of species {1}. {2} new, {3} elites, {4} mutated elites, {5} offspring, and {6} mutated offspring",
-                TNG.GenePool.Count, species.name, nNew, nElites, nMutatedElites, nOffspring, nMutatedOffspring
-            );
-            Debug.Log(genSummary);
             DnaUtils.DebugGenerationDiff(previousGenePool, TNG.GenePool);
-
             return TNG;
         }
 
@@ -127,6 +123,8 @@ namespace RansomeCorp.AI.Evolution
                 newDna;
 
             GenePool.Add(addition);
+            Composition.TryGetValue(addition.Heritage, out int count);
+            Composition[addition.Heritage] = count + 1;
         }
 
         public void AddMultipleDna(IEnumerable<Dna> additions, bool enforceDistinctive)
@@ -137,7 +135,7 @@ namespace RansomeCorp.AI.Evolution
 
         public void Finish()
         {
-            performanceData = new GenerationPerformanceData(GenePool);
+            PerformanceData = new GenerationPerformanceData(GenePool);
         }
     }
 
