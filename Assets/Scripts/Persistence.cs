@@ -34,7 +34,7 @@ public static class Persistence
 
     private static void SaveFitnessData(List<Generation> generationHistory, string saveName)
     {
-        string header = "Generation, Spawn Location Index, Total, Max, Average\n";
+        string header = "Generation, Spawn Location Index, Best, Average, Total\n";
         StringBuilder csvString = new StringBuilder(header);
 
         foreach (Generation g in generationHistory)
