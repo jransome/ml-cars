@@ -27,7 +27,7 @@ namespace RansomeCorp.AI.Evolution
 
         public static void DebugGenerationDiff(List<Dna> gen1, List<Dna> gen2)
         {
-            // remove clones from previous
+            // remove deliberate clones from previous
             var shouldBeUniques = gen2.Where(d => d.Heritage != DnaHeritage.Elite).ToList();
             List<Identicle> identicles = new List<Identicle>();
 
@@ -50,27 +50,16 @@ namespace RansomeCorp.AI.Evolution
                 Debug.LogError(log);
             }
 
-            var dnaOccurrences = gen2.ToDictionary(dna => dna, (_) => 1);
+            // check for intra generation clones
+            int nClones = 0;
             for (int i = 0; i < gen2.Count; i++)
             {
-                Dna pop = gen2[i];
-                for (int j = 0; j < gen2.Count; j++)
-                    if (i != j && pop.Equals(gen2[j])) dnaOccurrences[pop] += 1;
+                for (int j = i + 1; j < gen2.Count; j++)
+                {
+                    if (gen2[i].Equals(gen2[j])) nClones++;
+                }
             }
-
-            Dictionary<Dna, int> intraGenerationClones = dnaOccurrences.Where(occurrence => occurrence.Value > 1).ToDictionary(o => o.Key, o => o.Value);
-            if (intraGenerationClones.Count > 0)
-            {
-                var query = intraGenerationClones.GroupBy(
-                    kvp => kvp.Key.Heritage,
-                    kvp => kvp.Value
-                );
-                // foreach (var q in query)
-                // {
-                //     var l = string.Format("{0} duplicates from {1} detected within generation", q.Key, q.)
-                // }
-                Debug.LogError("clones");
-            }
+            if (nClones > 0) Debug.LogError($"{nClones} clones detected!");
         }
 
         /// <summary>

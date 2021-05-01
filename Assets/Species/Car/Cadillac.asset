@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PopulationPrefab: {fileID: 6641770778032953726, guid: 83bd4ddeaecaa8c41aa631c791dbf3cf,
     type: 3}
-  SpeciesColour: {r: 0, g: 0, b: 0, a: 0}
+  SpeciesColour: {r: 1, g: 1, b: 1, a: 0}
   SensorLayerMask:
     serializedVersion: 2
     m_Bits: 4294966779
@@ -29,18 +29,18 @@ MonoBehaviour:
   - -50
   - 80
   - -80
-  SensorDistance: 150
-  HiddenLayersNeuronCount: 01000000
+  SensorDistance: 80
+  HiddenLayersNeuronCount: 04000000
   HeterogeneousHiddenActivation: 0
   OutputLayerActivation: 1
-  GenerationSize: 30
+  GenerationSize: 50
   ProportionUnchanged: 0.05
   ProportionMutatantsOfUnchanged: 0.15
-  NewDnaRate: 0.05
+  NewDnaRate: 0
   OffspringMutationProbability: 0.5
   MutationSeverity: 0.2
-  ActivationMutationSeverity: 0.01
-  CrossoverPasses: 5
+  ActivationMutationSeverity: 0
+  CrossoverPasses: 10
   IncludeActivationCrossover: 0
   MaxTimeToReachNextGateSecs: 5
   MaxLifeSpanSecs: 0

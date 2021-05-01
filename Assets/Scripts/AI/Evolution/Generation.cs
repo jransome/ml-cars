@@ -86,7 +86,7 @@ namespace RansomeCorp.AI.Evolution
                     crossoverFailed = parent1.Equals(children[0]) || parent1.Equals(children[1]) || parent2.Equals(children[0]) || parent2.Equals(children[1]) || children[0].Equals(children[1]);
                     if (!crossoverFailed) break;
                 }
-                if (crossoverFailed) Debug.Log("Crossover failed after several attempts - selected parent genomes are likely too similar");
+                if (crossoverFailed) Debug.LogWarning("Crossover failed after several attempts - selected parent genomes are likely too similar");
 
                 if (crossoverFailed || (nMutatedOffspring <= targetNumMutatedOffspring && Random.Range(0f, 1f) < species.OffspringMutationProbability))
                 {

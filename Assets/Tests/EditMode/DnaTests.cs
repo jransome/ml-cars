@@ -4,6 +4,7 @@ using RansomeCorp.AI.NeuralNet;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using UnityEngine;
 
 public class DnaTests
 {
@@ -177,7 +178,6 @@ public class DnaTests
         parentsTotalWeights.Should().Be(offspringTotalWeights);
     }
 
-    // public void PerformsDnaMutationWithoutActivation()
     [Test]
     public void PerformsDnaMutation()
     {
@@ -187,23 +187,36 @@ public class DnaTests
         const int outputLayerActivationIndex = 3;
         int[] hiddenLayers = new int[] { 7 };
         Dna originalDna = Dna.GenerateRandomDnaEncoding(nInputs, hiddenLayers, nOutputs, (ActivationType)outputLayerActivationIndex, true);
+        float weightMutationPrevalence = 0.2f;
 
         // Act
-        Dna mutatedDna = Dna.CloneAndMutate(originalDna, DnaHeritage.MutatedElite, 0.02f, 0.8f);
+        Dna mutatedDna = Dna.CloneAndMutate(originalDna, DnaHeritage.MutatedElite, weightMutationPrevalence, 0.8f);
 
         // Assert
         CheckDnaIsNotReferentiallyEqual(originalDna, mutatedDna);
+        // Structure
         mutatedDna.Inputs.Should().Be(nInputs);
         mutatedDna.Outputs.Should().Be(nOutputs);
         mutatedDna.OutputsPerLayer.Should().Equal(originalDna.OutputsPerLayer);
+        mutatedDna.Heritage.Should().Be(DnaHeritage.MutatedElite);
+
+        // Weights
+        mutatedDna.WeightsAndBiases.Should().NotEqual(originalDna.WeightsAndBiases);
+        mutatedDna.WeightsAndBiases.Should().HaveCount(originalDna.WeightsAndBiases.Count);
+        List<double> mutatedWeights = new List<double>();
+        for (int i = 0; i < originalDna.WeightsAndBiases.Count; i++)
+        {
+            if (originalDna.WeightsAndBiases[i] != mutatedDna.WeightsAndBiases[i])
+                mutatedWeights.Add(mutatedDna.WeightsAndBiases[i]);
+        }
+        mutatedWeights.Should().HaveCount(Mathf.CeilToInt(weightMutationPrevalence * originalDna.WeightsAndBiases.Count));
+
+        // Activation        
         mutatedDna.ActivationIndexes.Should().NotEqual(originalDna.ActivationIndexes);
         mutatedDna.ActivationIndexes.Should().HaveCount(originalDna.ActivationIndexes.Count);
         int indexOfOutputLayerActivation = originalDna.ActivationIndexes.Count - nOutputs;
         mutatedDna.ActivationIndexes.Skip(indexOfOutputLayerActivation)
             .Should().Equal(originalDna.ActivationIndexes.Skip(indexOfOutputLayerActivation), "preserves output layer activation functions");
-        mutatedDna.WeightsAndBiases.Should().NotEqual(originalDna.WeightsAndBiases);
-        mutatedDna.WeightsAndBiases.Should().HaveCount(originalDna.WeightsAndBiases.Count);
-        mutatedDna.Heritage.Should().Be(DnaHeritage.MutatedElite);
     }
 
     [Test]
@@ -215,20 +228,33 @@ public class DnaTests
         const int outputLayerActivationIndex = 3;
         int[] hiddenLayers = new int[] { 7 };
         Dna originalDna = Dna.GenerateRandomDnaEncoding(nInputs, hiddenLayers, nOutputs, (ActivationType)outputLayerActivationIndex, true);
+        float weightMutationPrevalence = 0.02f;
 
         // Act
-        Dna mutatedDna = Dna.CloneAndMutate(originalDna, DnaHeritage.MutatedElite, 0.02f, 0);
+        Dna mutatedDna = Dna.CloneAndMutate(originalDna, DnaHeritage.MutatedElite, weightMutationPrevalence, 0);
 
         // Assert
         CheckDnaIsNotReferentiallyEqual(originalDna, mutatedDna);
+        // Structure
         mutatedDna.Inputs.Should().Be(nInputs);
         mutatedDna.Outputs.Should().Be(nOutputs);
         mutatedDna.OutputsPerLayer.Should().Equal(originalDna.OutputsPerLayer);
-        mutatedDna.ActivationIndexes.Should().Equal(originalDna.ActivationIndexes);
-        mutatedDna.ActivationIndexes.Should().HaveCount(originalDna.ActivationIndexes.Count);
+        mutatedDna.Heritage.Should().Be(DnaHeritage.MutatedElite);
+
+        // Weights
         mutatedDna.WeightsAndBiases.Should().NotEqual(originalDna.WeightsAndBiases);
         mutatedDna.WeightsAndBiases.Should().HaveCount(originalDna.WeightsAndBiases.Count);
-        mutatedDna.Heritage.Should().Be(DnaHeritage.MutatedElite);
+        List<double> mutatedWeights = new List<double>();
+        for (int i = 0; i < originalDna.WeightsAndBiases.Count; i++)
+        {
+            if (originalDna.WeightsAndBiases[i] != mutatedDna.WeightsAndBiases[i])
+                mutatedWeights.Add(mutatedDna.WeightsAndBiases[i]);
+        }
+        mutatedWeights.Should().HaveCount(Mathf.CeilToInt(weightMutationPrevalence * originalDna.WeightsAndBiases.Count));
+
+        // Activation        
+        mutatedDna.ActivationIndexes.Should().Equal(originalDna.ActivationIndexes);
+        mutatedDna.ActivationIndexes.Should().HaveCount(originalDna.ActivationIndexes.Count);
     }
 
     [Test]
@@ -289,7 +315,7 @@ public class DnaTests
         Dna dna1ReferenceClone = dna1;
         Dna dna2 = Dna.Clone(dna1);
         dna2.WeightsAndBiases[0] = 50;
-        
+
         // Act/Assert
         dna1.Equals(dna1).Should().BeTrue();
 
@@ -298,13 +324,13 @@ public class DnaTests
 
         dna1.Equals(dna1ValueClone).Should().BeTrue();
         dna1ValueClone.Equals(dna1).Should().BeTrue();
-        
+
         dna1.Equals(dna2).Should().BeFalse();
         dna2.Equals(dna1).Should().BeFalse();
-        
+
         dna1ValueClone.Equals(dna2).Should().BeFalse();
         dna2.Equals(dna1ValueClone).Should().BeFalse();
-        
+
         dna1ReferenceClone.Equals(dna2).Should().BeFalse();
         dna2.Equals(dna1ReferenceClone).Should().BeFalse();
 

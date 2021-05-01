@@ -48,7 +48,7 @@ public class SpeciesEvolver : MonoBehaviour
         yield return SelectedForBreeding.Count > 0 ? StartCoroutine(ShowSelectionProcess()) : null;
 
         string composition = TNG.Composition.Aggregate("", (log, kvp) => log += $"{kvp.Value} {kvp.Key}, ");
-        Debug.Log($"Creating generation {GenerationHistory.Count} of {Species.name} at spawn location {spawnLocationIndex}. Population count{TNG.GenePool.Count}, comprising:\n {composition}");
+        Debug.Log($"Creating generation {GenerationHistory.Count} of {Species.name} at spawn location {spawnLocationIndex}. Population count: {TNG.GenePool.Count}, comprising:\n {composition}");
         ReleaseGeneration(TNG, CurrentSpawnLocation);
     }
 
