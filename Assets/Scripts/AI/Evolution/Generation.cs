@@ -12,7 +12,7 @@ namespace RansomeCorp.AI.Evolution
         public List<Dna> GenePool;
         public GenerationPerformanceData PerformanceData;
         public Dictionary<DnaHeritage, int> Composition = new Dictionary<DnaHeritage, int>();
-        CarSpecies species;
+        public CarSpecies species;
 
         private Generation(CarSpecies species, int generationNumber, int spawnIndex, IEnumerable<Dna> genes = null)
         {
@@ -86,7 +86,7 @@ namespace RansomeCorp.AI.Evolution
                     crossoverFailed = parent1.Equals(children[0]) || parent1.Equals(children[1]) || parent2.Equals(children[0]) || parent2.Equals(children[1]) || children[0].Equals(children[1]);
                     if (!crossoverFailed) break;
                 }
-                if (crossoverFailed) Debug.LogWarning("Crossover failed after several attempts - selected parent genomes are likely too similar");
+                if (crossoverFailed) Debug.LogWarning("Crossover failed after several attempts - selected parent genomes are likely too similar. Falling back to mutation");
 
                 if (crossoverFailed || (nMutatedOffspring <= targetNumMutatedOffspring && Random.Range(0f, 1f) < species.OffspringMutationProbability))
                 {
