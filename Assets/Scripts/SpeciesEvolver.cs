@@ -7,9 +7,12 @@ using UnityEngine;
 public class SpeciesEvolver : MonoBehaviour
 {
     public CarSpecies Species;
+
+    [Header("Spawn location settings")]
     public SpawnLocations SpawnLocations;
     public Transform CurrentSpawnLocation = null;
-    public bool SplitSpawnDirection = true;
+    public bool SplitSpawnDirection = false;
+    public bool RandomiseSpawnLocation = true;
     public int GenerationsPerSpawnLocation = 15;
 
     public List<Generation> GenerationHistory { get; private set; } = new List<Generation>();
@@ -38,7 +41,7 @@ public class SpeciesEvolver : MonoBehaviour
     private IEnumerator CreateNextGeneration()
     {
         if (GenerationHistory.Count != 0 && GenerationHistory.Count % GenerationsPerSpawnLocation == 0)
-            CurrentSpawnLocation = SpawnLocations.GetNext(CurrentSpawnLocation);
+            CurrentSpawnLocation = RandomiseSpawnLocation ? SpawnLocations.GetRandom() : SpawnLocations.GetNext(CurrentSpawnLocation);
 
         int spawnLocationIndex = SpawnLocations.GetIndex(CurrentSpawnLocation);
         Generation TNG = GenerationHistory.Count == 0 ?

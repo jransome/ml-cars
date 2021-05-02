@@ -8635,7 +8635,7 @@ MonoBehaviour:
   SpawnLocations: {fileID: 1183149642}
   CurrentSpawnLocation: {fileID: 1102101224}
   SplitSpawnDirection: 0
-  GenerationsPerSpawnLocation: 1500
+  GenerationsPerSpawnLocation: 20
 --- !u!4 &985539030
 Transform:
   m_ObjectHideFlags: 0
@@ -10414,17 +10414,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Locations:
-  - {fileID: 73113405}
-  - {fileID: 590010510}
-  - {fileID: 1460460014}
-  - {fileID: 207329989}
-  - {fileID: 1085368045}
-  - {fileID: 744494331}
   - {fileID: 1102101224}
-  - {fileID: 751678380}
   - {fileID: 389332405}
-  - {fileID: 1048045413}
-  - {fileID: 400171826}
+  - {fileID: 590010510}
+  - {fileID: 1085368045}
 --- !u!4 &1183149643
 Transform:
   m_ObjectHideFlags: 0
