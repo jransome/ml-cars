@@ -3,20 +3,18 @@ using RansomeCorp.AI.NeuralNet;
 using System.Collections.Generic;
 using UnityEngine;
 
-// TODO: where does this file live?
-// namespace RansomeCorp.AI.Evolution
-// {
+// TODO: where does this file live/split into composable SOs?
 [CreateAssetMenu]
 public class CarSpecies : ScriptableObject
 {
     public readonly static Dictionary<DnaHeritage, Color> LineageColours = new Dictionary<DnaHeritage, Color>()
-        {
-            { DnaHeritage.New, Color.yellow },
-            { DnaHeritage.Elite, Color.grey },
-            { DnaHeritage.Offspring, Color.blue },
-            { DnaHeritage.MutatedOffspring, Color.green },
-            { DnaHeritage.MutatedElite, Color.magenta },
-        };
+    {
+        { DnaHeritage.New, Color.yellow },
+        { DnaHeritage.Elite, Color.grey },
+        { DnaHeritage.Offspring, Color.blue },
+        { DnaHeritage.MutatedOffspring, Color.green },
+        { DnaHeritage.MutatedElite, Color.magenta },
+    };
 
     [Header("General")]
     public GameObject PopulationPrefab = null;
@@ -33,9 +31,10 @@ public class CarSpecies : ScriptableObject
     public float VelocityNormalZ = 20f;
 
     [Header("Neural network")]
+    // When the activation function is non-linear, then a two-layer neural network can be proven to be a universal function approximator
     public const int Outputs = 2;
     public int Inputs { get; private set; } // computed dynamically
-    public int[] HiddenLayersNeuronCount = new int[] { 1 };
+    public int[] HiddenLayersNeuronCount = new int[] { 1 }; 
     public bool HeterogeneousHiddenActivation;
     public ActivationType OutputLayerActivation = ActivationType.TanH;
 
@@ -75,4 +74,3 @@ public class CarSpecies : ScriptableObject
         Inputs = SensorAngles.Length + 3; // +3 for physics sensors
     }
 }
-// }
