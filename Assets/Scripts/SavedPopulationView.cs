@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class SavedPopulationView : MonoBehaviour
@@ -8,19 +6,19 @@ public class SavedPopulationView : MonoBehaviour
     public Button Button;
     public Text BtnText;
     
-    private PopulationData PopData;
-    private God EvolutionManager;
+    private GenerationSaveData popData;
+    private SpeciesEvolver evolver;
 
-    public void Initialise(PopulationData popData, God em)
+    public void Initialise(GenerationSaveData populationData, SpeciesEvolver se)
     {
-        EvolutionManager = em;
-        PopData = popData;
-        BtnText.text = popData.SaveName;
+        evolver = se;
+        popData = populationData;
+        BtnText.text = populationData.SaveName;
     }
 
     private void Load()
     {
-        EvolutionManager.LoadGeneration(PopData);
+        evolver.LoadGeneration(popData.Generation);
     }
 
     private void Start()

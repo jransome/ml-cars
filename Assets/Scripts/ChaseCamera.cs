@@ -1,23 +1,25 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class ChaseCamera : MonoBehaviour
 {
-    public God EvolutionManager;
+    public SpeciesEvolver EvolutionManager;
     public float OrbitSpeed = 2f;
     private Transform chaseTransform;
+    private float lastCameraUpdate = 0f;
 
-    private void Update() 
+    private void Update()
     {
-        IOrderedEnumerable<Brain> livingAgents = EvolutionManager.GenerationPool
-            .Where(b => b.IsAlive)
-            .OrderByDescending(b => b.ChaseCameraOrderingVariable);
+        if (Input.GetKeyUp(KeyCode.Alpha1)) Time.timeScale = 1;
+        if (Input.GetKeyUp(KeyCode.Alpha6)) Time.timeScale = 6;
 
-        if (livingAgents.Count() > 0) chaseTransform = livingAgents.First().transform;
+        if (Time.time > lastCameraUpdate + 1f && EvolutionManager.MostSuccessfulAlive != null)
+        {
+            lastCameraUpdate = Time.time;
+            chaseTransform = EvolutionManager.MostSuccessfulAlive.transform;
+        }
 
-        if (chaseTransform != null) {
+        if (chaseTransform != null)
+        {
             transform.position = chaseTransform.position;
             transform.Rotate(Vector3.up * OrbitSpeed * Time.deltaTime);
         }

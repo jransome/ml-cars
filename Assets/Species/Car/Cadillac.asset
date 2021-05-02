@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d7f6f78e9df2d9408a9c1b1746f9d51, type: 3}
+  m_Name: Cadillac
+  m_EditorClassIdentifier: 
+  PopulationPrefab: {fileID: 6641770778032953726, guid: 83bd4ddeaecaa8c41aa631c791dbf3cf,
+    type: 3}
+  SpeciesColour: {r: 1, g: 1, b: 1, a: 0}
+  SensorLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294966779
+  DrawSensors: 0
+  SensorAngles:
+  - 0
+  - 15
+  - -15
+  - 30
+  - -30
+  - 50
+  - -50
+  - 80
+  - -80
+  SensorDistance: 80
+  VelocityNormalX: 10
+  VelocityNormalZ: 20
+  HiddenLayersNeuronCount: 04000000
+  HeterogeneousHiddenActivation: 0
+  OutputLayerActivation: 1
+  GenerationSize: 50
+  ProportionUnchanged: 0.1
+  ProportionMutatantsOfUnchanged: 0.15
+  NewDnaRate: 0
+  OffspringMutationProbability: 0.5
+  MutationSeverity: 0.2
+  ActivationMutationSeverity: 0
+  CrossoverPasses: 10
+  IncludeActivationCrossover: 0
+  MaxTimeToReachNextGateSecs: 5
+  MaxLifeSpanSecs: 0
+  GateCrossedReward: 6
+  OptimalDirectionReward: 1
+  OptimalPositionReward: 2
+  MaxPositionDifferenceTolerance: 15

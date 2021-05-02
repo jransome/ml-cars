@@ -1,84 +1,97 @@
-﻿using System.Collections;
+﻿using RansomeCorp.AI.Evolution;
+using RansomeCorp.AI.NeuralNet;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 using UnityEngine;
 
-public class CarBrain : Brain
+public class CarBrain : MonoBehaviour
 {
-    [SerializeField] private Car carController = null;
-    [SerializeField] private CarFitness fitnessCalculator = null;
-    [SerializeField] private DistanceSensors distanceSensors = null;
-    [SerializeField] private PhysicsSensors physicsSensors = null;
-    [SerializeField] private RacingGate lastGateCrossed = null;
-    private Rigidbody rb;
+    [SerializeField] private AgentController agentController;
+    [SerializeField] private CarFitness fitnessCalculator;
+    [SerializeField] private DistanceSensors distanceSensors;
+    [SerializeField] private PhysicsSensors physicsSensors;
+    [SerializeField] private Renderer speciesIndicator;
+    [SerializeField] private Renderer heritageIndicator;
 
+    private Action<CarBrain> OnDeathCb = delegate { };
+    private NeuralNetwork neuralNetwork;
+    private CarSpecies species;
+    public bool IsAlive { get; private set; } = false;
+    public float ThrottleDecision { get; private set; } = 0f;
+    public float SteeringDecision { get; private set; } = 0f;
     public float BrakingDecision { get; private set; } = 0f;
+    public float Fitness { get => fitnessCalculator.Fitness; }
 
-    public override void Arise(Vector3 startPosition, Quaternion startRotation)
+    public void Initialise(CarSpecies species, Vector3 startPosition, Quaternion startRotation, Action<CarBrain> onDeathCb)
     {
-        BrakingDecision = 0;
-        lastGateCrossed = null;
-        fitnessCalculator.ResetFitness();
-        if (rb == null) rb = GetComponent<Rigidbody>();
-        rb.velocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
-        base.Arise(startPosition, startRotation);
+        IsAlive = false;
+        OnDeathCb = onDeathCb;
+        this.species = species;
+        distanceSensors.Initialise(species);
+        fitnessCalculator.Initialise(species, this.Die);
+        speciesIndicator.material.color = species.SpeciesColour;
     }
 
-    protected override void Think()
+    public void Arise(Dna dna, Vector3 startPosition, Quaternion startRotation)
     {
-        if (Time.time - timeLastGateCrossed > GateSuicideThreshold) Die();
-        List<double> inputs = distanceSensors.CalculateNormalisedDistances()
-            .Concat(physicsSensors.GetVelocityVectors())
-            .Concat(physicsSensors.GetAngularVelocityVector())
-            .ToList();
-        List<double> outputs = nn.Calculate(inputs);
-        ThrottleDecision = (float)outputs[0];
-        SteeringDecision = (float)outputs[1];
-        BrakingDecision = (float)outputs[2];
-        ChaseCameraOrderingVariable = fitnessCalculator.Fitness;
+        if (IsAlive)
+            Debug.LogWarning("Brain was not dead when reset - expected when loading a save");
+
+        if (GetSensorInputs().Count != dna.OutputsPerLayer[0])
+            Debug.LogError($"Network not configured with expected number of inputs. Received {GetSensorInputs().Count} expected {dna.OutputsPerLayer[0]}");
+
+        if (dna.OutputsPerLayer.Last() != CarSpecies.Outputs)
+            Debug.LogError("Network not configured with expected number of outputs");
+
+        ThrottleDecision = SteeringDecision = BrakingDecision = 0;
+        agentController.ResetToPosition(startPosition, startRotation);
+        fitnessCalculator.Reset();
+
+        neuralNetwork = new NeuralNetwork(dna);
+        heritageIndicator.material.color = CarSpecies.LineageColours[dna.Heritage];
+        IsAlive = true;
+        StartCoroutine(ThoughtProcess());
     }
 
-    protected override void Die()
+    private IEnumerator ThoughtProcess()
     {
-        base.Die();
-        carController.Brake(1f);
-        rend.material.color = Color.red;        
-    }
-
-    protected override void HandleColliderTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("RacingGate"))
+        while (IsAlive)
         {
-            timeLastGateCrossed = Time.time;
-            RacingGate g = other.GetComponent<RacingGate>();
-            if (g == lastGateCrossed)
-            {
-                Die();
-                return;
-            }
-            lastGateCrossed = g;
-            if (Vector3.Dot(rb.velocity, g.OptimalDirection) < 0f) Die(); // if reversing around the track in a backwards direction
-            else fitnessCalculator.UpdateFitness(g);
+            List<double> outputs = neuralNetwork.Think(GetSensorInputs());
+            bool isThrottling = outputs[1] > 0;
+            SteeringDecision = (float)outputs[0];
+            ThrottleDecision = isThrottling ? (float)outputs[1] : 0f;
+            BrakingDecision = isThrottling ? 0f : -(float)outputs[1];
+
+            yield return new WaitForSeconds(0.1f);
         }
     }
 
-    protected override float CalculateFitness() => fitnessCalculator.Fitness;
+    private List<double> GetSensorInputs() => distanceSensors.CalculateNormalisedDistances()
+        .Concat(physicsSensors.GetNormalisedVelocityVectors(species.VelocityNormalX, species.VelocityNormalZ))
+        .Concat(physicsSensors.GetAngularVelocityVector())
+        .ToList();
 
-    // private void OnCollisionEnter(Collision other) 
-    // {
-    //     if (other.collider.tag == "Terrain") 
-    //     {
-    //         terrainBumps++;
-    //         cumulativeTerrainImpactVelocity += other.relativeVelocity.sqrMagnitude;
-    //     }
-    // }
+    private void Die()
+    {
+        if (!IsAlive) Debug.LogError("Tried to kill brain but was already dead?");
+        if (!IsAlive) return;
 
-    private void FixedUpdate()
+        IsAlive = false;
+        neuralNetwork.Dna.RawFitnessRating = fitnessCalculator.Fitness;
+        StopAllCoroutines();
+        OnDeathCb(this);
+        agentController.Brake(1f);
+        heritageIndicator.material.color = Color.red;
+    }
+
+    private void Update()
     {
         if (!IsAlive) return;
-        carController.Throttle(ThrottleDecision);
-        carController.Steer(SteeringDecision);
-        carController.Brake(BrakingDecision);
+        agentController.Throttle(ThrottleDecision);
+        agentController.Steer(SteeringDecision);
+        agentController.Brake(BrakingDecision);
     }
 }

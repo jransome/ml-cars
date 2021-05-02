@@ -1,46 +1,90 @@
-﻿using System.Collections;
+﻿using RansomeCorp.AI.Evolution;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 
-public class Persistence
+public static class Persistence
 {
-    private static string saveDirectory = Application.persistentDataPath;
-    private static DirectoryInfo dirInfo = new DirectoryInfo(saveDirectory);
+    private static readonly string saveDirectory = Application.persistentDataPath;
+    private static readonly DirectoryInfo dirInfo = new DirectoryInfo(saveDirectory);
 
-    public static List<PopulationData> GetSavedPopulations() => dirInfo.GetFiles().Select(f => ReadFile(Path.Combine(saveDirectory, f.Name))).ToList();
-
-    public static void Save(PopulationData popData)
+    public static List<GenerationSaveData> GetSavedPopulations()
     {
-        string filePath = Path.Combine(saveDirectory, popData.SaveName + ".json");
-        FileStream fs = File.OpenWrite(filePath);
-        StreamWriter writer = new StreamWriter(fs);
-        writer.Write(JsonUtility.ToJson(popData, true));
-        writer.Flush();
-        fs.Close();
+        List<GenerationSaveData> saves = dirInfo.GetFiles()
+            .Where(f => f.Extension == ".json")
+            .Select(f => ReadFile(Path.Combine(saveDirectory, f.Name)))
+            .ToList();
+        Debug.Log($"Found {saves.Count} saved populations in {saveDirectory}");
+        return saves;
     }
 
-    private static PopulationData ReadFile(string path)
+    public static void Save(List<Generation> generationHistory, string saveName)
+    {
+        SaveCurrentGenerationData(new GenerationSaveData(generationHistory.Last(), saveName));
+        SaveFitnessData(generationHistory, saveName);
+    }
+
+    private static void SaveCurrentGenerationData(GenerationSaveData saveData)
+    {
+        WriteToFile($"{saveData.SaveName}.json", JsonUtility.ToJson(saveData, true));
+        Debug.Log($"Population data saved at {saveDirectory}");
+    }
+
+    private static void SaveFitnessData(List<Generation> generationHistory, string saveName)
+    {
+        string header = "Generation, Spawn Location Index, Best, Average, Total\n";
+        StringBuilder csvString = new StringBuilder(header);
+
+        foreach (Generation g in generationHistory)
+        {
+            csvString.AppendLine(string.Join(",", new string[5] {
+                g.GenerationNumber.ToString(),
+                g.SpawnLocationIndex.ToString(),
+                g.PerformanceData.BestFitness.ToString("F"),
+                g.PerformanceData.AverageFitness.ToString("F"),
+                g.PerformanceData.TotalFitness.ToString("F"),
+            }));
+        }
+
+        WriteToFile($"{saveName}_fitness.csv", csvString.ToString());
+        Debug.Log($"Fitness data saved at {saveDirectory}");
+    }
+
+    private static void WriteToFile(string filename, string content)
+    {
+        string filePath = Path.Combine(saveDirectory, filename);
+        using (StreamWriter writer = File.CreateText(filePath))
+        {
+            writer.Write(content);
+        } // the streamwriter WILL be closed and flushed here, even if an exception is thrown.
+    }
+
+    private static GenerationSaveData ReadFile(string path)
     {
         StreamReader reader = new StreamReader(File.OpenRead(path));
-        return JsonUtility.FromJson<PopulationData>(reader.ReadToEnd());
+        GenerationSaveData loadedSave = JsonUtility.FromJson<GenerationSaveData>(reader.ReadToEnd());
+
+        if (loadedSave.FormatVersion != GenerationSaveData.CurrentFormatVersion)
+            Debug.LogError("Loaded incompatible save file!");
+
+        return loadedSave;
     }
 }
 
 [System.Serializable]
-public struct PopulationData
+public class GenerationSaveData
 {
-    public string SaveName;
-    public int GenerationNumber;
-    public List<Dna> GenePool;
-    public DnaStructure DnaStructure;
+    public static string CurrentFormatVersion = "0.1";
 
-    public PopulationData(List<Dna> genePool, int generationNumber = 1, string saveName = null)
+    public string FormatVersion;
+    public string SaveName;
+    public Generation Generation;
+    public GenerationSaveData(Generation generation, string saveName)
     {
-        SaveName = saveName == null ? "population_" + System.DateTime.Now.ToString("HHmmss_ddMMyyyy") : saveName;
-        GenerationNumber = generationNumber;
-        GenePool = genePool;
-        DnaStructure = genePool[0].structure;
+        FormatVersion = CurrentFormatVersion;
+        SaveName = string.IsNullOrEmpty(saveName) ? $"evolution_run_{System.DateTime.Now.ToString("HHmmss_ddMMyyyy")}" : saveName;
+        Generation = generation;
     }
 }

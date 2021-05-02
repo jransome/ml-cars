@@ -12,7 +12,7 @@ public class RacingGate : MonoBehaviour
     // used for setting up gates
     private void OnDrawGizmos() 
     {
-        Gizmos.color = Color.red;
+        Gizmos.color = Color.cyan;
         Gizmos.DrawRay(optimalVectorPosition.position - optimalVectorPosition.forward * 5, optimalVectorPosition.forward * 10); 
     }
 }
