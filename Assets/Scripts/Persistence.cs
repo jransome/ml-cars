@@ -26,6 +26,11 @@ public static class Persistence
         SaveFitnessData(generationHistory, saveName);
     }
 
+    public static void Delete(string fileName)
+    {
+        File.Delete(Path.Combine(saveDirectory, $"{fileName}.json"));
+    }
+
     private static void SaveCurrentGenerationData(GenerationSaveData saveData)
     {
         WriteToFile($"{saveData.SaveName}.json", JsonUtility.ToJson(saveData, true));

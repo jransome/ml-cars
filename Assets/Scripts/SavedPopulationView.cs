@@ -1,28 +1,39 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 public class SavedPopulationView : MonoBehaviour
 {
-    public Button Button;
-    public Text BtnText;
-    
-    private GenerationSaveData popData;
-    private SpeciesEvolver evolver;
+    public Button DeleteButton;
+    public Button LoadButton;
+    public Text LoadButtonText;
 
-    public void Initialise(GenerationSaveData populationData, SpeciesEvolver se)
+    private GenerationSaveData saveData;
+    private SpeciesEvolver evolver;
+    private Action onDeleted; // used to refresh parent
+
+    public void Initialise(GenerationSaveData populationData, SpeciesEvolver se, Action onDeleteSave)
     {
         evolver = se;
-        popData = populationData;
-        BtnText.text = populationData.SaveName;
+        saveData = populationData;
+        LoadButtonText.text = populationData.SaveName;
+        onDeleted = onDeleteSave;
     }
 
     private void Load()
     {
-        evolver.LoadGeneration(popData.Generation);
+        evolver.LoadGeneration(saveData.Generation);
+    }
+
+    private void Delete()
+    {
+        Persistence.Delete(saveData.SaveName);
+        onDeleted();
     }
 
     private void Start()
     {
-        Button.onClick.AddListener(Load);
+        LoadButton.onClick.AddListener(Load);
+        DeleteButton.onClick.AddListener(Delete);
     }
 }
