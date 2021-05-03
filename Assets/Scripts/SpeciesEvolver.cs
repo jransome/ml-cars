@@ -27,10 +27,15 @@ public class SpeciesEvolver : MonoBehaviour
 
     public void LoadGeneration(Generation loadedGeneration)
     {
+        if (loadedGeneration.species == null)
+        {
+            Debug.LogWarning($"Loaded generation's species instance does not exist or has been modified. Defaulting to current species: {Species.name}");
+            loadedGeneration.species = Species;
+        }
         GenerationHistory = new List<Generation>() { loadedGeneration };
 
         // In case the number of spawn locations changed since this generation was saved
-        Transform spawnLocation = loadedGeneration.SpawnLocationIndex < SpawnLocations.Locations.Count ?
+        Transform spawnLocation = loadedGeneration.SpawnLocationIndex >= 0 && loadedGeneration.SpawnLocationIndex < SpawnLocations.Locations.Count ?
             SpawnLocations.Locations[loadedGeneration.SpawnLocationIndex] :
             CurrentSpawnLocation;
 
