@@ -17,8 +17,7 @@ public class SaveView : MonoBehaviour
     {
         Persistence.Save(SpeciesEvolver.GenerationHistory, SaveName.text);
 
-        ClearSaveViews();
-        PopulateSaveViews();
+        Refresh();
     }
 
     private void PopulateSaveViews()
@@ -26,9 +25,15 @@ public class SaveView : MonoBehaviour
         ActiveSavedPopViews = Persistence.GetSavedPopulations().Select(popData =>
         {
             GameObject go = Instantiate(SavedPopPrefab, SavedPopsPanel);
-            go.GetComponent<SavedPopulationView>().Initialise(popData, SpeciesEvolver);
+            go.GetComponent<SavedPopulationView>().Initialise(popData, SpeciesEvolver, Refresh);
             return go;
         }).ToList();
+    }
+
+    private void Refresh()
+    {
+        ClearSaveViews();
+        PopulateSaveViews();
     }
 
     private void ClearSaveViews()
