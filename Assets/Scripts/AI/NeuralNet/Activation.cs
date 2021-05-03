@@ -29,7 +29,7 @@ namespace RansomeCorp.AI.NeuralNet
 
         static double TanH(double input) => Math.Tanh(input);
 
-        static double Sigmoid(double value) //(aka logistic softstep)
+        static double Sigmoid(double value)
         {
             double k = Math.Exp(value);
             return k / (1.0f + k);

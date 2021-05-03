@@ -8,19 +8,21 @@ public class OutputsView : MonoBehaviour
     public Slider ThrottleIndicator;
     public Slider BrakeIndicator;
 
+    private CarBrain carToTrack = null;
+
+    private void Start()
+    {
+        MostSuccessfulPoller.OnMostSuccessfulAliveChanged += (newCarBrain) =>
+        {
+            carToTrack = newCarBrain;
+        };
+    }
 
     private void Update()
     {
-        CarBrain carToTrack = (CarBrain)EvolutionManager.MostSuccessfulAlive;
-
-        if (carToTrack) 
-            UpdateCarOutputSliders(carToTrack);
-    }
-
-    private void UpdateCarOutputSliders(CarBrain carBrain)
-    {
-        SteeringIndicator.value = carBrain.SteeringDecision;
-        ThrottleIndicator.value = carBrain.ThrottleDecision;
-        BrakeIndicator.value = carBrain.BrakingDecision;
+        if (carToTrack == null) return;
+        SteeringIndicator.value = carToTrack.SteeringDecision;
+        ThrottleIndicator.value = carToTrack.ThrottleDecision;
+        BrakeIndicator.value = carToTrack.BrakingDecision;
     }
 }
