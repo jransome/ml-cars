@@ -1216,7 +1216,7 @@ GameObject:
   - component: {fileID: 146906245}
   - component: {fileID: 146906246}
   m_Layer: 5
-  m_Name: Outputs
+  m_Name: CarControlsView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11451,7 +11451,7 @@ GameObject:
   - component: {fileID: 1299071082}
   - component: {fileID: 1299071086}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: EvolutionView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11552,7 +11552,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c70723f01556d642beab52221101bbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  chaseCamera: {fileID: 1362585289}
   speciesEvolver: {fileID: 985539029}
+  carControlsView: {fileID: 146906246}
+  neuralNetworkView: {fileID: 2111084025}
 --- !u!1 &1301792565
 GameObject:
   m_ObjectHideFlags: 0
@@ -12440,6 +12443,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   EvolutionManager: {fileID: 985539029}
   OrbitSpeed: 3
+  ChaseTransform: {fileID: 0}
 --- !u!1 &1377057224
 GameObject:
   m_ObjectHideFlags: 0
@@ -19909,8 +19913,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ef4e8bc1abba7a43a5840d4b4b3d0f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  layoutViewPrefab: {fileID: 1244270241663563482, guid: 7348f43a08deb494fa025aa6c30a7122,
-    type: 3}
   neuronViewPrefab: {fileID: 5233471400713787616, guid: a134141fbc047394b91275a01505785e,
     type: 3}
   connectionViewPrefab: {fileID: 1531599572921026012, guid: a30b836b85d5e8f418707c70c268867e,

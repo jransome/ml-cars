@@ -18,7 +18,7 @@ MonoBehaviour:
   SensorLayerMask:
     serializedVersion: 2
     m_Bits: 4294966779
-  DrawSensors: 1
+  DrawSensors: 0
   SensorAngles:
   - 0
   - 15
