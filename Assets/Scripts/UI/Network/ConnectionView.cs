@@ -8,6 +8,7 @@ public class ConnectionView : MonoBehaviour
     {
         lineRenderer.useWorldSpace = false;
         lineRenderer.SetPositions(new Vector3[] { start, end });
+        gameObject.SetActive(true);
     }
 
     public void UpdateView(float value)

@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class NetworkView : MonoBehaviour
 {
-    [SerializeField] GameObject layoutViewPrefab;
     [SerializeField] GameObject neuronViewPrefab;
     [SerializeField] GameObject connectionViewPrefab;
     [SerializeField] Transform neuronsContainer;
@@ -16,16 +15,26 @@ public class NetworkView : MonoBehaviour
     NeuralNetwork displayedNeuralNetwork;
     List<List<NeuronView>> displayedNeuronViews = new List<List<NeuronView>>(); // includes the input 'layer'
 
-    // private List<NeuronView> neuronViewsPool = new List<NeuronView>();
-    // private List<ConnectionView> connectionViewsPool = new List<ConnectionView>();
+    private List<NeuronView> neuronViewsPool = new List<NeuronView>();
+    private List<ConnectionView> connectionViewsPool = new List<ConnectionView>();
+
+    private static T GetPooledView<T>(List<T> pool, GameObject prefab, Transform viewContainer) where T : MonoBehaviour
+    {
+        T view = pool.Find(v => !v.isActiveAndEnabled);
+        if (view != null) return view;
+
+        view = Instantiate(prefab, viewContainer).GetComponent<T>();
+        pool.Add(view);
+        return view;
+    }
 
     private void Start()
     {
         MostSuccessfulPoller.OnMostSuccessfulAliveChanged += (carBrain) =>
         {
             displayedNeuronViews.Clear();
-            foreach (Transform neuronView in neuronsContainer) Destroy(neuronView.gameObject);
-            foreach (Transform connectionview in connectionsContainer) Destroy(connectionview.gameObject);
+            foreach (Transform neuronView in neuronsContainer) neuronView.gameObject.SetActive(false);
+            foreach (Transform connectionview in connectionsContainer) connectionview.gameObject.SetActive(false);
 
             if (displayedNeuralNetwork != null) displayedNeuralNetwork.OnLayerFeedForward -= UpdateWeightVisualisation;
             DrawNetwork(carBrain.NeuralNetwork);
@@ -47,27 +56,15 @@ public class NetworkView : MonoBehaviour
         }
     }
 
-    // NeuronView GetPooledNeuronView()
-    // {
-    //     NeuronView nv = neuronViewsPool.Find(nv => !nv.isActiveAndEnabled);
-    //     if (nv) return nv;
+    NeuronView GetPooledNeuronView()
+    {
+        return GetPooledView<NeuronView>(neuronViewsPool, neuronViewPrefab, neuronsContainer);
+    }
 
-    //     nv = Instantiate(neuronViewPrefab, neuronsContainer).GetComponent<NeuronView>();
-    //     nv.gameObject.SetActive(false);
-    //     neuronViewsPool.Add(nv);
-    //     return nv;
-    // }
-
-    // ConnectionView GetPooledConnectionView()
-    // {
-    //     ConnectionView cv = connectionViewsPool.Find(cv => !cv.isActiveAndEnabled);
-    //     if (cv) return cv;
-
-    //     cv = Instantiate(connectionViewPrefab, connectionsContainer).GetComponent<ConnectionView>();
-    //     cv.gameObject.SetActive(false);
-    //     connectionViewsPool.Add(cv);
-    //     return cv;
-    // }
+    ConnectionView GetPooledConnectionView()
+    {
+        return GetPooledView<ConnectionView>(connectionViewsPool, connectionViewPrefab, connectionsContainer);
+    }
 
     void DrawNetwork(NeuralNetwork neuralNetwork)
     {
@@ -79,11 +76,10 @@ public class NetworkView : MonoBehaviour
             List<NeuronView> neuronViewsInCurrentLayer = new List<NeuronView>(outputsPerLayer[layerIndex]);
             displayedNeuronViews.Add(neuronViewsInCurrentLayer);
 
-            Vector2 offset = new Vector2(0, 0);
             for (int neuronIndex = 0; neuronIndex < outputsPerLayer[layerIndex]; neuronIndex++)
             {
-                var nv = Instantiate(neuronViewPrefab, neuronsContainer).GetComponent<NeuronView>();
-                nv.transform.localPosition = new Vector2(layerIndex * neuronSpacing.x, -neuronIndex * (neuronSpacing.y / outputsPerLayer[layerIndex])) + offset;
+                NeuronView nv = GetPooledNeuronView();
+                nv.Init(new Vector2(layerIndex * neuronSpacing.x, -neuronIndex * (neuronSpacing.y / outputsPerLayer[layerIndex])));
                 neuronViewsInCurrentLayer.Add(nv);
             }
         }
@@ -94,7 +90,7 @@ public class NetworkView : MonoBehaviour
             {
                 for (int k = 0; k < outputsPerLayer[layerIndex - 1]; k++)
                 {
-                    ConnectionView cv = Instantiate(connectionViewPrefab, connectionsContainer).GetComponent<ConnectionView>();
+                    ConnectionView cv = GetPooledConnectionView();
                     cv.Init(
                         displayedNeuronViews[layerIndex - 1][k].transform.localPosition,
                         displayedNeuronViews[layerIndex][neuronIndex].transform.localPosition

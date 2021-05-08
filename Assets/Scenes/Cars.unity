@@ -19917,7 +19917,7 @@ MonoBehaviour:
     type: 3}
   neuronsContainer: {fileID: 1707331731}
   connectionsContainer: {fileID: 348586726}
-  neuronSpacing: {x: 200, y: 600}
+  neuronSpacing: {x: 150, y: 500}
 --- !u!1 &2112178863
 GameObject:
   m_ObjectHideFlags: 0
