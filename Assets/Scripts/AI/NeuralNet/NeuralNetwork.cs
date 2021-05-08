@@ -7,6 +7,8 @@ namespace RansomeCorp.AI.NeuralNet
 {
     public class NeuralNetwork
     {
+        public event Action<List<double>, List<INeuron>, int> OnLayerFeedForward = delegate { };
+
         public readonly Dna Dna;
         public readonly List<List<INeuron>> Layers = new List<List<INeuron>>();
 
@@ -44,6 +46,8 @@ namespace RansomeCorp.AI.NeuralNet
 
         private List<double> FeedForward(List<double> inputs, List<List<INeuron>> remainingLayers)
         {
+            OnLayerFeedForward(inputs, remainingLayers.First(), Dna.OutputsPerLayer.Count - remainingLayers.Count);
+
             List<double> outputs = remainingLayers
                 .First()
                 .ConvertAll((neuron) => neuron.Compute(inputs));

@@ -8,21 +8,23 @@ using UnityEngine;
 
 public class CarBrain : MonoBehaviour
 {
+    public bool IsAlive { get; private set; } = false;
+    public float ThrottleDecision { get; private set; } = 0f;
+    public float SteeringDecision { get; private set; } = 0f;
+    public float BrakingDecision { get; private set; } = 0f;
+    public float Fitness { get => fitnessCalculator.Fitness; }
+    public int DnaId { get => neuralNetwork.Dna.Id; }
+    public NeuralNetwork NeuralNetwork { get => neuralNetwork; }
+
     [SerializeField] private AgentController agentController;
     [SerializeField] private CarFitness fitnessCalculator;
     [SerializeField] private DistanceSensors distanceSensors;
     [SerializeField] private PhysicsSensors physicsSensors;
     [SerializeField] private Renderer speciesIndicator;
     [SerializeField] private Renderer heritageIndicator;
-
     private Action<CarBrain> OnDeathCb = delegate { };
     private NeuralNetwork neuralNetwork;
     private CarSpecies species;
-    public bool IsAlive { get; private set; } = false;
-    public float ThrottleDecision { get; private set; } = 0f;
-    public float SteeringDecision { get; private set; } = 0f;
-    public float BrakingDecision { get; private set; } = 0f;
-    public float Fitness { get => fitnessCalculator.Fitness; }
 
     public void Initialise(CarSpecies species, Vector3 startPosition, Quaternion startRotation, Action<CarBrain> onDeathCb)
     {
