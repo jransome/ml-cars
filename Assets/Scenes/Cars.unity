@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 170076734}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1571,7 +1571,7 @@ Light:
   m_Type: 1
   m_Shape: 0
   m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
-  m_Intensity: 0.5
+  m_Intensity: 0.82
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -11552,6 +11552,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c70723f01556d642beab52221101bbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bestAgentPollIntervalSeconds: 3
   chaseCamera: {fileID: 1362585289}
   speciesEvolver: {fileID: 985539029}
   carControlsView: {fileID: 146906246}
@@ -13064,8 +13065,7 @@ MonoBehaviour:
   SpeciesEvolver: {fileID: 985539029}
   SaveName: {fileID: 1700329869}
   SaveButton: {fileID: 1270824921}
-  SavedPopPrefab: {fileID: 5909398407654195072, guid: 241779f0651644465a7ac93e7987a3e7,
-    type: 3}
+  SavedPopPrefab: {fileID: 5909398407654195072, guid: 241779f0651644465a7ac93e7987a3e7, type: 3}
   SavedPopsPanel: {fileID: 214003769}
 --- !u!114 &1427896455
 MonoBehaviour:
@@ -14539,7 +14539,7 @@ Terrain:
   m_DrawTreesAndFoliage: 1
   m_StaticShadowCaster: 0
   m_ReflectionProbeUsage: 1
-  m_MaterialTemplate: {fileID: 10652, guid: 0000000000000000f000000000000000, type: 0}
+  m_MaterialTemplate: {fileID: 2100000, guid: 594ea882c5a793440b60ff72d896021e, type: 2}
   m_BakeLightProbesForTrees: 1
   m_PreserveTreePrototypeLayers: 0
   m_DeringLightProbesForTrees: 1
@@ -19913,10 +19913,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ef4e8bc1abba7a43a5840d4b4b3d0f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  neuronViewPrefab: {fileID: 5233471400713787616, guid: a134141fbc047394b91275a01505785e,
-    type: 3}
-  connectionViewPrefab: {fileID: 1531599572921026012, guid: a30b836b85d5e8f418707c70c268867e,
-    type: 3}
+  neuronViewPrefab: {fileID: 5233471400713787616, guid: a134141fbc047394b91275a01505785e, type: 3}
+  connectionViewPrefab: {fileID: 1531599572921026012, guid: a30b836b85d5e8f418707c70c268867e, type: 3}
   neuronsContainer: {fileID: 1707331731}
   connectionsContainer: {fileID: 348586726}
   neuronSpacing: {x: 150, y: 500}
