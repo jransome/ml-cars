@@ -4,9 +4,9 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Terrain
   - Gate
   - RacingGate
+  - Terrain
   layers:
   - Default
   - TransparentFX
@@ -16,7 +16,7 @@ TagManager:
   - UI
   - 
   - 
-  - PostProcessing
+  - 
   - Car
   - 
   - 
